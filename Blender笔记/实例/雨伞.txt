@@ -1,0 +1,23 @@
+~use a 【screw modifier】 to turn a line into a octagon shape
+~use a 【hook modifier】(or ctrl+H) to hook the outer vert on an empty
+(place the hook mod topmost)
+~create another empty at the center and make it the parent of that previous one
+~use a subdivision modifier to make the umbrella-shape curve possible
+(before screw mod)
+~add a simpledeform modifier after subdivision and make the wanted curve shape
+bend along y axis, if it doesn't work, try rotating the object a little bit and it will be fine
+gives information about direction, 【if there's no variation along z-axis, bending won't work】
+~add a 【rotation constrain】 on the center empty, 
+with "for transform" and "local space" selected
+
+if I want the bending angle controlled by center object's rotation,
+I may right click the rotation, copy as 【driver】, right click bending angle, paste it
+select "script expression", then I can edit an expression on the original angle tab
+try some value first and eventually get the right expression 
+
+finally, make center empty the child of umbrella so that it can stick with it
+
+make a handle
+press s,then shift+z to scale in both x y direction
+press shift+rmb to reposition the 3d cursor
+use spin tool on the left, choose x axis and make that hook shape

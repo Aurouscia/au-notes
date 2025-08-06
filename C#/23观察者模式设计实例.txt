@@ -1,0 +1,46 @@
+【仅仅使用委托的写法】
+class Program
+    {
+        static void Main(string[] args)
+        {
+            Cat cat = new Cat("Tom", "Blue");
+            Mouse mouse1 = new Mouse("Jerry", "Orange");
+            cat.catCome += mouse1.RunAway;//这个操作称为注册
+            Mouse mouse2 = new Mouse("Mickey", "Black");
+            cat.catCome += mouse1.RunAway;
+            //新添加一个观察者，只用注册到对象的委托中就行
+            cat.CatComing();//被观察者状态发生改变，就会调用所有注册过的
+        }
+    }
+
+class Cat
+    {
+        private string name;
+        private string color;
+
+        public Cat(string name, string color)
+        {
+            this.name = name;
+            this.color = color;
+        }
+        //被观察者的状态发生改变
+        public void CatComing()
+        {
+            Console.WriteLine(color + "的猫" + name + "过来了");
+            //mouse1.RunAway();如果用传统写法，
+            //就会造成每次添加老鼠都要修改猫类，容易出问题，维护困难
+            if(catCome!=null)
+                catCome();
+        }
+        public Action catCome;
+    }
+
+【老鼠类的构造函数中注册】
+        public event Action catCome;//发布消息
+
+        public Mouse(string name,string color,Cat cat)
+        {
+            this.name = name;
+            this.color = color;
+            cat.catCome += this.RunAway;//注册委托，订阅消息
+        }

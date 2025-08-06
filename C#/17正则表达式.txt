@@ -1,0 +1,68 @@
+(string) Regular Expression
+专门用于字符串处理的语言
+表达一种特定规则的字符串
+
+1.检索：获取想要的部分
+2.匹配：检查目标字符串是否符合规定
+（判断密码，邮箱是否合法）
+
+由普通字符和特殊字符(元字符)组成
+
+using System.Text
+bool IsMatch(string input,string pattern)
+寻找：
+Match Match(string input,string pattern)
+返回值是有关匹配的信息的对象
+寻找所有：
+MatchCollection Matches(...)
+
+Replaces(string input,string patterns,string replacement);
+替换字符串中所有符合条件的地方
+
+string[] Split(...)
+
+在正则表达式前面加上@字符，
+表示对反斜杠不作转义处理，可作为语法存在
+
+
+^匹配字符串的开始位置
+Regex.Replace(s,"^","开头加上的内容");
+$匹配字符串的结尾位置
+Regex.Replace(s,"$","结尾加上的内容");
+
+.换行符外的所有字符
+\w字母，数字，下划线，汉字
+\W是\w的补集
+\s所有空白符号\n\r\t\v\f等
+\S是\s的补集
+\d0-9的数字
+\D是\d的补集
+
+Regex.IsMatch(s," ")
+
+[abc] 匹配a字符或者b字符或者c字符
+[a-c]匹配a到c的字符
+[^x]匹配除了x之外的字符
+[^xyz]匹配除了xyz之外的字符
+
+{n}匹配前面的字符次
+{n,}n次或以上
+{n,m}n到m次
+?零次或一次
++一次或多次
+*零次或多次
+
+
+string pattern=@"^\d{5,12}$";
+表示开头结尾之间只能有5-12位数字
+
+择一匹配符号 |
+左右符合一个就行
+@"\d|[a-z]"代表数字或字母
+MatchCollection col = Regex.Matches(s,pattern);
+
+string strSplit = "zhang;li,wang;zhao";
+string pattern = @"[;]|[,]|[.]";
+Regex.Split(strSplit,pattern).ToList().ForEach(i=>Console.WriteLine(i));
+
+(表达式){2}重复某表达式两次，用括号框起来

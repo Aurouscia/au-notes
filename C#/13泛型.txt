@@ -1,0 +1,22 @@
+参数化类型，在同一份代码上操作多种类型
+定义一个类，类中某些字段的类型不确定
+可以在类构造的时候确定下来
+class ClassA<T>{//T代表一个类型
+     private T a;
+     private T b;
+     public ClassA(T a,T b){
+           this.a=a;this.b=b;
+     }
+}
+var o1=new ClassA<int>();
+
+泛型可以同时存在很多个
+class ClassB<T1,T2,T3>
+
+泛型方法
+参数的类型不确定，调用的时候再确定
+public static GetSum<T>(T a,T b){
+     return a+""+b;  (字符串拼接)
+}
+GetSum<int>(23,12);
+GetSum<double>(23.2,12);

@@ -1,0 +1,99 @@
+await关键字
+在运行某任务时不会阻塞，依然能回应其他请求
+
+System.Threading.Tasks.Task
+Task：没返回值的版本
+Task<TResult>：有返回值的版本
+实例化该类的时候就会开始执行一些代码，启动任务，然后可以去做别的事
+当需要结果的时候就使用await这些任务
+Coffee cup = PourCoffee();
+Console.WriteLine("Coffee is ready");
+
+Task<Egg> eggsTask = FryEggsAsync(2);
+Task<Bacon> baconTask = FryBaconAsync(3);
+Task<Toast> toastTask = ToastBreadAsync(2);
+
+Toast toast = await toastTask;
+ApplyButter(toast);
+ApplyJam(toast);
+Console.WriteLine("Toast is ready");
+Juice oj = PourOJ();
+Console.WriteLine("Oj is ready");
+
+Egg eggs = await eggsTask;
+Console.WriteLine("Eggs are ready");
+Bacon bacon = await baconTask;
+Console.WriteLine("Bacon is ready");
+
+Console.WriteLine("Breakfast is ready!");
+
+可以把异步操作和同步操作合并在一起成为一个async函数
+通过将操作分离到一个[返回任务]的新方法中来组合任务
+如果操作里有任意一部是异步的，那么整个操作就是异步的
+async修饰符表示此方法含有await语句
+static async Task<Toast> MakeToastWithButterAndJamAsync(int number)
+{
+    var toast = await ToastBreadAsync(number);
+    ApplyButter(toast);
+    ApplyJam(toast);
+
+    return toast;
+}
+ var toastTask = MakeToastWithButterAndJamAsync(2);
+
+如果一个任务在运时出错，并不会马上引发异常
+会在await任务时引发异常
+异常会存储在AggregateException.InnerExceptions中，在await时重新抛出
+
+
+Task.WhenAll(Task1,Task2,Task3,...)
+会返回一个当所有参数里的task都完成时才会完成的Task
+Task.WhenAny(List<Task>)会返回一个当任意一个task完成时完成的task
+了解到其中哪一个task完成了
+var breakfastTasks = new List<Task> { eggsTask, baconTask, toastTask };
+while (breakfastTasks.Count > 0)
+{
+    Task finishedTask = await Task.WhenAny(breakfastTasks);
+    if (finishedTask == eggsTask)
+    {
+        Console.WriteLine("Eggs are ready");
+    }
+    else if (finishedTask == baconTask)
+    {
+        Console.WriteLine("Bacon is ready");
+    }
+    else if (finishedTask == toastTask)
+    {
+        Console.WriteLine("Toast is ready");
+    }
+    breakfastTasks.Remove(finishedTask);
+}
+
+异步代码可用于 I/O 绑定和 CPU 绑定代码，但在每个方案中有所不同。
+异步代码使用 Task<T> 和 Task，它们是对后台所完成的工作进行建模的结构。
+async 关键字将方法转换为异步方法，这使你能在其正文中使用 await 关键字。
+应用 await 关键字后，它将挂起调用方法，并将控制权返还给调用方，直到等待的任务完成。
+仅允许在异步方法中使用 await。
+
+你的代码是否会“等待”某些内容，例如数据库中的数据？
+如果答案为“是”，则你的工作是 I/O 绑定。
+downloadButton.Clicked += async (o, e) =>
+{
+    // This line will yield control to the UI as the request
+    // from the web service is happening.
+    //
+    // The UI thread is now free to perform other work.
+    var stringData = await _httpClient.GetStringAsync(URL);
+    DoSomethingWithData(stringData);
+};
+你的代码是否要执行开销巨大的计算？
+如果答案为“是”，则你的工作是 CPU 绑定：
+calculateButton.Clicked += async (o, e) =>
+{
+    // This line will yield control to the UI while CalculateDamageDone()
+    // performs its work. The UI thread is free to perform other work.
+    var damageResult = await Task.Run(() => CalculateDamageDone());
+    DisplayDamage(damageResult);
+};
+
+The await keyword is where the magic happens. It yields control to the caller of the method that performed await

@@ -1,0 +1,5 @@
+SMTP默认端口25
+大多数云服务器为避免垃圾邮件泛滥禁用25端口
+可以使用加密版的SMTPS，默认端口465
+.net自带的System.Net.Mail不支持465(加密版)的SMTP
+需要使用nuget的 MailKit.Net.Smtp;

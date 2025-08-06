@@ -1,0 +1,14 @@
+builder.Services.Configure<FormOptions>(c =>
+{
+    c.ValueLengthLimit = 104857600;
+    c.MultipartBodyLengthLimit = 104857600;
+    c.MultipartHeadersLengthLimit = 104857600;
+}
+);
+
+
+IIS system.webServer/security/requestFiltering 尺寸限制
+IIS system.web/httpRuntime 尺寸限制
+
+要先在控制面板-程序-开启关闭windows功能中打开IIS
+再安装.net windows server hosting bundle

@@ -1,0 +1,37 @@
+【Input类】
+建议在update中调用
+bool res=Input.GetMouseButton(0);按下不撒手
+bool res=Input.GetMouseButtonDown(0);按下的第一帧返回true
+bool res=Input.GetMouseButtonUp(0);松开的第一帧返回true
+0，1，2分别代表左键右键和中键
+
+bool res=Input.GetKey(KeyCode.A);
+bool res=Input.GetKeyDown(KeyCode.A);
+bool res=Input.GetKeyUp(KeyCode.A);
+
+按着一个键的时候按另一个键
+Input.GetKey(KeyCode.C)&&Input.GetKeyDown(KeyCode.D)
+
+【InputManager】
+用来设置真实按键和虚拟按键之间的对应关系
+Edit/ProjectSettings/Input可以找到，可以自定义虚拟按键数量
+属性
+Name：名称(代码访问)
+Descriptive Name：描述该按钮功能
+Positive/Negative Button：指定正向和负向按钮（键盘上的）
+(最好在KeyCode结构体里面查)mouse 0：鼠标左键
+(Alt)第二正向和负向按钮
+需要绑定更多时：再创建一个同名轴
+Gravity：复位速度，松开时由目标值返回默认值的速度
+Sensitivity：灵敏度，按下时由默认值到目标值的速度
+类型调为Mouse Movement后
+正向移动返回正值，移动越快返回值越大
+
+【使用】
+bool result = Input.GetButton("Horizontal");
+        //GetButtonDown(),GetButtonUp()
+        //只能判断是否按下，不能判断方向
+float value = Input.GetAxis("Horizontal");
+//有过渡的值
+float value = Input.GetAxisRaw("Vertical");
+//没有过渡的值

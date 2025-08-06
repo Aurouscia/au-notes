@@ -1,0 +1,31 @@
+顶部可以通过@model xxx.xxx.xx来指定模型，可以获得Intelisense支持
+后面可以通过Model对象来访问控制器传来的东西
+
+<form asp-action="Edit">会自动生成防伪标记
+控制器那边需要[ValidateAntiForgeryToken]标记才能有用
+
+<label asp-for="Title" class="control-label"></label>
+<input asp-for="Title" class="form-control" />
+<span asp-validation-for="Title" class="text-danger"></span>
+分别是标签帮助程序，输入帮助程序和验证帮助程序(显示验证不通过信息)
+
+最可靠的方法是在视图中指定模型类型。 此模型通常称为 viewmodel。 将 viewmodel 类型的实例传递给此操作的视图。
+使用 viewmodel 将数据传递给视图可让视图充分利用强类型检查。 强类型化（或强类型）意味着每个变量和常量都有明确定义的类型（例如 string、int 或 DateTime）。 在编译时检查视图中使用的类型是否有效。
+@model WebApplication1.ViewModels.Address
+
+也可以使用ViewData和ViewBag字典传递信息
+ViewData字典的值为object类型，到视图页需要cast一个
+var address = ViewData["Address"] as Address;才能使用
+也可以通过在控制器字段上方加[ViewData]来把其存入viewdata
+容易出错，尽量不用
+ViewBag可以不用类型转换，用法：
+ViewBag.Greeting = "Hello";
+ViewBag.Address  = new Address()
+使用时：
+@ViewBag.Address.Name<br>
+【ViewBag和ViewData的存储空间是共用的】
+
+css
+如果要写css，创建一个同名的css文件(包括cshtml后缀)
+xxx.cshtml.css，里面的css只会影响同名的页面
+运行的时候，该css文件会被重写并与其他css整合到一起

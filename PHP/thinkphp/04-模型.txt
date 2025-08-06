@@ -1,0 +1,266 @@
+<?php
+namespace app\model;
+use think\Model;
+class tab1 extends Model{
+    
+}
+模型的名称最好与表的名称一样（下划线->驼峰）
+tp_user_type(表名)=>TpUserType(模型名)
+
+设置模型名（不再是类名）
+protected $name = 'user';
+
+可以在use的时候设置别名，下面调用的类名就写那个别名
+use app\model\User as UserModel;
+UserModel::find(xx);
+
+设置表名(一般不设置)
+protected $table = 'tab1';
+
+protected static function init(){
+     初始化操作
+}
+
+新增数据(控制器里执行)
+$user=new UserModel();
+$user->name='Bob';
+$user->email='xxx';
+$user->save();
+或者
+$user->save(['name'=>'Bob','email'=>'xxx']);
+$user->saveAll(多维数组)
+$user::create(['username'=>'xx','pwd'=>'123'],['username','pwd'],false)
+(新增数组，允许写入的字段，是否replace)
+
+删除数据
+$user=UserModel::find(258);
+$user->delete();
+或者
+UserModel::where('id','>',80)->delete();
+UserModel::destroy(function($query){$query->where('id','>',80);});
+
+修改数据
+$user=UserModel::where('username','xx')->find();
+$user->username='xxx';
+$user->price=Db::raw('price+1');
+$user[->allowField(['username','email'])]->save();
+如果数据没有变化就不会更新，如果数据一样还想更新
+$user->force()->save()
+通过主键进行批量更新
+$list=[
+['id'=>118,'username'=>'xx','email'=>'xxx']
+['id'=>119,'username'=>'xx','email'=>'xxx']
+];$user->saveAll($list);
+通过::update()更新(id必须放在第一位)
+UserModel::update(['id'=>251,'username'=>'xx'])
+或者作为第二个参数
+UserModel::update(['username'=>'xx'],['id'=>251])
+第三个参数：限制只更新哪些字段
+
+查询
+$user=UserModel::find(129)等
+$user=UserModel::findOrEmpty()
+if($user->isEmpty())
+和数据库查询一样可以连缀，以find()或者select()或者value()或者column()结尾
+$user=UserModel::where('id',19)->value('username');
+$user=UserModel::whereIn('id',[19,20,21])->column('username','id')注：column的两个参数是值和键
+$user=UserModel::getBy字段名('xxx');
+
+字段设置
+在模型类里面：
+protected $schema=['id'=>'int','username'=>'string']
+可以不用写，不写会自动获取
+
+模型里写方法
+public function getUserName(){
+     $obj=$this->find(19);
+     return $obj->getAttr('username');
+     }
+$user=new UserModel();
+echo $user->getUsername();
+
+模型的获取器
+对模型实例的数据做出自动处理
+是写在模型中的公共方法，名称为getXXXAttr()
+public function getStatusAttr($value)
+{$status=[-1=>'删除',0=>'禁用',1=>'正常'];
+return $status[$value]}
+可以把得到的数据处理后再给出，在控制器中得到对应值：
+$user=UserModel::find(19);
+return $user->status;
+也可以写个不存在的字段
+public function getNothingAttr($value,$data)
+{$arr=[-1=>'删除',0=>'禁用',1=>'正常'];
+return $arr[$data['status']]}    $data中是整条记录的信息
+调用时：写那个不存在的字段
+echo $user->nothing
+或者：绕过获取器直接取得数据
+$user->getData('status');
+
+在控制器端写动态获取器
+$user=UserModel::WithAttr('email',function($value){return strtoupper($value)})->select();
+动态获取器的优先级更高
+
+模型的修改器
+public function setXXXAttr($value){
+     return strtoupper($value);
+}
+会在修改属性时自动调用
+
+查询封装
+在模型里创建一个封装的查询或写入方法，方便控制器端调用
+public function scopeMale($query){   (和闭包方法一样要随便传一个值)
+     $query->where('gender','男')->field('id,username,gender,email')->limit(5);}
+在控制器端调用时直接把后缀作为参数使用
+function xxx(){
+     $result=UserModel::scope('male')->select();
+}
+查询封装可以传递参数
+public function scopeEmail($query,$value){
+      $query->where('email','like','%'.$value.'%')
+}
+$result = UserModel::scope('email','xiao')->select();
+scope封装查询可以连缀使用，表示与关系
+最后只能以select和find结尾
+定义强制全局查询条件protected $globalScope=['status'];
+任何查询都一定会带上这个条件
+定义强制全局方法public function scopeStatus($query){
+      $query->where('status','1');}
+两个东西名称必须一一对应
+去掉强制查询条件：
+UserModel::withoutGlobalScope(['status'])，不写参数就是全部
+}
+
+模型搜索器
+public function searchXXAttr($query,$value,$data){
+    $query->where('email','like',$value.'%');
+}
+public function searchXXAttr($query,$value,$data){
+    $query->whereBetweenTime('create_time',$value[0],$value[1]);
+$result=UserModel::withSearch(['email','create_time'],['email'=>'xiao','create_time'=>['2014-1-1','2017-1-1']])->select();
+withSearch第一个参数设定搜索器字段，第二个参数是表达式的值的数组
+后面可以跟着别的条件
+UserModel::withSearch(...)->where('gender','女')->select()
+可以添加除了字段值之外的其他数据，会从$data参数进来，$data装着withSearch第二参数的值
+public function searchXXAttr($query,$value,$data){
+     $query->where('email','like',$value.'%');
+     if(isset($data['sort'])){  $query->order($data['sort']);  }
+}
+$result=UserModel::withSearch(
+	['email','create_time'],
+	['email'		=>'xiao',
+	'create_time'	=>['2014-1-1','2017-1-1']
+	'sort'		=>['price'=>'desc']
+	])->select();
+
+模型的数据集(select()后的东西)和Db的数据集一样
+hidden()可以隐藏某个字段，visible()可以只显示某个字段
+withAttr()可以对字段进行函数处理
+$result=UserModel::select();
+$result->hidden(['password']->withAttr('email',function($value){return strtoupper($value);}))
+return json($result);
+
+模型的自动时间戳
+protected $autoWriteTimestamp=true;		int类型
+protected $autoWriteTimestamp='datetime';	时间类型
+就会自动写入create_time和update_time两个字段
+如果想改变字段名：
+protected $createTime='create_at';
+protected $updateTime='update_at';
+protected $updateTime=false;不需要update_time
+$user->isAutoWriteTimestamp(false)->save();   动态实现保存但不修改update_time
+
+模型的只读字段
+protected $readonly=['username','email'];
+$user->readonly(['username','email'])->save();
+
+模型的类型转换
+protected $type=['price' =>'interger','status' =>'boolean','create_time' =>'datetime:Y-m-d'];
+integer,float,boolean,array,object,serialize,json,timestamp,datetime
+
+Db的JSON字段
+有的字段类型为json，直接写成数组就行了
+$data=['username'=>'xx'
+      'list'=>['username'=>'xx']
+]
+save前要指定哪些是要转成json的字段
+return Db::name('user')->json(['list'])->save($data);
+输出时也要指明哪些时json字段，否则会输出为字符串
+$user=Db::name('user')->json(['list'])->where('list->username','xx')->find();
+完全修改json数据：
+$data['list']=['username'=>'xx','gender'=>'男'];
+Db::name('user')->json(['list'])->where('id',258)->update($data);
+只修改一个json数据：
+$data['list->username']='xx';
+Db::name('user')->json(['list'])->where('id',258)->update($data);
+
+模型的json字段
+需要先指定哪些字段是json
+protected $json=['list'];
+在插入记录时：
+$user=new Usermodel();
+$user=list=['gender'=>'女','email'=>'xxx'];
+$user->save();
+通过对象调用的方式获取json里面的数据
+$user=UserModel::find(xxx);
+return $user->list->username;
+查询json里面的数据
+$user=UserModel::where('list->username','xx')->find();
+return $user->list->email;
+更新修改json数据
+$user=UserModel::find(xxx);
+$user->list->username='xx';
+$user->save();
+
+软删除
+并没有真正删除，只是屏蔽掉了，可以恢复
+需要use SoftDelete;
+protected $deleteTime='delete_time';（?）
+UserModel::destroy(287);
+UserModel::find(287)->delete();
+如果查询时还想包括已经软删除的数据
+$user=UserModel::withTrashed()->select();
+$user=UserModel::onlyTrashed()->select();
+如果想恢复：
+$user=UserModel::onlyTrashed()->find(xx);
+$user->restore();
+如果想永久删除，在restore后
+$user->force()->delete();
+
+模型的事件
+after_read
+b/a_insert
+b/a_update
+b/a_write
+b/a_delete
+b/a_restore
+要使用这些事件，在模型里写静态方法即可
+protected static function onAfterRead($query)
+{echo '执行了查询方法';}
+
+模型的关联
+有User和Profile两个模型
+在User模型里写：
+	public function profile()
+	{return $this->hasOne(Profile::class,'外键名');}
+默认的外键名是当前模型名加上_id，例如user_id
+在控制器里就可以写：
+	return $user->profile->hobby;
+反向关联：在Profile模型里写
+	public function user()
+	{return $this->belongsTo(User::class,'外键名');}
+默认的外键名是关联模型名加上_id，例如profile_id
+在控制器里就可以写：
+	return $profile->user->email;
+通过主表修改附表的字段值
+	$user->profile->save(['hobby'=>'xxx'])
+可以添加，注意属性改成了方法
+	$user->profile()->save(['hobby'=>'xxx'])
+如果查询时两张表有同一个字段，需要指明表
+	where('profile.id',2);
+
+一对多关联：表2中有多条数据对应表1中一条数据
+hasOne就需要写成hasMany()，参数一样
+不同的是返回结果是个数组
+
+多对多关联（经过中间表）略

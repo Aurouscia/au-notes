@@ -1,0 +1,124 @@
+显示和逻辑相分离
+显示主要指html和js部分
+业务逻辑主要指php和sql部分
+
+应该把功能强行分为两个部分，php部分和html部分
+让浏览器去请求那个负责逻辑的部分，逻辑部分require显示部分
+可以让代码重用，增加利用率，方便更新
+
+当不得不把html和php混在一起的时候，尽量不要让php输出html
+很容易在修改样式的时候把php改坏掉
+<?php foreach($arr as $row):?>
+<tr><td><?php echo $row['xxx'];?></td>
+</tr>
+<?php endforeach;?>应该这么写
+
+模板：
+结构已经确定，数据部分由外部(动态脚本)传递进来填充
+php代码应该只负责输出数据(循环和echo)，不要负责处理数据
+这种混编文件叫模板
+让浏览器去请求那个php文件，而不是那个html文件
+（因为html文件里不能解析php内容，会原封不动发给用户，不安全）
+模板文件不希望浏览器直接请求，应该隐藏起来
+法一：
+把所有模板都放在一个文件夹里，然后在文件夹里创建.htaccess文件，
+里面写上deny from all(拒绝所有)
+这样整个文件夹都不能从外面访问了
+（依赖于apache配置文件中allowoverride all(允许.htaccess文件重写配置)）
+法二：
+直接把不想被访问的文档，放在文档根目录外面
+
+MVC
+发现不同页面里有数据的重复
+应该把数据处理分离出来，在需要的功能中调用
+所以要把业务逻辑部分划分成【功能调度单元(control)】和【数据处理单元(model)】
+还剩一个【结果展示单元(view)】
+文件名后加_m,_v,_c
+浏览器请求_c文件，m和v都被c调度，m和v之间没关系
+
+模型类
+模型一般指的是模型类的对象，而不是类本身
+每张表应当对应一个模型
+每张表的操作都由这个脚本来完成，这个脚本也只管这个表
+【每个表的操作模型，应该是由某个模型类实例化而来】
+model文件里写那个class
+control文件里实例化模型类对象，调用某个方法，实现固定功能
+
+基础模型类
+各个模型可能会出现一样的代码
+放在基础模型类里，让其他model继承之
+在构造函数中调用_initxxx方法做好初始化工作
+
+模型的单例
+如果使用某个表的多次操作，使用该表的一个模型就可以
+所以要保证模型的单例化
+可以通过一个单例工厂来实现(所有的model类都需要)
+工厂类：直接new，不能实现需要的业务逻辑，需要辅助一段代码
+判断当前模型类是否实例化过，如果实例化过，直接返回对象
+如果没有，就new 一个新的
+class factory{
+public static function M($model_name){
+	static $model_list=array();
+	if(!isset($model_list[$model_name])){
+		require './'.$model_name.'.class.php';
+		$model_list[$model_name]=【new $model_name】;
+	}
+	return $model_list[$model_name];
+}
+
+控制器类
+依据功能的相关性，将一系列【相关】的功能，
+使用一个控制器类来处理，改控制器的每个方法就对应某个功能
+按照功能划分而不是按表来划分
+
+需要在某个地方实例化控制器并调用方法，让浏览器请求这个文件(index.php)
+这个文件叫前端控制器/入口文件/请求分发器
+
+动作分发参数A：
+如何做到一个前端控制器调用控制器类的不同方法:
+在请求前端控制器index.php时，向其传递一个参数a表示当前需要执行的动作
+index.php?a=list
+后面拼上Action，拼凑成函数名listAction来执行
+【根据a来判断要去执行哪个操作，这个过程就叫分发】
+
+控制器分发参数C：
+表示当前所需要执行的控制器类名
+Index.php?c=tab3&a=info
+【这种情况下，项目对外提供的任何功能，都是由某个控制器的某个方法完成的】
+【称之为单入口模式】
+
+$default_controller='tab2';
+$c=isset($_GET['c'])?$_GET['c']:$default_controller;
+$default_action='list';
+$a=isset($_GET['a'])?$_GET['a']:$default_action;
+$controller_name=$c.'_controller';
+require $controller_name.'.class.php';
+$controller=new $controller_name();//可变类
+$action_name=$a.'Action';
+$controller->$action_name();//可变方法名
+
+在一次请求周期中，a和c不应该改变
+应该保证a和c不改变，应该存入常量里
+$default_controller='tab2';
+【define('c',isset($_GET['c'])?$_GET['c']:$default_controller);】
+
+基础控制器
+为所有控制器提供基础代码
+protected function _initContentType(){
+        header('Content-Type:text/html;charset=utf-8');
+    }
+    public function __contruct(){
+        $this->_initContentType();
+    }
+
+目录布局
+随着文件越来越多，应该把文件分门别类存起来
+区分：框架代码和应用程序代码
+框架：在各个应用程序间通用的，比如sqlObj类，基础模型和控制器，工厂类
+应用程序：当前项目的业务逻辑实现的代码
+index放在根目录里
+应用程序里以平台/模块划分（功能的聚合）前台/后台
+某个平台里分为mvc三个目录
+【相对路径应该以当前根require其他文件位置(index)开始，而不是被require的文件那开始】
+
+p分发参数：确认去哪个平台，front或者back或者test

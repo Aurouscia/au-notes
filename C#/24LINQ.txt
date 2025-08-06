@@ -1,0 +1,61 @@
+类似于SQL语言，用来查询List
+
+【表达式写法】
+var res = 【from】 item 【in】 listName
+ //临时标识符和要查询的集合
+【where】 item.Level>8 && item.xx=="xxx"  //查询条件
+【select】 item.Name;   //指定返回的属性
+中间随意换行，最后加个分号，因为全是一句话
+from后面的那个词随意取名，是用来条件判断的
+
+【扩展方法写法】
+static bool Condition(ClassName element)
+{
+   //true的话就会选上这个元素，false就会过滤掉
+   if(element.Level>8) return true;
+   return false;
+}
+
+var res = listName.Where(Condition);
+给一个过滤方法名称，它会自动把所有元素一个个用该方法检查
+
+var res = listName.Where(m=>m.Level>8 && m.xx=="xxx");
+给一个lambda表达式也行
+
+
+【集合联合查询】
+同时from两个集合，会将两个集合作乘法再查询
+当两个集合中有重合的元素，
+但需要从其中一个集合选条件查询位于另一个集合的属性
+var res = from iA in ListA from iB in ListB
+where iA.Property1 == iB.Name && iB.Power>xxx
+（用对应关系限制，排除无意义项目）
+select new {itemA = iA,itemB = iB};同时输出两个东西
+或者select iA
+
+【联合查询-扩展方法】
+new是新创建了一个联合数据类型（猜的）
+.Where前面一整个是个集合
+ListA.SelectMany(iA=>ListB,(iA,iB)=>new{iiA=iA,iiB=iB}).Where(x=>x.iiA.Property1==x.iiB.Name&&x.iiB.Power>xxx)
+
+【对查询结果排序】
+LINQ语句中
+在where和select之间加一个orderby m.Age
+默认正序，如果要倒序就
+orderby m.Age descending(关键字)
+
+orderby m.Level,m.Age先比Level，Level一样就比Age
+
+【排序-扩展方法】
+var res=ListName.Where(m=>m.Level>8&&m.xx=="xxx").OrderBy(m=>m.Age);  （这个委托直接返回m的一个属性）
+想按两个字段排序的话
+后面添加  .ThenBy(m=>m.Level)
+不会打乱前一个排序的顺序
+
+【Join on集合联合】
+var res = from iA in ListA
+【join】 iB 【in】 ListB 【on】 iA.Property1 【equals】 iB.Name
+where iB.Power>xxx
+select new {iiA = iA,iiB = iB}
+
+【分组等操作见后续视频】

@@ -1,0 +1,28 @@
+public class TransformHelper//工具类，不继承monoBehaviour，放在Asset里面就行
+{
+    /// <summary>
+    /// 在层级未知的情况下查找子物体
+    /// </summary>
+    /// <param name="ParentTF">父物体变换组件</param>
+    /// <param name="target">要寻找的名称</param>
+    /// <returns></returns>
+    public static Transform SearchChild(Transform ParentTF, string target)
+    {
+        Transform childTF = ParentTF.Find(target);
+//在子物体(一代)中寻找名为字符串的物体，返回其transform，找不到则返回null
+        if (childTF != null)
+            return childTF;
+
+        //将问题交给子物体
+        for (int i = 0; i < ParentTF.childCount; i++)
+        {
+            childTF = SearchChild(ParentTF.GetChild(i), target);
+            if (childTF != null)
+                return childTF;
+        }
+        return null;
+    }
+}
+
+使用时：直接用工具类名访问这个方法
+TransformHelper.SearchChild(transform, "C1").Translate(0,1,0);

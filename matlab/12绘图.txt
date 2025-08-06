@@ -1,0 +1,101 @@
+X=[1,2,5.5,7,8]
+plot(x)
+按序号分配横坐标，X作为纵坐标画折线图
+
+x = 0:pi/100:2*pi;
+y = sin(x);
+plot(x,y)
+手动指定每个点的横纵坐标
+如果两边点的数量不一致，
+维数不一样，是不行的
+
+【填充数列】配合上面的那个使用
+B=linspace(55,100,10)    线性填充
+生成55到100的十个数，其中等差
+55 60 65 70 75 80 85 90 95 100
+
+B=logspace(0,3,4)    指数填充(?)
+生成10的0次方到10的3次方的四个数字
+1 10 100 1000
+
+【可以标记轴并添加标题】
+xlabel('x')
+ylabel('sin(x)')
+title('Plot of the Sine Function')
+
+Text(a,b,'xxxx')，在a，b处添加文字
+
+通过向 plot 函数添加第三个字符串输入参数
+前半边【指定颜色】，后半边【指定线型】
+plot(x,y,'r--')
+plot(x,y,'y--h')
+plot(x,y,'r-o')
+对应关系见书72页
+plot(x,y,'ro')中间无杠：【散点图】
+
+figure(1);
+figure(2);
+【画多个窗口】
+切换活动窗口
+
+hold on/off   切换绘图是否追加，
+关闭时绘制新的图像会清除已有的
+grid on/off   切换网格是否显示
+
+axis ('on/off')  切换坐标是否开启
+axis ('square')
+axis ([xmin xmax ymin ymax])【指定坐标轴范围】
+axis ('auto')
+axis ('equal')
+
+【三维曲线】
+plot3(x,y,z);
+grid on或者box on（最小外接矩形）
+
+【三维曲面】
+[X,Y] = meshgrid(-2:0.2:2);
+或者
+x=linspace(0,4,30);
+y=linspace(0,3,20);
+[X,Y]=meshgrid(x,y)【生成数据点阵】                            
+Z = X .* exp(-X.^2 - Y.^2);
+surf(X,Y,Z)
+或mesh(X,Y,Z)
+
+【子图】
+subplot(2,2,1); mesh(X); title('X');
+subplot(2,2,2); mesh(Y); title('Y');
+subplot(2,2,3); mesh(Z); title('Z');
+subplot(2,2,4); mesh(X,Y,Z); title('X,Y,Z');
+前两个参数指定网格尺寸(2x2)，
+第三个参数指定活动位置
+
+【fplot】
+自动动态采样率绘制函数
+fplot('sin(x)',[min max],tol(可选),'-+')
+第一个参数是字符串形式的函数表达式
+
+【对数坐标图】
+loglog(x,y)
+semilogx(x,y)
+semilogy(x,y)
+
+【极坐标图】
+polar(t,r,'b-')
+t：极角，r：极距
+
+【条形图】
+x=[1 2 3;4 7 3]
+bar(X)
+会自动分为两组，一共六根棒子
+barh(X)
+横着画
+bar(X,'stack')
+堆起来画
+
+【饼子图】
+y=[1 4 6 5 3];
+explode=[0 1 0 0 0];
+pie(y)
+pie(y,explode);分离出一部分
+pie3(y);立体饼图

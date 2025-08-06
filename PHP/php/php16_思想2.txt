@@ -1,0 +1,64 @@
+自动加载
+控制器类(可增加)，模型类(可增加)，框架核心类
+分为两类：
+位置可以确定不动的类（当自动加载方法确定时，类文件确定了）
+可以扩展的类（没有办法确定）
+对于已经确定的类，用最简洁的方式加载
+对于需要扩展的类，需要通过类名的规律，完成位置的判断，进而完成自动加载
+function userAutoLoad($className){
+    //做一个类名与类文件的映射
+    $framework_class_list=array(
+        'controller'=>'./framework/controller.class.php',
+        'model'=>'./framework/model.class.php',
+        'Factory'=>'./framework/Factory.class.php',
+        'sqlObj'=>'./framework/sqlObj.class.php'
+    );
+    if(isset($framework_class_list[$className])){
+        require $framework_class_list[$className];
+    }
+    //控制器类，截取后十个匹配字符串
+    elseif(substr($className,-10)=='controller'){
+        require './application/'.p.'/controller/'.$className.'.class.php';
+    }
+    elseif(substr($className,-5)=='model'){
+        require './application/'.p.'/model/'.$className.'.class.php';
+    }
+}
+【spl_autoload_register('userAutoLoad');//注册自动加载】
+
+项目里涉及目录名的地方都可以做成常量，方便修改目录名
+
+项目中的图片，css，js都需要在浏览器端请求到，由浏览器执行
+与项目中核心类和模板文件不同(不能在浏览器请求到)
+application和framework都应该设置成不应该访问的
+应该把css和图片什么的放在一个可以直接被浏览器请求到的地方
+（和application/framework平级的，名叫web或者public）
+里面也要分back和front平台
+
+sql里，ipv4和无符号整型可以互相转换
+select inet_aton('192.168.39.75');
+select inet_ntoa(1145141919);
+
+CREATE table test17_admin(admin_id int unsigned not null auto_increment,admin_name varchar(32) not null default '',admin_pass varchar(32) not null default '' ,primary key(admin_id)) charset=utf8;
+
+跳转：
+立即跳转和等一会再跳转
+Header('Location:');
+PHP服务器向浏览器发送一条指令（响应头信息）
+header函数前不应该有任何输出东西，否则会占用输出缓冲
+header函数后的东西也会照常执行完毕(哪怕跳转了)
+所以跳转后面应该立即终止脚本，header()后面接上一个die;
+n秒后跳转：
+Header('Refresh:秒数;URL=目标');
+会在当前URL上停留几秒，之后就会跳转
+提示的样式可以轻松定制
+封装一个跳转的方法，是所有控制器都需要的功能（应该放到基础控制器里）
+
+框架类
+入口文件太臃肿，应该把东西放到一个框架里去
+
+框架形式的文件退出时：<a>的target应该写"_top"才能让整个窗口退出
+href里面写a=logout
+logoutAction里面unset($_SESSION['is_login'])
+
+is_login登录标志里可以存储信息

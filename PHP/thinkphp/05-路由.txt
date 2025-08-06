@@ -1,0 +1,64 @@
+路由默认是开启的
+配置文件在config\app开启
+config\route设置
+定义文件在route\app
+
+在route\app中写：
+use think\facade\Route;
+Route::get('think', function () {
+    return 'hello,ThinkPHP6!';
+});
+地址栏写：xxx.com/index.php/think就会进入这里
+在route\app中写：
+Route::get('hello/:name', 'index/hello');
+其中/:name表示一个可以传入的参数
+地址栏写：xxx.com/index.php/hello/world
+就会把"world"参数传给index控制器下的hello方法
+如果不写方法，默认是这个控制器里的index方法
+
+Route::get只接get请求
+Route::rule可以接任何类型的请求
+Route::('ds','Address/details');
+填'/'表示首页地址
+第三个参数可以限制('GET|POST')
+地址栏传来的数据就是GET
+
+是否强制：
+之前的老办法还能否进入：在config\route里设置
+
+要得到路由的地址：
+url('旧地址，即控制器/方法名',['id'=>5]要传递的参数);
+会返回路由定义的地址
+
+路由的变量规则（略）
+pattern()
+闭包
+Route::get('think',function(){return 'hello'});
+Route::get('hello/:name',function($name){return 'hello,'.$name;});
+
+如果controller文件夹里面有子文件夹，就需要用点连接文件夹名和控制器名来访问
+xx.com/index.php/group.xx控制器/xx方法
+Route::rule('details/:id','group.Blog/details');
+
+重定向
+Route::redirect('ds/:id','http://baidu.com');
+
+指定只允许什么后缀
+Route::rule('details/:id','group.Blog/details')->ext('html|shtml');
+禁止某些后缀
+Route::rule('details/:id','group.Blog/details')->denyExt('gif|jpg|png');
+
+ajax和jquery,额外参数（略）
+filter(),append()
+
+路由的域名和跨域请求（略）
+
+路由分组
+Route::rule('address',function(){
+	Route::rule('ds/:id','Address/details');
+	Route::rule('sr/:name','Address/search');
+})->ext('html')->pattern(xxx);
+
+miss(错误处理)(略)
+
+资源路由(略)

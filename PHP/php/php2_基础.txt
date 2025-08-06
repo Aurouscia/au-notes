@@ -1,0 +1,121 @@
+php可以组成单独文件，也可以嵌入到html里面
+
+如果客户端请求静态网页，直接返回html文件
+如果客户端请求动态网页
+服务器会把php文件给php脚本引擎进行运算
+然后替换成纯html，交给apache，再发送给客户端
+php脚本引擎只能处理php的东西，关于数据库的代码交给mysql处理
+
+客户端→apache→php引擎→mysql
+客户端←apache←php引擎←mysql
+
+标准格式：
+<?php
+   print "xxxx<br/>";
+?>
+每行最后必须有分号
+字符串里面的<br/>不会处理，是浏览器的事
+
+foreach(){
+xxx
+}
+可以写为：
+foreach() :
+xx
+endforeach;
+while{
+xxx
+}
+可以写为：
+while:
+endwhile:
+
+字符串
+"xxx"."xxx"可以用句点把两个字符串拼起来
+"xxxx/"xxx"可以用转义字符在里面打引号
+print有返回值，echo没有
+echo能显示逗号分隔的几个东西
+$xxx和转义字符都会被双引号解释，单引号不会
+Print "It is currently $temp degrees"
+
+不可以把html塞进php块里面
+php不能解释<>
+一句语句可以跨越多行
+
+转义字符
+"\n"换行，"\t"制表符，"\r"回车，"\0"null，"\x0B"垂直制表符
+
+注释
+单行的用//或者#
+多行的用/*    */
+<!--xxx-->属于html代码
+
+php对变量的大小写区分，对函数和关键字的不区分
+
+变量名以美元符号开头
+直接给一个不存在的变量赋值，就是定义
+不支持js那种定义但不赋值的语法
+isset()判断变量是否存在【不存在和=null都会返回false】
+$name ="xxx";
+$salary =12000;
+echo $name,$salary;
+$myColor = 0x33CC99;
+$distance_to_moon = 3.844e+5;
+$_开头的为预定义变量，可以在脚本任意未知引用
+unset($v1)将变量名和数据之间的联系切断
+$v1和3都无意义了
+只能使用字母数字下划线，不能数字开头，不能是关键字，驼峰命名法区分各个单词
+
+值传递和引用传递
+所有变量默认都是值传递，要想引用传递，必须用&符号
+$v2=$v1，存在传值问题
+$v2=$v1+10，不存在传值问题
+值传递时$v1和$v2各拥有一份数据，传递后两者无关
+$v10=10;
+$v20=&$v10;，将v10的地址给了v20，&为取地址符
+这种情况下，改动一个变量，另一个跟着一起改变
+如果一个unset，则另一个不受影响
+
+可变变量
+一个变量的名本身也是一个变量
+$v1="abc" //这是个字符串，内容是"abc"
+$abc=10 //这是个普通变量，内容是数字10
+echo $$v1
+一个$符号出现，就视图解释为一个变量，变量名为$v1，
+其为abc，所以整体为$abc，值为10
+
+定义常量
+Define("PI",3.1415);
+
+布尔值：1和0
+$answer = 1;
+if(answer==true){
+     print "yes,true.<br/>"
+}
+
+null值
+unset($n)后，$n变成null
+
+操作符
+=  +=  *=
+==  !=
+===  !===
+（==会做类型转换，即使类型不同也可能等于"1"和1）
+（===不会做类型转换，类型不同一定不同）
+++  --
+~  &  |  ^  <<  >>
+.（字符串连接）
++  -  *  /  %
+(int)(float)(string)(bool)(array)(object)强制转换
+
+数组（传统数组）
+array()函数为初始化器，逗号分隔物品
+$names = array("Jessica","Michelle","Linda");
+$names[3]="xxx";数组会自动扩大
+print "$names[0]";
+（关联数组，以字符串为索引）
+$address_book = array("Jessica"=>"(415)555-2946",
+"Michelle"=>"(027)189-7150-1210");
+print $address_book["Jessica"];
+var_dump($address_book)显示整个数组
+

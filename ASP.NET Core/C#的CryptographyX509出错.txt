@@ -1,0 +1,8 @@
+方法1：
+X509Certificate2 x509 = new X509Certificate2(strPathPfx, strPasswordPfx);
+改为X509Certificate2 x509 = new X509Certificate2(strPathPfx.ToString(), strPasswordPfx.ToString(), X509KeyStorageFlags.MachineKeySet)
+方法2：
+IIS应用池》高级设置 》修改加载用户配置文件 》True
+————————————————
+版权声明：本文为CSDN博主「smiles_914」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/qq_34894585/article/details/108386960

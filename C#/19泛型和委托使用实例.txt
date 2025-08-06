@@ -1,0 +1,67 @@
+class Employee
+    {
+        public string Name { get; private set; }
+        public decimal Salary { get; private set; }
+        public Employee(string name,decimal salary)
+        {
+            this.Name = name;
+            this.Salary = salary;
+        }
+        
+        //e1大于e2就返回true
+        public static bool Compare(Employee e1,Employee e2)
+        {
+            if (e1.Salary > e2.Salary)
+                return true;
+            return false;
+        }
+        public override string ToString()//重写ToString方法方便输出
+        {
+            //默认：return base.ToString(); //这里的base指的是Object类，默认的ToString()
+            return Name + "  " + Salary;
+        }
+    }
+
+
+
+public static void GenericSort<T>(T[] sortArray, Func<T,T,bool> compareMethod)
+        {
+            bool swapped = true;
+            do
+            {
+                swapped = false;
+                for (int i = 0; i < sortArray.Length - 2; i++)
+                {
+                    if (compareMethod(sortArray[i] , sortArray[i + 1]))  
+//T类型无法直接比较，需要从类那里用委托提供比较的方法
+                    {
+                        T temp = sortArray[i];
+                        sortArray[i] = sortArray[i + 1];
+                        sortArray[i + 1] = temp;
+                        swapped = true;
+                    }
+                }
+            }
+            while (swapped);//如果遍历一次没有发生任何交换，就结束
+        }
+
+
+
+static void Main(string[] args)
+        {
+            Employee[] employees = new Employee[]
+            {
+                new Employee("ABC1",4000),
+                new Employee("ABC2",3500),
+                new Employee("ABC3",2400),
+                new Employee("ABC4",6000),
+            };
+
+            GenericSort<Employee>(employees, Employee.Compare);
+//使用的时候，需要具象化委托（和T一样）
+            foreach(Employee item in employees)
+            {
+                Console.WriteLine(item);//Console.Write会自动调用ToString()方法
+//而此时Employee类中的该方法已经被重写了
+            }
+        }

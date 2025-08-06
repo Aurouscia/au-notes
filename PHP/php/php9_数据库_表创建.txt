@@ -1,0 +1,167 @@
+
+数据库分为
+层次数据库：类似xml的文本结构
+网状数据库：已经淘汰
+关系数据库（一般都是指这个）
+
+关系数据库就是表的集合
+关系指：表与表之间的对应关系
+
+结构化查询语言：不需要考虑逻辑
+是一种国际化标准，各种关系数据库都是实现并扩充这种标准
+数据库存储的本质就是将大量的数据值通过数据库管理系统进行复杂但逻辑清晰有序的存储
+
+一个表应该对应一个文件夹，在数据库文件夹下的data文件夹里
+不要手动动里面的东西
+每个数据库都有个opt文件，每个表都有frm文件
+
+数据：装在格子里的东西
+数据库：指一个具体的存储数据的逻辑名称，通常一个项目会使用一个数据库来存储其所有数据
+数据库管理系统(DBMS)：通常就是指数据库软件产品
+字段/列
+记录/行
+
+php操作数据库基本流程
+连接数据库 mysqli_connect("localhost",'root','密码');
+设置编码mysqli_query($link,"set names utf8");
+选择数据库mysqli_query($link,"use test1");
+执行命令$result=mysqli_query($link,"任何sql语句");
+如果是无返回结果的命令，会返回true和false表示成功和失败
+如果是有返回结果的命令，失败了会返回false，成功了就会返回数据
+
+这是两种资源类型
+数据库连接资源：
+$link=mysql_connect("localhost","root","123");
+结果集资源：
+$result=mysql_query($link,"select...");
+
+插入行
+$str1="insert into test_table1(id,name)values($randId,$randName);";
+选择行
+$str2="select * from test_table1 where id > 1;";
+返回的是数据集，通过某个函数转换为数组
+mysqli_fetch_array(数据集)会每次取得其中一行，需要用循环遍历
+并把这一行装入数组里，以字段名和序号作为数组索引，内容作为键值
+while($record=mysqli_fetch_array($result)){//完了之后会停下循环
+                    echo "<pre>";
+                    var_dump($record);
+                    echo "</pre>";
+                }可以将数据输出
+
+得到列信息
+while($fieldInfo=mysqli_fetch_field($result)){
+           echo $fieldInfo->name;
+           }
+
+（sql）show databases可以输出所有数据库的名称
+（sql）desc "数据库名" 可以输出一个数据库的结构描述(describe)
+mysqli_num_fields($result)得到结果集的字段个数
+mysqli_num_rows($result)得到结果集的行数
+mysqli_error()返回最近的一个错误描述
+
+创建数据库
+create database [if not exists] xxxx(数据库名) [charset 字符集] [collate 字符排序规则]
+if not exists是判断该数据库是否存在，存在就不创建
+字符集：数据存储到本数据库中时使用的字符编码名称，通常是utf8
+修改字符集
+alter database 数据库名 charset 新字符集 collate 新排序规则
+删除数据库
+	drop database 数据库名
+选择，进入某数据库，要操作，必须先进入
+	use 数据库名
+显示所有数据库
+	show databases
+
+字段的数据类型
+tinyint 一字节(-128~127)(0-255)
+smallint 两字节
+mediumint 三字节
+int 四字节
+bigint 八字节
+
+创建表时指定字段
+create table tab1 (f1 数据类型,f2 数据类型)
+数据类型：类型名 [(长度n)] [unsigned] [zerofill]
+长度：显示形式上的长度，unsigned：无法存储负数，正数加倍
+zerofill：左边补0以达到指定长度，同时也unsigned了
+CREATE table tab1 (id int(4) zerofill,name int(4) zerofill)
+小数：
+	float double和decimal
+时间：
+	date time datetime year timestamp
+	timestamp代表当前时刻，本质上是一个数字，代表1970到现在的秒数(无需赋值)
+		可以用php里的date()函数转成date(Y-m-d H:i:s,xxx)
+	手动写入时间数据时应该用单引号引起来
+	date支持'1000-01-01'到'9999-12-31'
+	time支持'-838:59:59'到'838:59:59'
+	datetime：前两个拼起来，中间用空格隔开
+	year：'1901'到'2155'
+字符串：
+	varchar可变长度字符串(最多65532字节的字符串)  可以不填满，长度以实际长度为准
+	char定长字符串(最多256个字符)  会自动补上空格填满
+	设定时都必须写上长度varchar(20)
+	binary 类似char，存的是二进制数据
+	varbinary 类似varchar
+	text 超大文本，没有长度限制，并不占用一行的长度(一行最大65535字节)
+	blob 超大二进制文本(一般用来存储图片)
+选项：
+	单选项enum
+	enum('选项','选项','选项',......);
+	insert into xxx(choice)values('aa');
+	insert into xxx(choice)values(3);选项的本质是数字123456....可以通过数字存入
+	多选项set
+	enum('选项','选项','选项',......);
+	多选项的本质是1,2,4,8,16....
+
+表操作
+create table [if not exist] xxx(字段列表，约束或索引列表)表选项列表;
+列表都是表示多个，之间用逗号分开
+字段列表里的每个字段 (字段名,类型,字段修饰属性) 
+
+字段修饰属性
+not null
+auto_increment【必须同primary key或者unique key一起使用】
+primary key（主键，唯一键增强版，也不能重复，一个表只能设定一个主键）
+unique key （唯一键，不能重复的字段）
+default xxx(默认值)
+
+索引：
+索引是一个内置表，该表的数据是对真实表的某些字段做了排序的存储形式
+可以极大提高查找数据的速度
+key(f1,f2)
+primary key(f1)
+unique key(f1)
+
+约束：
+限定数据以符合要求的某种形式
+primary key(f1)主键约束，和上面俩是三位一体
+unique key也是三位一体
+外键约束：某个字段的值，必须来源于另一个表的某个主键字段的值
+例如：学生信息里的班级字段必须来自于班级列表里的班级号
+foreign key(班级号) references 班级信息表(班级主键)
+
+表选项：略，一般不设置
+
+修改表：
+alter table 表名 修改语句1,修改语句2,...
+alter table 表名 add 字段名 字段类型 字段属性
+alter table 表名 drop 字段名
+alter table 表名 change 原字段名 新字段名 新字段类型 新字段属性
+alter table 表名 modify 字段名 新字段类型 新字段属性
+
+alter table 表名 rename 新表名
+alter tabel 表名 add foreign/primary/index key (字段名列表)
+alter table 表名 drop primary key
+alter table 表名 drop foreign key 外键名
+
+drop table 表名
+
+
+视图：
+可以看作一个临时存储数据构成的表，本质上只是个select语句
+把这个select语句进行包装，并设定了一个名字，其后就可以把名字当一个表用
+如果一个select语句比较复杂，又在多个页面需要用到，就可以做成一个视图，方便使用
+create view 视图名(列名1,列名2,...) as 一条复杂的select语句
+alter view 视图名(列名1,列名2,...) as select语句
+drop view 视图名
+

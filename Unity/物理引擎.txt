@@ -1,0 +1,116 @@
+Add Component-physics-rigid body
+为物体添加刚体组件
+让物体具有物理特性（会往下掉）
+
+再添加一个Collider（有许多形状）
+（用来决定物体用来碰撞的形状）
+能凑合就最好用BoxCollider（运算快）
+添加后可以修改碰撞器的center和size
+(或者点击Edit Collider按钮，在视窗中直接编辑)
+mesh collider：用物体自己的模型作为碰撞器(非常消耗性能)
+勾选convex：使用凸壳作为碰撞器（可优化性能）
+
+【刚体的属性】
+有刚体组件，就会检测是否与其他东西接触
+如果停着不动，刚体就会进入休眠
+
+mass：表示物体间相对的质量大小，
+用于碰撞时“动量守恒”，单位自己把握
+drag：空气阻力
+砖头：0.001 羽毛：10
+angular drag：角阻力
+插值：用来缓解抖动
+Interpolate：内插值：根据上一帧变换来平滑本帧
+Extrapolate：外插值：预估下一帧
+碰撞检测：
+Discrete：低速物体
+Continuous：高速物体
+约束Constraints：
+freeze position/rotation
+is kinematic：
+开启后，成为运动学刚体，不受物理引擎作用，
+但可以影响其他物体（台球杆等）
+
+固定的建筑物，不参与交互，但要限制穿模
+就只加Collider，不用rigidbody
+
+要检测是否有接触，但不用计算碰撞
+就只加rigidbody，不加Collider
+
+例子：
+A2有刚体，A3没有刚体
+A2去撞A3，会反弹回来，A3不动：
+因为A2检测到了A3的碰撞器
+A3去撞A2，会穿模过去：
+因为A2不动，进入了休眠，而A3并不会被检测
+
+【产生碰撞的条件】
+两者都有Collider组件（有边界）
+运动的那个物体有刚体组件
+
+【碰撞三阶段】
+(不要拼错了，否则不会注册)
+void OnCollisionEnter(Collision other)
+碰撞的第一帧执行，输入参数是事件参数类
+可以通过other.collision.GameObject找到物体
+other.collision.GetComponent<>()找其他组件
+ContactPoint cp=other.contact【获取接触点组】
+cp.point接触点的世界坐标（可以用来加特效）
+cp.normal接触面法线（判断碰撞方向）
+void OnCollisionStay(Collision other)
+两物体接触时每帧都执行
+void OnCollisionExit(Collision other)
+两物体分开时执行
+
+【触发器】
+带有碰撞器组件，而且is trigger被勾选
+这么一个物体就叫触发器，无碰撞效果
+（子弹打到目标上，穿过去，扣血）
+（探测半径内（很大的sphere collider）敌人）
+触发条件：
+两者都有碰撞组件
+其中之一带有刚体组件（被撞者也行）
+其中之一勾选isTrigger
+
+【触发三阶段】
+void OnTriggerEnter(Collider otherCld)
+参数直接就是碰撞器组件
+void OnTriggerStay(Collider otherCld)
+void OnTriggerExit(Collider otherCld)
+
+一个物体可以加2个collider组件
+同时检测触发和碰撞条件
+
+
+【高速物体】
+如果物体很快，两帧之间把目标跨过去了
+解决方法：子弹一发射就用射线检测之
+class Bullet
+public LayerMask mask;（编辑器里选）
+private 
+void Start()
+{
+   bool Physics.Raycast(Vector3 origin, V3 direction, 
+out RaycastHit info,float maxDistance, int/LayerMask 层)
+   {info 是射线检测到的信息}
+【把要检测的物体放进该层】
+}
+返回值是布尔值，是否检测到这条射线上有目标物体
+if(xxxxx)
+{targetPos=info.hit}
+else
+{targetPos=this.transform.position+this.transform.forward*100}
+
+Update()
+{
+this.transform.position=vector3.MoveTowards(transform.position,targetPos,Time.deltaTime*moveSpeed)
+if((xx.position-targetPos).sqrMagnitude<0.1f)
+{Destroy(this.gameObject);}
+}
+
+【物理材质】
+mesh Collider中可以填一个物理材质（区别于渲染用材质）
+在project面板创建一个physics material，起个名字
+dynamic/static friction 动和静摩擦力
+bounciness (0到1) 弹性
+combine合并方式，两个物体相互作用，怎么取值

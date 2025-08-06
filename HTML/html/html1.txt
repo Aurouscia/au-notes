@@ -1,0 +1,103 @@
+浏览器可以直接翻译HTML,CSS和javaScript
+这三种文件不需要服务器，可以直接看到结果
+PHP,MySQL代码需要经过服务器解析为HTML代码再发给服务器
+服务器再把html东西发给用户
+用户那边不会有PHP和mySQL内容，为了保证数据库安全
+
+B/S架构：B是浏览器，S是服务器
+
+静态网页的扩展名:html,htm
+动态网页的扩展名:asp,aspx,jsp,php(含有php和mysql代码)
+由服务器端软件Apache来解释为html代码
+
+固定的文件结构标记
+<html>最大的结构，表示文件的开头和结尾
+    <head>一般用于特殊功能
+        <meta></meta>告诉浏览器用什么字符编码来显示
+        <title>xxx</title>是网页标题(浏览器顶部的)只能纯文本
+    </head>
+    <body>是主体内容
+        xxxxxx
+    </body>
+</html>
+
+解决乱码问题
+<meta>标记的字符集设定与编辑环境的一致
+php和mysql的字符集
+浏览器会自动选择
+
+修饰标记
+<标记名称 属性1="属性值1" 属性2="属性值2"></标记名称>
+<font size="7" color="red">李四</font>
+有开始有结束的称为双边标记，没有结束标记和内容的称为单边标记
+例如<hr>水平线<br>换行
+
+字体修饰标记
+加粗<b></b>
+下划线<u></u>
+斜体<i></i>
+下标和上标<sub></sub><sup></sup>
+字体颜色和大小<font size="1~7" color="单词" face="黑体">内容</font>
+
+字符集设置（单边标记）
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+排版标记
+水平线：<hr size="粗细" width="宽度" align="对齐方式" Noshade>
+size值为像素
+width值为像素或百分比(浏览器xx%宽)
+align可选左中右
+noshade是个没有值的属性
+如果只写<hr>会用默认属性画线
+
+<body>的属性
+text:网页的前景色(文本颜色)
+bgColor:网页的背景色
+background:网页背景图片路径（控制不了平铺）
+
+段落标记<p></p>
+段落的前后会自动插入空行
+Align:可选左中右
+标题标记<h1></h1>
+也有align属性
+
+编辑器中多余的空白和换行都会被忽略
+字符实体：
+&nbsp; 代表一个空格（半个汉字大）
+&lt; 代表小于号
+&gt; 代表大于号
+&amp; 代表&号
+&yen;代表￥号
+&copy;代表©号
+&times;代表×号
+&divide;代表÷号
+<pre>
+</pre>加了这个标记后，保留所有空白和换行，原封不动输出
+在php中用于打印一个数组
+
+项目符号标记(无序列表)
+<ul>
+    <li>内容</li>
+    <li>内容</li>ul里嵌套li标记，可以有多个
+</ul>可以用css调整各个元素的位置，是否显示前面的点
+<li>里可以嵌套<ul>，二级菜单
+属性:type指定前面的点的类型(三种默认)，取值：disc,circle,square
+这个属性既可以添加到ul，也可以添加到li
+可以是图片，但要用css设置
+如果<font><li></li></font>，前面的点的颜色也会受到影响
+
+编号列表标记(有序列表)
+<ol>
+     <li>内容<li>
+     <li>内容<li>
+</ol>
+和ul一样有type属性，取值为1，a，A，I，i
+start属性，从第几开始编号，取值为正整数
+
+两种列表可以互相嵌套
+
+<dl>
+    <dt>词条</dt>
+    <dd>描述</dd>
+</dl>
+必须有dt，可以没有dd

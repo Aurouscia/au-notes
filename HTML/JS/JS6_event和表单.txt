@@ -1,0 +1,84 @@
+echo "<input type=\"hidden\" name=\"".$name."\" value=false>";
+echo "<input type=\"checkbox\" name=\"".$name."\" value=true>";
+ //一般情况下，不打勾会不提交任何东西，这样写可以让打勾提交true，不打勾提交false
+
+
+事件发生时，会向调用函数传递一个event对象，记录当前环境信息
+一个事件对应一个event对象，event对象短暂存在
+
+<img id="img01" src="images/01.jpg" onclick="get_xy(【event】)"/>固定写法
+function get_xy(e){是形参，怎么写随便
+    alert(e);}
+或者
+var obj = document.getElementById("img01");
+obj.onclick=get_xy;  没法带参数
+function get_xy(e){  虽然上面不能传递参数，但事件对象还是传过来了
+    alert(e)}
+
+（这个应该不用管）
+老版IE不需要传递event，那边自动就会收到
+所以为了兼容性写：var x=e?e.clientX:event.clientX;
+
+e.clientX，e.clientY点击的坐标(相对于窗口(不包括顶上滚动掉没显示的)左上角)
+pageX，pageY点击的坐标(相对于网页(包括顶上滚动掉没显示的)左上角)
+screenX，screenY
+
+
+表单对象：
+form的属性：
+	name:表单名称
+	method:提交方式，get和post（这个要和后端人员商量）
+	action:处理程序
+enctype:加密方式
+form的方法：
+	submit()提交表单
+	reset()重置表单（同reset按钮）
+form的事件
+	onsubmit()单击提交按钮后，发送数据前发生
+	onreset()重置时发生
+表单提交三种方法
+	submit按钮结合onsubmit事件
+	submit按钮结合onclick事件
+	button按钮结合onclick事件和submit()方法
+onsubmit可以接受返回值
+form里写onsubmit="return check()"，可以在条件不满足时阻止表单提交
+或者：input type="submit"里写onclick="return check()"，也行
+
+文本框对象：
+属性
+Name Value Size Disabled Readonly Maxlength
+事件
+onfocus(单击之) onblur(单击别处)
+方法
+select() focus() blur()
+
+最好：<form>套<table>
+
+复选框
+name value checked(true/false)
+<fieldset></fieldset>形成一个框
+如果几个对象name都一样，获取将产生一个数组
+<input type="checkbox" name="hobby"/>
+<input type="checkbox" name="hobby"/>
+var 【arr】=document.form1.hobby;
+
+二级联动菜单：可以使用以字符串为索引的数组（比较复杂）
+var cityList = new Array();
+cityList['北京市']=['xx区','xx区','xx区'];
+下拉列表select对象的常用属性
+	options数组，返回所有option组成的数组
+	name
+	selectedIndex当前选中的索引号
+	value当前选中的option的值
+	length长度，option的个数
+选项option的常用属性
+	text指一对option标签中间的文本
+	value
+	index指其索引号
+	selected
+给下拉列表写入option时，应该先给其指定高度，否则会显示异常
+	province.length=arr_province.length
+然后创建option对象
+	province[i].text=arr_province[i];
+	province[i].value=arr_province[i];
+数组的length是可读可写的

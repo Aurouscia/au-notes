@@ -1,0 +1,53 @@
+【引用另一个样式文件】
+@import './xxx.wxss'
+会并入目标文件成为一个，不会有多余请求
+
+【rpx】
+在屏幕宽度为375物理像素的情况下
+1rpx=1px
+
+【内联样式动态】
+<view style="color: {{eleColor}}; font-size: {{eleFontsize}}"></view>
+
+【支持选择器】
+.class  #id   element
+
+【flex布局】
+https://developers.weixin.qq.com/ebook?action=get_post_info&docid=00080e799303986b0086e605f5680a
+
+主轴为横向向右，交叉轴为纵向向下
+项目默认会从左到右排列，排满后沿交叉轴方向换行
+
+对容器：
+display:flex;（与block,inline同级）
+
+flex-direction:
+row(默认值)| row-reverse(右往左)| column(上往下) |column-reverse
+使用这个属性时会改变内部坐标轴的方向
+
+flex-wrap:
+nowrap(不换行，多的溢出)| wrap(多的换行)| wrap-reverse(往上换行)
+
+justify-content:
+flex-start(往左堆)|flex-end(往右堆)|center(挤中间)，都不留空隙
+space-between(分散开，左右紧贴边缘)| space-around()(左右距离边缘一半间距)|space-evenly(都一样)
+
+align-items:设置项目在行中的对齐方式。
+stretch(沿交叉轴拉伸)|center(沿交叉轴居中)|flex-end|baseline(第一行文字)|flex-start
+
+align-content:多行排列时，设置行在交叉轴方向上的对齐方式，以及分配行之间及其周围多余的空间。
+stretch（默认值） | flex-start | center |flex-end | space-between | space-around | space-evenly
+
+对容器内项目：
+order:0（默认值） | <integer>
+数字越小，顺序越靠前
+
+flex-shrink:1（默认值） | <number>
+flex-grow:0（默认值） | <number>
+flex-basis:auto（默认值） | <length>
+flex:none | auto | @flex-grow @flex-shrink @flex-basis
+align-self:auto（默认值） | flex-start | flex-end |center | baseline| stretch
+
+
+
+

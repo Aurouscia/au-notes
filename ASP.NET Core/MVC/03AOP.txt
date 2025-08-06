@@ -1,0 +1,136 @@
+AOP：面向切面编程
+想要在已完成的代码中加入新功能，但不想一个个改之前的函数（容易出问题）
+可以不修改以前的代码，动态增加业务逻辑
+
+如果那些attribute里面有依赖注入的东西，会在[]里面报错
+解决方法：[TypeFilter(typeof(CustomActionFilterAttribute))]
+
+【AuthorizeAttribute权限验证】
+
+【IResourceFilter资源缓存】
+必须自定义扩展，通过特性来支持
+定义这么一个类：
+public class CustomResourceFilterAttribute : Attribute, IResourceFilter
+其中有两个方法：
+//在xx资源前
+        public void OnResourceExecuting(ResourceExecutingContext context)
+	string key = context.HttpContext.Request.Path;//指当前请求路径
+	//一旦给context.Result赋值，后面就跳过调用它的action函数体，直接显示页面
+           	 if (CacheDictionary.ContainsKey(key))
+           	{//如果缓存里有相同请求路径的，可以直接取出使用
+               	context.Result = (IActionResult)CacheDictionary[key];
+           	}
+//在xx资源后
+        public void OnResourceExecuted(ResourceExecutedContext context)
+	CacheDictionary[key] = context.Result;
+	//可以把视图结果保存到静态的字典里面去
+public static Dictionary<string, object> CacheDictionary = new Dictionary<string, object>();
+
+顺序：
+会先执行OnResourceExecuting
+然后是控制器构造函数
+然后是Action方法
+然后是OnResourceExecuted（两面包夹之势）
+这个东西是用来缓存的
+1.定义一个缓存区域
+2.请求来了，根据缓存的标识，判断其是否存在
+3.如果没有缓存，做计算
+4.计算结果保存到缓存里
+还有一个异步版本：IAsyncResourceFilter
+Task IAsyncResourceFilter.OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
+{
+            string key = context.HttpContext.Request.Path;
+            if (Cache.ContainsKey(key))
+            {
+                context.Result = (IActionResult)Cache[key];
+                return;
+            }
+            ResourceExecutedContext context1 = await next.Invoke();//等标注该attribute的action执行完后才会回来
+            Cache[key] = context1.Result;
+}
+
+【IActionFilter方法前后记录】
+可以直接用也可以扩展
+会先执行控制器构造函数
+然后是OnActionExecuting
+然后是Action
+最后是OnActionExecuted
+最靠近action，适合用来记录日志
+其context是action的直接输入和输出
+同样也有Async版本，使用方法同上
+注入这么一个接口
+    public interface IMyLogger
+    {
+        void Log(string info);
+    }
+    public class MyLogger1:IMyLogger
+    {
+        public async void Log(string info)
+        {
+            FileInfo f = new FileInfo("Log/Log1.txt");
+            StreamWriter sw = f.AppendText();
+            await sw.WriteAsync(info+"\n");
+            sw.Flush();
+            sw.Close();
+            sw.Dispose();
+        }
+    }
+然后写成
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            var para = Newtonsoft.Json.JsonConvert.SerializeObject(context.Result);
+            var controllerName = context.HttpContext.GetRouteValue("controller");
+            var actionName = context.HttpContext.GetRouteValue("action");
+            _myLogger.Log($"控制器：{controllerName}，方法：{actionName}，结果：{para}");
+        }
+
+        //在xxaction执行前
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+            var para= context.HttpContext.Request.QueryString.Value;
+            var controllerName = context.HttpContext.GetRouteValue("controller");
+            var actionName = context.HttpContext.GetRouteValue("action");
+            _myLogger.Log($"控制器：{controllerName}，方法：{actionName}，参数：{para}");
+        }
+就可以对整个action进行监控，输入什么输出什么都记录下来
+
+【IResultFilter结果前后扩展】
+把视图渲染夹在中间的filter
+onResultExecuting
+渲染视图内容
+onResultExecuted
+可以：做视图前的统一处理，json格式的统一处理
+        [CustomResultFilter]
+        public IActionResult Index3()
+        {
+            return Json(new
+            {
+                Id = 123,
+                Name = "Richard",
+                Age = 34
+            });
+        }
+
+    public class CustomResultFilterAttribute : Attribute, IResultFilter
+    {
+        public void OnResultExecuted(ResultExecutedContext context)
+        {
+        }
+
+        public void OnResultExecuting(ResultExecutingContext context)
+        {
+            if(context.Result is JsonResult)  //属于某个类或者其子类
+            {
+                JsonResult result = (JsonResult)context.Result;
+                context.Result = new JsonResult(new MyModel()
+                {
+                    Data = result.Value
+                });//放进另一个json里
+            }
+        }
+    }
+
+return Json()和filter里面context.Result = new JsonResult一样都会自动序列化对象为json
+
+【IAlwaysRun相应结果补充】
+【IExceptionFilter异常处理】

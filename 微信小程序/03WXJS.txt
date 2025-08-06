@@ -1,0 +1,165 @@
+小程序浏览器里没有DOM和BOM，不能执行jQuery和node之类的东西
+
+
+【js模块化】
+var common = require('common.js')
+Page({
+  helloMINA: function() {
+    common.sayHello('MINA')
+  },
+  goodbyeMINA: function() {
+    common.sayGoodbye('MINA')
+  }
+}
+
+【js顺序】
+会先执行app.js
+然后是按顺序执行app.json中pages页面的东西
+
+
+【作用域】
+函数和变量文件内有效
+如果要设置和读取全局变量，需要现在app.js设置
+App({
+  globalData: {
+    userInfo: null
+  }
+})
+然后在需要设置和读取的地方先获取全局实例
+然后通过globol属性访问
+getApp().global.userInfo=xxxx;
+
+
+【App】
+App构造函数位于app.js
+接受一个对象参数
+内部有几个名称固定的生命周期事件
+
+onLaunch(){xxxx}当小程序初次打开
+onShow()/onHide()当小程序显示/后台隐藏
+
+
+【跳转】
+wx.navigateTo({ url: 'pages/detail/detail?id=1&other=abc' })
+
+Page({
+  onLoad: function(option) {
+        console.log(option.id)
+        console.log(option.other)
+  }
+})
+
+
+【setData】
+  add:function(){
+    this.setData({time:this.data.time+1});
+  },
+
+在页面内使用this.setData(xx,xx)来设置页面变量
+是一个异步过程
+第一个参数是个js对象，键为变量名。
+第二个参数是设置完成后的回调函数
+
+直接修改 Page实例的this.data 而不调用 this.setData 是无法改变页面的状态的，还会造成数据不一致。
+由于setData是需要两个线程的一些通信消耗，为了提高性能，每次设置的数据不应超过1024kB。
+不要把data中的任意一项的value设为undefined，否则可能会有引起一些不可预料的bug。
+
+【用户行为】
+下拉刷新 onPullDownRefresh
+监听用户下拉刷新事件，需要在app.json的window选项中或页面配置page.json中设置enablePullDownRefresh为true。当处理完数据刷新后，wx.stopPullDownRefresh可以停止当前页面的下拉刷新。
+上拉触底 onReachBottom
+监听用户上拉触底事件。可以在app.json的window选项中或页面配置page.json中设置触发距离onReachBottomDistance。在触发距离内滑动期间，本事件只会被触发一次。
+
+
+【页面栈】
+使用 wx.navigateTo({ url: 'pageD' }) 可以往当前页面栈多推入一个 pageD，此时页面栈变成 [ pageA, pageB, pageC, pageD ]。
+使用 wx.navigateBack() 可以退出当前页面栈的最顶上页面，此时页面栈变成 [ pageA, pageB, pageC ]。
+使用wx.redirectTo({ url: 'pageE' }) 是替换当前页变成pageE，此时页面栈变成 [ pageA, pageB, pageE ]，当页面栈到达10层没法再新增的时候，往往就是使用redirectTo这个API进行页面跳转。
+
+初始化		小程序打开的第一个页面			onLoad, onShow
+打开新页面 调用	API wx.navigateTo		onHide		onLoad, onShow
+页面重定向 调用	API wx.redirectTo		onUnload	onLoad, onShow
+页面返回 调用	API wx.navigateBack	onUnload	onShow
+
+
+【微信api】
+一般在wx对象下
+wx.on* 开头的 API 是监听某个事件发生的API接口，接受一个 Callback 函数作为参数。当该事件触发时，会调用 Callback 函数。
+如未特殊约定，多数 API 接口为异步接口 ，都接受一个Object作为参数。
+API的Object参数一般由success、fail、complete三个回调来接收接口调用结果
+wx.get* 开头的API是获取宿主环境数据的接口。
+wx.set* 开头的API是写入数据到宿主环境的接口。
+
+wx.request({
+url: 'test.php',
+data: {},
+header: { 'content-type': 'application/json' },
+success: function(res) {
+ // 收到https服务成功后返回
+ console.log(res.data)
+},
+fail: function() {
+ // 发生网络错误等情况触发
+},
+complete: function() {
+ // 成功或者失败后触发
+}
+})
+
+有部分API会拉起微信的原生界面，此时会触发Page的onHide方法，当用户从原生界面返回到小程序时，会触发Page的onShow方法。
+
+
+【事件】
+<view id="tapTest" data-hi="WeChat" bind:tap="tapName"> Click me! </view>
+(bind后面的冒号可要可不要)
+// page.js
+   Page({
+  tapName: function(event) {
+    console.log(event)
+  }
+})
+
+当事件回调触发的时候，会收到一个事件对象，对象的详细属性如下表所示。
+
+事件对象属性
+属性		类型		说明
+type		String		事件类型
+timeStamp	Integer		页面打开到触发事件所经过的毫秒数
+target		Object		触发事件的组件的一些属性值集合
+currentTarget	Object		当前组件的一些属性值集合
+detail		Object		额外的信息
+touches		Array		触摸事件，当前停留在屏幕中的触摸点信息的数组
+changedTouches	Array		触摸事件，当前变化的触摸点信息的数组
+
+target和currentTarget事件对象属性
+属性	类型	说明
+id	String	当前组件的id
+tagName	String	当前组件的类型
+dataset	Object	当前组件上由data-开头的自定义属性组成的集合
+
+touch和changedTouches对象属性
+属性		类型	说明
+identifier		Number	触摸点的标识符
+pageX, pageY	Number	距离文档左上角的距离，文档的左上角为原点 ，横向为X轴，纵向为Y轴
+clientX, clientY	Number	距离页面可显示区域（屏幕除去导航条）左上角距离，横向为X轴，纵向为Y轴
+
+bind:xx是从里向外冒泡的
+capture-bind:是从外向里捕获的
+
+以下示例中，点击 inner view 会先后调用handleTap2、handleTap4、handleTap3、handleTap1。
+<view
+  id="outer"
+  bind:touchstart="handleTap1"
+  capture-bind:touchstart="handleTap2"
+>
+  outer view
+  <view
+    id="inner"
+    bind:touchstart="handleTap3"
+    capture-bind:touchstart="handleTap4"
+  >
+    inner view
+  </view>
+</view>
+
+把bind换成catch会阻止后续的冒泡和捕获

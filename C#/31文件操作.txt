@@ -1,0 +1,25 @@
+【查看文件属性】
+using System.IO
+FileInfo f = new FileInfo("文件路径+名字");
+可以写绝对路径或者相对路径
+  相对路径：从当前程序所在的位置找
+vs里可以设置文件"始终复制到运行目录"
+  绝对路径：从盘符开始的路径
+里面含有反斜杠，所以要在字符串的引号前面加一个@
+表示不识别转义字符
+属性：
+f.Exist 可查看这个该路径这个文件是不是存在的
+f.Name 可取得文件名
+f.Directory 可取得文件所在的路径
+f.Length 可取得文件大小
+函数：
+f.Delete() 删除该文件
+f.CopyTo("文件路径+名字") 把某文件复制到某路径+名字
+f.Create() 按f指定的路径和名字创建不存在的文件
+f.MoveTo("文件路径+名字")  剪切，如果路径不变相当于重命名
+
+【文件夹操作】
+DirectoryInfo d = new DirectoryInfo("路径");
+d.Exist  该文件夹是否存在
+d.CreateSubdirectory("新子文件夹名")
+d.Create()  按f指定的路径和名字创建不存在的文件夹

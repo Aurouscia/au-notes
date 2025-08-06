@@ -1,0 +1,21 @@
+自定义一个【比较器类】，用来在list.Sort中对元素排序
+这个类必须实现IComparer<T>接口
+
+class BlockCompare:IComparer<Block>
+   int IComparer<Block>.Compare(Block A, Block B)
+   {A比B大返回正数，反之返回负数，相等为0}
+
+要使用时，先实例化之，然后填入Sort里面
+BlockCompare cmp;
+list.Sort(cmp);
+
+【引用类型作参数】
+如果把引用类型作参数，
+是把原来的引用复制一份给函数，指向同样的地方
+如果直接对参数进行操作，例如
+mi.AddRange(FindAll(xxx))
+函数返回后改引用指向的内容变了
+如果对参数进行赋值，例如
+mi=FindAll(xxx)
+则将这个参数（局部变量）指向另一个地方
+原来的引用指向内容没有变化

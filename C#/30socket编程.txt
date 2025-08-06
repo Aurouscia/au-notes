@@ -1,0 +1,24 @@
+Socket tcpServer = new Socket
+(AddressFamily.InterNetwork,SocketType.Stream,ProtocolType.Tcp);
+
+ip：一个计算机的地址
+192.168.xxx.xxx
+计算机可能有不止一个ip地址（如果有多个网卡的话）
+
+端口号：用来指定把信息发给计算机上的某个软件
+一个软件唯一占用一个端口号，1-约60000
+申请一个四位数的，一般都是空的
+
+IPAddress ip = new IPAddress(new byte[] { 192, 168, 50, 103 });
+EndPoint point = new IPEndPoint(ip,1145);
+//EndPoint是个抽象类，用IPEndPoint实现，后者封装了ip地址和端口
+tcpServer.Bind(point);  //向操作系统申请一个可用的ip和端口用来通信
+
+tcpServer.Listen(100);//使得socket进入监听模式，参数是最大连接数
+Socket clientSocket = tcpServer.Accept();
+//↑暂停当前线程，直到有个客户端连上，返回其socket对象
+
+string message = "Welcome";
+byte[] data = Encoding.UTF8.GetBytes(message);
+//↑对字符串编码，得到byte组
+clientSocket.Send(data);

@@ -1,0 +1,16 @@
+模型需要一个public int Id{get; set;}字段作为主键
+
+[StringLength(60, MinimumLength = 3)]
+StringLength 特性使你能够设置字符串属性的最大长度，以及可选的最小长度。
+[Required]
+必填
+[Display(Name = "Release Date")]
+设置其在@html.DisplayNameFor中显示的名称
+[DataType(DataType.Date)]
+用于格式设置但不提供验证
+[Range(1, 100)]
+值限定在某范围内
+
+最后在控制器那边读取bool ModelState.IsValid判断是否合法
+（一般都用不到，因为会被客户端的js拦截，
+如果用某种方法绕开了js，就会撞到ModelState.IsValid）

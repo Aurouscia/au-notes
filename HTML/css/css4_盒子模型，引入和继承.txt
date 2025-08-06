@@ -1,0 +1,46 @@
+每个html元素都可看成盒子
+一个盒子具有：内容的宽高，边框线(有粗细)，4个内边距和4个外边距
+width设置的是内容宽，内外边距和边线都加在其基础上
+
+边框属性：
+border-left/right/bottom/top设置元素的某一边线
+border-left:粗细 线型 颜色，属性值之间空格隔开
+border-left:2px solid #FF0000
+简写形式：border:同时改四个方向
+线型的取值：none，solid，dashed，dotted，double
+
+display:block
+将行内元素转换为块元素(有宽和高)
+display:inline, none
+
+padding-left/right/top/bottom设置某一内边距
+padding:5px 10px;上下5，左右10
+padding:5px 10px 15px;上5，左右10，下15
+padding:四个，顺序为上右下左
+
+margin同理
+
+两个垂直的块元素的上下距离会取外边距较大值
+解决方法：中间插一个空的div
+
+
+引入css方法
+1.内嵌式
+通过<style></style>放在<head>里面
+<style type="text/css">
+xx{xx:xx;}
+</style>
+2.外链式
+链接外部的css文件，扩展名为.css
+<link href="xx/xx.css" rel="stylesheet(固定)" type="text/css(固定)" />
+这<link>一般放<head>里面
+3.行内式（优先级最高）
+每个html元素都有一个style属性，可以通过其直接加属性
+<p style="width:400px;margin:5px;">xxxxxx</p>
+
+
+继承性
+内部元素将继承外部元素的样式，多个外部元素的样式将叠加到内部
+继承过程中如果设置父辈设置过的属性会将其覆盖
+
+优先级：略

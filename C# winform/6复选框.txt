@@ -1,0 +1,29 @@
+CheckBox
+
+一种优化：
+循环里的if else链中可以加入Continue
+
+lambda表达式与List.Find配合使用
+.Find和.FindAll函数的参数需要填一个委托
+一个用于判断某对象符不符合要求的委托
+可以用lambda表达式简写
+reslist rl = list.Find(x=>{return x.Text==target;})
+
+判断某控件是否为按钮/复选框
+方法一：
+判断xxxxx as CheckBox是否为null
+不同于强制类型转换，as转换不成功不会异常
+而是会返回null
+方法二：
+判断xxxxx.GetType()是否等于typeof(CheckBox)
+
+
+checkBox1.Checked 是否勾勾
+
+.ThreeState  是否支持三种状态（树状用）
+indeterminate：表示一个或多个子项打勾
+此时得用CheckState来读取之
+
+AutoSize为false的时候可以改本体大小
+其选择范围取决于本体而非框框的大小
+同时可以在TextAlign中调整字位置

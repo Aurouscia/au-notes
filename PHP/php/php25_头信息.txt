@@ -1,0 +1,5 @@
+$_SERVER["HTTP_ACCEPT_LANGUAGE"];
+
+php发出请求（模拟请求）
+可以用来：做采集程序，公共平台
+模仿http头信息的格式发送

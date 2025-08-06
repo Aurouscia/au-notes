@@ -1,0 +1,147 @@
+vue的SFC：
+把脚本，模板和样式装在一个xx.vue文件里
+
+<script>
+export default{}
+</script>
+里面填的是设置组件实例的json
+
+
+可以使用【data】属性指定一些模板用的数据
+data里面应该是一个返回js对象的函数，例如：
+<script>
+export default{
+    data(){
+        return{
+            message: "Hello World"
+        }
+    }
+}
+<script>
+vue会在创建组件实例时调用这个函数。
+后面，这个message就成为了标识符，可以在模板中使用，
+而且这个DOM受到message对象的动态更新。
+如果要设置未提供值的东西，定义一个null或者undefined
+
+
+
+<template>
+   <h1>{{message}}</h1>
+</template>
+{{}}里不只能写标识符，可以写任何js表达式
+<h1>{{ message.split('').reverse().join('') }}</h1>
+
+
+
+也可以用【methods:{}】在里面定义函数：
+export default {
+  data() {
+    return {
+      count: 0
+    }
+  },
+  methods: {           //应该是一个json对象
+    increment() {
+      // update component state
+      this.count++
+    }
+  }
+}
+在函数里，可以用this.xx访问组件实例的属性
+那些用data声明的属性都可以访问。
+
+不要在methods里面写lambda表达式，vue不能正常解析
+
+这里定义的函数一般用来填v-on:xxx
+
+
+
+
+【computed属性】
+export default{
+  computed: {              //也是json对象
+    filteredTodos(){
+      if(this.hideCompleted){
+        return this.todos.filter((x)=>!x.done);
+      }else{
+        return this.todos;
+      }
+    }
+  }
+}
+可以声明一个基于其他属性现场计算出来的属性
+如果在模板中放入过多逻辑，不好维护，违背了视图和逻辑分离的准则。
+- <li v-for="todo in todos">
++ <li v-for="todo in filteredTodos">
+它会自动在依靠的属性改变时改变自己的值。
+
+    computed:{
+      reverseHw:function(){
+        return this.hw.split('').reverse().join('');
+      }//或者直接写reverseMsg(){}
+    }
+<div>{{reverseHw}}</div>
+
+不要加括号，当作属性使用
+和函数的不同：
+结果会缓存下来，如果依赖值没有发生改变，就不会重新计算
+相比函数会节省很多性能
+
+以上是计算属性的简写，只有get块
+完整写法还有set块（一般不写，计算属性一般只读）
+computed:{
+   reverseMsg:{
+      get:function(){
+          return this.hw.split('').reverse().join('');
+      }
+      set:function(newValue){
+          this.hw = newValue;
+      } 
+}
+
+
+
+ref
+手动修改某个html元素
+在mount了之后用this.$refs.xxx访问
+<p ref="p">hello>hello</p>
+export default{
+    mounted(){//生命周期中的某个事件，mounted了之后才能对ref的元素修改
+        this.$refs.p.textContent="123";
+    }
+}
+
+
+
+
+【watch】侦听器
+对某个变量进行监听
+    watch:{
+      name:function(newValue,oldValue){
+        this.hw=oldValue+"->"+newValue;
+      }
+    }
+当count发生改变就会执行这个函数，新值和旧值从参数传进来。
+一般用来执行异步操作或者复杂逻辑
+
+另一种写法：写属性，可以有更多的设置
+    watch:{
+        name:{
+            immediate:true,        //初始化时调用一次函数
+            handler:function(){       //函数
+                 xxxx
+            }
+        }
+    }
+
+watch监听某个对象，并不能监听到它内部属性的变化 
+深度监听：
+user:{
+   handler:function(newValue){xxx},
+   deep:true     //会递归进去监听所有属性和属性的属性（性能开销很大）
+}
+只监听对象里的某一个属性，使用字符串进行优化
+"user.name":{
+   handler:function(newValue){xxx},
+   deep:true     
+}

@@ -1,0 +1,11 @@
+
+运行：
+npm init vite@latest 项目名称 -- --template vue
+然后按照指示
+cd xxx
+npm install
+
+modules是外部依赖项
+public是静态文件
+src是源代码
+src/main.js是入口文件

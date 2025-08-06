@@ -1,0 +1,58 @@
+MVC
+C:输入
+M:保存数据，计算业务逻辑
+V:视图层
+
+如果启用应用(不调试)
+可以在vs里修改代码，刷新浏览器，立即查看结果
+
+session默认关闭
+如果要使用session，需要在program.cs里：
+builder.Services.AddSession();
+app.UseSession();
+
+默认路由
+/[Controller]/[ActionName]/[Parameters]
+是在Program.cs里的app.MapControllerRoute()设置的
+pattern: "{controller=Home}/{action=Index}/{id?}");
+如果不提供后面的URL，就会默认到home控制器的index方法
+
+action不一定要返回IActionResult，可以返回string
+action的参数可以由xx?a=xx&b=xxx（查询字符串）输入
+
+HtmlEncoder.Default.Encode($"Hello {name}, ID is: {id}");
+可以防止JS攻击
+
+如果有多个参数，其中一个名为id，则URL末尾的参数会匹配到id这个参数
+（在默认路由定义中有名为id的参数）
+
+如果想使用视图模板来回应请求，应该写Return Page();
+会指向那个与action同名的cshtml文件
+可以使用ViewData字典传递数据给视图
+
+布局页在_Layout.cshtml页面里
+_ViewStart文件里可以指定使用的布局文件，使其为null可以不用任何布局
+
+如果一个控制器里有两个同名方法，其中一个标注[HttpPost]，
+用来处理post请求，另一个不标注的默认处理get请求
+可以一个用来显示表单页，另一个用来把表单数据提交数据库
+也可以不写，这样同一个方法就会处理两种请求，在仅用post内容筛选数据时可以这么写
+
+同名的方法（重载）必须参数不同，如果没有不同，可以写一个不用的参数
+或者起一个不一样的名字
+如果不想在视图层写不一样的action名称，可以在方法上方加
+[HttpPost, ActionName("Delete")]，为其指定action名
+当post请求发来时，路由就会调用这个方法
+
+表单的最后会有一个隐藏的验证令牌，如果其指向的方法会修改数据，
+就应该在方法上标注[ValidateAntiForgeryToken]，以防被攻击
+
+表单默认是post提交，如果需要用get(一些信息存入URL)
+就可以指定method=get
+
+DisplayNameFor HTML 帮助程序检查 Lambda 表达式中引用的 Title 属性来确定显示名称。 由于只检查但未计算 Lambda 表达式，因此当 model、model.Movies[0] 或 model.Movies 为 null 或空时，你不会收到访问冲突。
+
+自带的Ilogger可以在控制器构造函数依赖项注入一个，可用于记录
+_logger.logxxx("xxx");输出会输出到"输出"
+
+

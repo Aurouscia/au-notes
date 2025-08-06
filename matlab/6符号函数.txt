@@ -1,0 +1,50 @@
+syms x y z
+创建符号变量
+syms x 相当于 y=sym('y');
+想定义一个符号常量时，只能使用：
+f=syms(5);
+
+A=sym('a',[1 20])
+快速创建a1到a20
+
+syms x  y integer
+assumptions
+assumptions(x)
+assum([x,y],'clear')
+
+syms f(x,y,z)
+创建没有函数体的符号函数
+此时自动创建x和y
+
+f(x,y)=x+2*y;
+为符号函数指定函数体
+
+f(3,2)
+计算函数值
+
+f(1:3,2:4)
+一次性输入一组数，对对应序号的数计算
+
+dfx=diff(f,x)
+dfx符号函数是f对x偏微分后的函数
+dfx(y+1,y)
+求x=y+1这条线上的偏微分
+
+
+syms x
+M=[x,x^3;x^2,x^4];  （符号矩阵）
+f(x)=M
+创建输入一个数，输出一个矩阵的函数
+如果输入是个矩阵，输出将会是一个元胞数组
+y=f([1,2,3;4,5,6]);
+
+
+syms x1 x2;
+a=[x1,x2];
+F=[f1;f2];（注意是列向量）
+J=jacobian(F,a);
+如果想代入值的话，可以：
+b=[1 2]
+y=subs(J,a,b);
+（在符号表达式J中用b代替a）
+然后y=eval(y)算出double型矩阵得到结果

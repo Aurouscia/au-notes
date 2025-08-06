@@ -1,0 +1,140 @@
+php中自定义变量的作用域分两种，全局(函数外)和局部(函数内)，互相不重合
+预定义变量的作用域称为超全局作用域，函数内外全都可用
+预定义变量又叫超全局变量，超全局变量都是数组
+$_GET,$_POST,$_SERVER...(大约十个)
+
+$_GET变量(数组)
+get这个词，常常出现在<form action="abc.php" method="get">...</form>
+这就叫表单以get方式提交数据（总是字符串形式）
+则$_GET这个预定义数组变量，就是值以这种方式提交的所有数据的集合(数组)
+相应的，也可以post方式提交
+在网页中以get方式提交数据有多种形式
+1.作用是：用户填写表单数据并提交后，会将数据发给页面abc.php
+<form action="abc.php" method="get">
+    用户名：<input type="text" name="xxName"/>
+    密码：<input type="pwd" name="xxPwd"/>
+    <input type="submit" value="提交"/>
+</form>
+也可以理解为打开abc.php还可以理解为，请求该网页abc.php
+2.形式和上面不一样，本质一样：都是get请求，当用户点击这个链接时：xxxxx
+<a href="abc.php?xxName=test1&xxPwd=123">xxx</a>
+3.当该行语句执行时，xxxxx
+<script>
+    location.href="abc.php?xxName=test1&xxPwd=123";
+</script>
+4.
+<script>
+    location.assign("abc.php?xxName=test1&xxPwd=123");
+</script>
+然后，在abc.php中
+<?php
+    $v1=$_GET['xxName'];
+    $v2=$_GET['xxPwd']；本质是字符串，实际上是数组索引
+    echo "<pre>";
+    var_dump($_GET);可以输出一个变量的最完整信息，名字，数据，长度
+    echo "</pre>";最好配合pre用
+?>
+爱好：同一件事，单选和多选必须用一样的name
+<input type="checkbox" name="hobby" value="足球">足球
+<input type="checkbox" name="hobby" value="蓝球">蓝球
+<input type="checkbox" name="hobby" value="排球">排球
+传递之后：
+$_GET['hobby']='篮球';
+$_GET['hobby']='足球'；发生覆盖
+解决办法：多选项的东西表单中name写成数组
+<input type="checkbox" name="hobby[]" value="足球">足球
+<input type="checkbox" name="hobby[]" value="蓝球">蓝球
+<input type="checkbox" name="hobby[]" value="排球">排球
+传递之后：
+  ["hobby"]=>
+  array(2) {
+    [0]=>
+    string(6) "足球"
+    [1]=>
+    string(6) "蓝球"
+  }变成一个拥有完整数据的数组
+
+$_POST变量，也是数组，类似$_GET变量
+$_POST代表页面通过post方式提交的数组，只有表单submit一种形式
+作用是：用户填写表单数据并提交后，会将数据发给页面abc.php
+<form action="abc.php" method="post">
+    用户名：<input type="text" name="xxName"/>
+    密码：<input type="pwd" name="xxPwd"/>
+    <input type="submit" value="提交"/>
+</form>
+也可以理解为打开abc.php还可以理解为，请求该网页abc.php
+区别：顶上的栏不会显示数据
+
+一般用post交表单，get一般用在链接里
+
+$_REQUEST变量，也是数组
+$_REQUEST其实并不是一个独立的数据来源，而是$_POST和$_GET的组合
+由系统内部自动存储
+通常get和post数据不会同时出现，request数组就代表其中之一
+（一般情况下两者都可以同样接收）
+如果有post和get同时提交的情形：
+一般就只有一种html语法会出现这种情形，文件名后加数据
+<form action="abc.php?a=5&b=6" method="post">
+    用户名：<input type="text" name="xxName"/>
+    密码：<input type="pwd" name="xxPwd"/>
+    <input type="submit" value="提交"/>
+</form>
+此时a和b以get方式提交，xxName和xxPwd以post方式提交
+$xx=$_POST['xxName'];
+$xx=$_GET['a'];
+也可以：
+$xx=$REQUEST['xxName'];
+$xx=$REQUEST['a'];
+当get和post有重名项时
+1.尽量避免重名
+2.如果重名了，此时request数组只存储其中一个数据，要么是post要么是get
+3.至于存储的是哪个，由php.ini的设置项决定request_order="GP"或者"PG"，后面的覆盖前面的
+三者是互相没有关系的，$_GET数据unset掉，request的还在
+
+$_SERVER变量，也是个数组
+该变量存储了服务器端或客户端的请求信息或设置信息，比较多，
+不同的服务器和不同的请求页面，数据项可能不同
+REMOTE_ADDR用户的ip地址
+SERVER_ADDR服务器的ip地址
+SERVER_NAME主机名
+DOCUMENT_ROOT站点绝对路径，(其实就是主机设置中的documentRoot)
+PHP_SELF当前网页的文件路径
+QUERY_STRING表示一个get请求的整体字符串，
+类似www.xx.com/abc.php?a=5&b=6中的a=5&b=6的部分(问号后面部分)
+
+$GLOBALS变量（没有$后的下划线）
+似乎是多余的，所有全局变量都在里面，
+其有超全局性，可以把全局变量弄到函数里去使用
+变量名就是数组下标，变量值就是对应的值
+【项目的任何地方都能访问(包括其他文件)】
+$v1=1;
+$v2=2;
+var_dump($GLOBALS);
+包括其自己,get,post,自定义全局变量,cookie和file
+
+常量
+用于存储一个不希望变化的东西
+常量的值不能改变，也不能销毁
+命名规则：全大写
+define("PI",3.1416)
+echo PI（不要$）
+const只能在最顶层使用(不能在大括号里面用)
+const 常量名(不要引号) = 常量值
+使用常量：【直接用名字，不要$】
+或者constant("常量名")：因为：【常量在字符串中无法识别】
+const C1 11;
+$s1 = "C1";
+constant(C1)和constant($s1)都一样
+常量具有超全局作用域，函数内外都可以用
+只能存储标量:int float string bool
+defined()判断常量是否存在（只能判断常量）
+if(defined(xxx)==false){定义该常量}
+使用未定义的常量会报错，和使用一个未定义的变量一样
+
+预定义常量：可以直接使用，有些常量需要某些模块打开才能用
+M_PI,PHP_OS,PHP_VERSION,PHP_INT_MAX
+
+魔术常量：值会随着一定条件(环境)而变化的常量，
+形式和使用上是常量，实际上是值会改变
+__DIR__（当前目录）,__FILE__（当前文件）,__LINE__（当前行号）
+（前后各两个下划线）

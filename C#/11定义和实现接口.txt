@@ -1,0 +1,29 @@
+命名：前面加一个字母I，表示Interface
+
+public interface IFlyHandler{
+      public void Fly();
+      public void Eat();
+}
+函数只有签名，没有函数体{}
+只能有属性，不能有字段(?)
+不能有构造函数
+所有成员默认public，不能private
+
+在类中实现接口
+public class Bird1:IFlyHandler{
+     public void Fly()
+           {xxxx;}
+     public void Eat()
+           {xxxx;}
+}
+必须补齐接口中的两个函数
+
+接口的继承
+interface IA{void MethodA()}
+interface IB:IA{void MethodB()}
+接口B就有了两个函数签名
+
+抽象基类可以包含正常的方法，接口只能有抽象方法
+抽象基类和接口都不能被实例化
+一个类可以实现多个接口
+接口名称之间使用逗号分隔

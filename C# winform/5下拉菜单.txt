@@ -1,0 +1,70 @@
+快速监视：
+选择变量后：Ctrl+D+Q
+初始化器
+new string[]{"x","x","x"};
+
+
+ComboBox
+其宽度由字体决定
+
+和文本框一样，右上角有个小箭头可以点开编辑
+可以选择绑定数据，或者直接编辑项
+绑定数据：DataSource属性（一般不用，局限性比较大）
+直接编辑项：Items集合（也可以绑定）
+
+双击：自动创建并绑定上
+SelectedIndexChanged函数
+
+comboBox1.SelectedIndex=a
+使其选择上第a个项目
+
+comboBox1.Items.Count
+当前集合里内容的个数
+comboBox1.Items.Add()
+增加一个选项
+comboBox1.Items.AddRange()
+增加一组选项
+
+.Text
+获取其(所有控件都是)【显示】的内容
+.SelectedItem;
+获取当前选择的对象(object类型)
+.SelectedText;
+.SelectedValue;
+未知
+
+
+【style】：
+simple 固定大小，不能下拉
+dropdown 可以手动改里面的数据
+dropdownlist 只能选择
+如果手动改了里面的数据，
+代码中又有cmb.SelectedItem.Tostring()
+就会报错，因为根本不存在这一项
+所以：我们应该用第三种
+
+【联动】：
+前面省，后面市
+动态加载数据
+
+        public Dictionary<string, string> locs;
+
+        private void Form_Load(object sender, EventArgs e)
+        {
+            locs = new Dictionary<string, string>();
+            locs.Add("武汉市", "汉阳区，江岸区，武昌区");
+            locs.Add("南京市", "鼓楼区，雨花台区，江宁区");
+            foreach (var item in locs.Keys)
+            {
+                comboBox1.Items.Add(item.ToString());
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            【comboBox2.Items.Clear();】
+            string selectedText = comboBox1.SelectedItem.ToString();
+            string[] secondaryTexts = locs[selectedText].Split('，');
+            comboBox2.Items.AddRange(secondaryTexts);
+            comboBox2.SelectedIndex = 0;
+        }

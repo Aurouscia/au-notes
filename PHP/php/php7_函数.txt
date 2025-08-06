@@ -1,0 +1,86 @@
+function 函数名(形参)
+{函数体}
+
+函数的形参可以设置默认值
+function getArea($r,$PI=3.14){xxx}
+$a1=getArea(3);当只有一个参数时，后面的形参会使用默认值
+默认值只能是常量，不能是变量，对象，资源
+
+function xxx(&$a,$b){xxx}
+在形参中加&(取地址符)可以让传值变成传递引用
+这是在函数中改变它会改变实参的值
+
+在函数内部，可以使用的几个函数
+func_get_args();取得接收到的所有实参数据，结果是个数组
+func_get_arg(n);取得第n个数据（从0开始）
+func_num_args();取得实参数据的个数
+function getSum(){
+	$arr=func_get_args();
+	$sum=0;
+	foreach($arr as $value){
+		$sum+=$value;
+	} return $sum; }
+$sum1=getSum(1,2,5);
+
+也可以让函数返回引用
+function &f1(xx){(函数名前加取地址符)
+	static $result=0;(使用静态变量)
+	xxxx
+	return $result();}
+$v1=&f1(xx)
+$v1++也会使得$result+1
+
+可变函数：
+可变变量
+一个变量的名本身也是一个变量
+$v1="abc" //这是个字符串，内容是"abc"
+$abc=10 //这是个普通变量，内容是数字10
+echo $$v1
+一个$符号出现，就视图解释为一个变量，变量名为$v1，
+其为abc，所以整体为$abc，值为10
+可变函数一样
+$str1="f1";
+$v1=$str1(3,4)相当于调用f1(3,4)
+应用：
+function jpg()
+function png()
+$houzhui=get_houzhui($fileName);
+$houzhui();
+
+匿名函数：
+$str1=function(){xxx}
+$v1=$str1();
+用起来就像可变函数一样
+
+有些少量函数可以使用一个匿名函数作为参数
+并在过程中执行这个匿名函数
+call_user_func_array(匿名函数，数组);
+含义：将数组的每一项当作匿名函数的实参传进去，并执行之，再返回数据
+call_user_func_array(
+	function($m1,$m2,$m3){
+		echo $m1;
+		echo $m2;
+	}
+	, array(1,2,3)
+);
+
+函数的作用域
+php中全局域和局部域是分开的，互不重叠
+js中全局包括局部
+超全局变量：系统定义的那几个，函数内外都可以取到
+静态局部作用域：也是局部，但是函数退出后不丢失，下次不再初始化
+局部可以访问全局变量：
+$v1=10;
+function f3(){
+	global $v1;//使用global关键字进行一次声明，就能访问全局变量了
+	xxx}
+实际上：在函数内部创建了一个同名的函数，并通过引用指向了外部变量
+unset($v1)指的是断开这种引用联系
+也可以通过GLOBALS超全局数组在函数内访问全局变量
+GLOBALS['v1']++;
+这里是对那个全局变量的直接操作，unset会使得其被删除
+也可以这么创建一个不存在的全局变量
+GLOBALS['xxx']=123;
+
+function_exists("func1");
+判断某函数是否被定义过

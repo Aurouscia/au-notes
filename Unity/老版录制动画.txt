@@ -1,0 +1,54 @@
+【动画录制】
+以开门为例，
+调出Animation窗口
+为门添加Animation组件
+Animation窗口和组件中都会显示各个动画
+要添加一个clip，在窗口左上角选择clip的地方做
+
+Animation窗口中的时间轴（xx秒：xx帧）
+
+【Animation类】
+CrossFade()两个动画间淡入淡出，适于人物
+Play()没有淡入淡出的动画
+PlayQueued()不立即播放下个动画，排队，等当前动画播完了再播这个
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// 控制门的开关
+/// </summary>
+public class Door : MonoBehaviour
+{
+    private bool isOpen=false;
+    private Animation anim;
+    private string animName = "dooropen";
+    private void Start()
+    {
+        anim = GetComponent<Animation>();
+    }
+    private void OnMouseDown()
+    {
+        if (isOpen)
+        {
+            if (anim.isPlaying == false)【如果没有在播，就把进度条拉到最后】
+            {
+                anim[animName].time = anim[animName].length;
+            }
+            anim[animName].speed = -0.5f;【设置倒放】
+        }
+        else
+        {
+            anim[animName].speed = 0.5f;
+        }
+        anim.Play(animName);
+        isOpen = !isOpen;
+    }
+}
+
+【动画模式】
+Once  一次
+Loop  循环
+PingPong  正反来回
+ClampForever  固定到永远：留在最后一帧，再也不能播放别的动画

@@ -1,0 +1,70 @@
+include include_once require require_once
+它们的本质是一样的，都是用于加载/引入/包含一个外部文件到当前php代码
+
+进入include语句时相当于退出了php脚本模式，进入html模式，
+处理里面的html代码和<?php xxx ?>部分，最后再返回php脚本模式
+相当于
+?>
+include的内容
+<?php
+
+1.如果加载文件失败，有不同的处理办法
+	require会fatal error（后面的依赖前面的代码时用这个）
+	include会警告（无关紧要的东西用这个）
+2.如果加载文件重复，有不同的处理办法
+	带once的会避免重复加载同一个文件
+都是语法结构，不是函数，include 'xxx.php' 或者 include('xxx.php')
+涉及到文件路径：
+相对路径：以“./”或“../”开头的路径
+	./表示当前网页文件位置，../表示上一级文件夹
+	include过来之后，会把那个文件中的所有东西都拿到include的位置
+	（被包含文件不再出现<html>之类的东西）
+绝对路径：
+	windows系统  c:/d1/d2/page1.php
+	unix系统  /d1/d2/page1.php
+	网络  http://www.xxx.com/d1/d2/page1.php(拿来执行之后的结果，没有php代码)
+也可以只有文件名，无路径：
+	会先去系统设置的include目录寻找
+		set_include_path('c:/xx/xxx;c:/xxx/xxx');
+		$path=get_include_path('xxxx');
+		$new_path=$path.";xxxx";    //追加
+		$new_path=$path.PATH_SEPARATOR."xxxx";
+		set_include_path($new_path);    //不会破坏原有的设定
+	再去当前执行网页文件所在目录寻找
+		就是地址栏中显示的文件
+	再去include命令所在文件的所在目录查找
+		假如一个被include的文件自己有include，就会发生这种情况
+被载入文件中return关键字的使用
+	会使得后面的部分直接中断，回到原来的文件中
+	return $m; 
+	$n = include 'xxxx.php'; //可以接收结果
+
+getcwd()获得当前工作目录
+
+E_ERROR，E_WARNING等是数字常量，用来判断错误种类
+E_PARSE：语法错误，不能开始执行
+E_USER_ERROR：用户自定义错误
+可以在程序中自定义错误，针对数据的不合理情形
+E_ALL：代表所有错误
+E_STRICT：可以执行但在目前版本中过时了
+这些错误的本质都是数字，1，2，4，8等，所以可以通过位运算来合并
+错误可以自行触发：使用未定义变量，函数，包含不存在文件等
+也可以人工触发：
+trigger_error("错误提示",用户错误代号)
+trigger_error("xxxx",E_USER_NOTICE/WARNING/ERROR);
+是否显示错误：
+ini_set("display_error",true/false);
+ini_set("error_reporting",E_NOTICE);
+ini_set("error_reporting",E_ALL&~E_NOTICE);
+
+【ini_set("名称"，值)可以设置php.ini中的值】
+ini_get("名称")可以取得某项的值
+
+设置ini中的error_log属性，可以定义错误日志的文件名
+ini_set("log_errors"=On);
+ini_set("error_log","php_errors.log")
+
+set_error_handler("myError")
+设置一个遇到错误会自动调用的函数
+function myError($errNo,$errMsg,$errFile,$errLine){xxx}
+四个参数顺序固定(名字可以自己起)，分别为错误号，错误信息，文件，行号

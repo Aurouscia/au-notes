@@ -1,0 +1,34 @@
+【Time】
+Time.time：从游戏启动到现在的时间(秒，浮点数)
+Time.deltaTime：上一帧到这一帧的时间
+
+private void Update()
+    {
+        //this.transform.Rotate(0, 1, 0);
+        //每渲染帧转一度，1秒转了多少度无从得知
+        //帧多就快，帧少就慢
+
+        this.transform.Rotate(0, speed*Time.deltaTime, 0);
+        //角速度*这帧时间，可以保证角速度不受性能和渲染时间影响
+    }
+private void FixedUpdate()
+    {
+        this.transform.Rotate(0, speed, 0);
+        //固定0.02秒，在这里不需要*deltaTime
+    }
+
+【timeScale：时间流逝速度】
+会改变FixedUpdate但【不会改变Update】的速度
+但update里有*deltatime时也会受到影响
+所以个别不受时间流逝影响的物体应该放update里
+deltaTime会受影响，【unscaledDeltaTime】不会受影响
+time会受影响，realtimeSinceStartup不会受影响
+
+【固定间隔做事】
+Private void Update()
+if(Time.time>=nextTime)
+{
+//每x秒做的事情
+nextTime +=x;
+}
+可以节省性能

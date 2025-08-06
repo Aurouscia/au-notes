@@ -1,0 +1,13 @@
+【LateUpdate】
+固定的相机使用LookAt函数看向目标
+应该在LateUpdate里做，确保目标先运动，相机再看向目标
+否则先后顺序不确定，会一卡一卡的
+
+【Debug.Log】
+Debug.Log(Time.FrameCount+"--"+xxxx)
+
+【vs不认了】
+vs资源管理器右上角点击显示所有文件，包含在项目中
+
+【碰撞不检测了】
+刚体中关闭Kinematic

@@ -1,0 +1,212 @@
+【类】
+即类别
+【对象】
+类的具体实例，即归属于类的个体
+名词：数据成员
+动词：方法成员
+【创建类】
+访问级别 class 类名【所有单词的首字母大写】
+(区别于变量名的驼峰命名法)
+{
+        类成员(数据和方法)
+}
+通常每个类都在一个独立的c#源文件中
+创建类意味着产生了一种新的数据类型(引用类型)
+
+using System;
+namespace unityLearning2
+{
+    class Wife//所有wife都这样，是个抽象的概念
+    {
+        //【数据成员】
+        string name;//默认为private
+        //和private string name;一样
+        private int age;
+        private float height;//还是写上private比较好
+
+        //【方法成员】
+        public void SetName(string name)
+        {
+            this.name = name;
+            //this指当时的对象(引用)【即wife01】
+            //相当于wife01.name
+        }
+        public string GetName()//以后不会需要这么写
+        {
+            return name;
+            //不会有二义性，指的肯定是数据成员中的name
+        } 
+        public void SetAge(int age)
+        {
+            this.age = age;
+        }
+        public int GetAge()
+        {
+            return age;
+        }
+    }
+}
+【使用类】
+namespace unityLearning2
+{
+    class Program2
+    {
+        static void Main(string[] args)
+        {
+            Wife wife01;//声明一个wife类型的引用
+            wife01 = new Wife();//指向wife类型的对象(实例化wife类型对象)
+            //即给wife01开辟堆中空间(大小取决于成员)，填入默认数据
+            wife01.SetName("Anna");
+            wife01.SetAge(18);
+            Console.WriteLine(wife01.GetName());
+            Console.WriteLine(wife01.GetAge());
+            Wife wife02=wife01;//栈上新开了一个引用，指的是堆中同一个区域
+        }
+    }
+}
+【成员变量】
+区别于局部变量
+即写在类内方法外的变量
+存储在堆中，由类名作为引用
+当无类名指向该类，成为垃圾被清除
+具有默认值
+可以与局部变量重名(默认指局部变量，因为局部变量在栈，成员变量在堆)
+用this.区分，this.name即为类的成员变量
+
+【访问修饰符】
+一个类中，所有成员默认为private，在类外无法访问到
+(private还是要写的)
+写public，就可以从外部访问
+【最好是】用public方法访问private的变量，可以检查输入的数是否合法
+public void SetAge(int age)
+        {
+            if (age <= 19 && age >= 18)
+                this.age = age;
+            else
+                throw new Exception("我不要");//创建一个exception类型的对象
+        }
+如果公开了，那就可以瞎几把乱改，不好
+也有可能要经过某种计算
+要直接改，也可以
+
+【属性】可以在做操作/保护的情况下进行简便的读写
+        private int age;//字段：存储数据
+        //属性：保护字段，本质就是对字段的读取/写入方法
+(需要从外部读写的字段才需要)
+        public int Age    //不要括号即为属性，
+        //规范上名字和变量一样，但首字母大写
+        {
+            get//读取时保护
+            {
+                return age;//不要写成大写的了，会造成stackOverflow
+            }
+            set//写入时保护
+            {
+                if (value <= 19 && value >= 18)//设置属性时会执行这里
+                    this.age = value;//value即为输入的数据("Mary")
+                else
+                    throw new Exception("我不要");
+            }
+        }
+
+wife03.Name = "Mary";//设置属性(注意N是大写)会执行set块
+wife03.Age = 18;
+Console.WriteLine(wife03.Age);//会执行get块
+如果只写get或者只写set，即为只读/只写属性
+尝试访问/修改时会提示没有访问器
+
+【构造函数】
+创建一个该类对象的方式，可以快捷地初始化数据成员
+(里面也可以写创建对象就执行的代码)
+如果没有，编译器会自动生成一个无参数构造函数，就一个个填罢
+如果有，编译器不会自动生成一个无参数构造函数，必须按提示填入
+
+【public Wife(string name,int age)  //本质：一个方法】
+        //【没有返回值】没有什么void的位置
+        //【必须和类同名】
+//创建对象时(new Wife()时)自动调用，其他时候不行
+        {
+            Name = name;//通过属性写入
+            Age(属性) = age(局部变量);
+        }
+public Wife() { }
+//构造函数的重载，此时【不写参数也能创建对象】，都填默认值
+使用时：
+Wife wife03 = new Wife("Mary",19);
+或
+Wife wife03 = new Wife();
+如果【私有化构造函数】
+private Wife(){ }
+则外部无法创建新的Wife对象
+如果有这种情况：
+public Wife(string name,int age)        
+        {
+            Console.WriteLine("execute when creating instance");
+            Name = name;
+            Age = age;
+        }
+public Wife(string name)
+        {
+            Console.WriteLine("execute when creating instance");
+            Name = name;
+        }
+public Wife() { Console.WriteLine("execute when creating instance"); }
+要改动一个创建对象就执行的代码，不方便改，那么：
+public Wife(string name, int age):this(name)
+//会去执行下面的函数，并把name给它
+        {
+            Age = age;
+        }
+        public Wife(string name):this()//会去执行下面的无参数函数
+        {
+            Name = name;
+        }
+        public Wife() { Console.WriteLine("execute when creating instance"); }
+可以把参数多的构造函数中的部分功能，交给参数少的构造函数
+
+【示例】
+namespace User
+{
+    /// <summary>
+    /// 用户集合类
+    /// </summary>
+    class UserList
+    {
+        //字段
+        private int autoIndex=0;
+        private User[] list = null;
+        //属性
+        private int Count
+        {
+            get
+            {
+                return autoIndex;
+            }
+        }
+        //构造函数
+        public UserList():this(8){}
+        public UserList(int capacity)
+        {
+            list = new User[capacity];
+        }
+        public void Add(User value)
+        {
+            CapacityCheck();
+            list[autoIndex++] = value;
+        }
+        private void CapacityCheck()//一个方法最好只干一件事
+        {
+            if (autoIndex >= list.Length)
+            {
+                //扩容数组：开辟一个两倍大的空间，粘进去，改引用
+                User[] newList = new User[list.Length * 2];
+                list.CopyTo(newList, 0);
+                list = newList;
+            }
+        }
+        public User Get(int index)
+        {
+            return list[index];
+        }
+    }
+}

@@ -1,0 +1,20 @@
+(MessageBox静态类.Show(xxx)可弹出一个对话框)
+MessageBox.Show(txt2.SelectedText)
+
+MutiLine 是否可跨越多行
+ScrollBars 滑动条的种类(Dock后才有横向滑块)
+PasswordChar 对单行框框，把所有字符替换为该字符
+这时，里面的内容不让复制
+Enabled 是否开启(否则变灰)
+ReadOnly 是否只读(否则可以更改)
+
+textBox1.SelectedText
+textBox1.TextLength
+
+事件：
+TextChanged
+
+方法：
+textBox1.Append(str);
+textBox1.Select();
+textBox1.SelectAll();

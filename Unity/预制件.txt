@@ -1,0 +1,25 @@
+【预制件prefab】
+把对象从Hierarchy拽到Project
+就可以几个场景共用一个对象
+修改Hierarchy里面的只改一个对象本身
+修改project里面的资源(预制件)，能改所有实例对象
+
+创建预制件后，其中的每个实例对象的Inspector面板顶部会出现三个按钮
+修改一个实例对象，想要应用到其他对象中，
+可以点击apply，把修改交给预制件
+
+实例对象做修改后，改完的结果
+【发现那个属性是加粗的】
+不归预制件管理了，修改预制件时这个属性不再变化
+右击revert value可以放弃实例属性值，交还给预制件管理
+
+select：从Hierarchy中浅蓝色字体的对象，定位到project中预制件的位置
+revert：放弃实例属性值
+apply：用此实例属性值替换预制件属性
+
+
+如果某物体需要Instantiate预制件，
+那就public GameObject xxx;
+在编辑器里拖进去就行
+或者使用Resources.Load("路径")
+（必须放在一个Resources目录下（没有就自创））

@@ -1,0 +1,20 @@
+public T this[int index]
+{
+     get{}
+     set{}
+}
+
+        public T this[int index]
+        {
+            get
+            {
+                return GetItem(index);
+            }
+            set
+            {
+                if (index >= 0 && index <= count - 1)
+                    array[index] = value;
+                else
+                    throw new Exception("IndexOutOfRange");
+            }
+        }

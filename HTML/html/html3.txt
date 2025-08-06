@@ -1,0 +1,78 @@
+XHTML
+主要目的：取代HTML，是其升级版
+HTML语法不规范，在某些设备上会无法正常显示
+标记上基本一样，但更严格，纯净
+
+所有标记必须正确嵌套，分清大小，不能交叉嵌套
+	<h1><font></font></h1>
+所有标记必须小写
+所有标记必须闭合
+	双边标记有<xx></xx>，单边标记<xx />，/前有空格
+所有属性值必须加引号
+所有属性必须有值
+	<hr noshade="noshade" />
+文档开头必须有DTD类型定义
+
+DTD：代码不用记，在IDE创建文件时会有选项
+严格型：body中不能有表现和格式，只能有结构标记
+	html与css完全分离
+过渡型：可以有表现和格式
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+框架型：可以实现多个网页在一个窗口呈现
+
+<meta>
+提供一些元信息，比如关键字，描述信息，作者，刷新，
+缓存过期时长，编码字符集
+http-equiv和content是一对的，前者带着属性名，后者带着属性值
+name和content也是一对的
+这些信息会首先发给客户端
+设置网页字符集(必写)：
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+网页自动刷新，效果和单击刷新按钮一样：
+<meta http-equiv="refresh" content="10" />
+延迟一段时间后跳转：
+<meta http-equiv="refresh" content="3;url=http://www.baidu.com" />
+如果需要写两对，就写在两个<meta>里
+设置网站的关键字：（有利于被搜索引擎抓到）
+<meta name="keywords" content="关键字xxx" />
+<meta name="description" content="描述xxx" />
+<meta name="author" content="作者xxx" />
+百度上显示的词条，大字是title，小字是description
+
+表格标记（一种布局方法，现在多用div+css代替之）
+比较深层，不利于被搜索引擎抓取
+<table>
+    <th>标题单元格居中加粗显示
+    <tr>一对tr代表一行
+        <td>一对td代表一个单元格
+        </td>
+    </tr>
+</table>
+table属性：
+width：宽度，height：高度（html中数值都不要单位）
+如果不指定，自动以里面的元素确定宽高
+border：边线粗细，bordercolor：边线颜色
+align：水平对齐方式
+cellpadding：单元格边线到内容的距离（内边距）
+cellspacing：两个单元格之间的距离（外边距）
+style="border-collapse:collapse"细边框
+每行的高度默认由里面的内容决定，一行高度一致，一列宽度一致
+bgcolor：表格背景色
+background：表格背景图片
+tr属性：
+height：一行的高度
+bgColor：行的背景色
+align：行的内容水平居中显示
+valign：行的内容垂直居中显示top，middle，bottom
+td/th属性：
+width：单元格宽度
+height：单元格高度
+bgcolor：背景色
+background：背景图片
+align：水平对齐
+valign：垂直对齐
+rowspan：跨行合并
+colspan：跨列合并
+要合并，先找到第一个（左边和上面）合并的属性放在那个单元格里面
+<td rowspan ="3"></td>
+下面两个单元格删掉，否则会多出来

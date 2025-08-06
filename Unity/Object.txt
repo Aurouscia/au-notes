@@ -1,0 +1,30 @@
+【GameObject类】
+场景里所有东西(hierarchy面板)都是gameobject
+activeSelf该物体自己的激活开关状态
+如果父级未激活，子级的activeSelf仍为开，但子级并未激活
+activeInHierarchy实际上的激活状态
+bool DaGou =this.gameObject.activeSelf;
+this.gameObject.SetActive(false);【设置是否激活】
+
+无法直接添加组件
+
+GameObject lightGO = new GameObject();【创建新物体】
+lightGO.transform.Translate(0, 1, 0);
+Light light = lightGO.【AddComponent<Light>()】;
+light.color = Color.red;
+light.type = LightType.Point;
+
+GameObject.Find("name");//非常消耗资源
+获取具有这个标签的物体
+GameObject[] allEnemy=GameObject.FindGameObjectsWithTag("Enemy");
+GameObject player = GameObject.FindWithTag("Player");
+
+【object类】包罗万象
+删除任何对象：
+Object.Destroy(gameobject,5);5秒后删除xxx
+Object.Destroy(GameObject.Find("RedLight"));
+DontDestroyOnLoad();加载新场景时不删除
+以类型(一般为脚本名)查找任何东西：
+Object.FindObjectsOfType<MeshRenderer>();
+克隆：
+obj Instantiate(obj,position,rotation)

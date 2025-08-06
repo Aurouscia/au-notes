@@ -1,0 +1,26 @@
+如果一个类要依赖另一个类，直接实例化那个类是不好的
+如果要替换依赖的实现，就必须对每个依赖它的类修改类名
+如果依赖项本身有依赖项，就必须在外面配置，这种配置会在各个地方反复写
+
+应该：使用接口和基类把依赖关系抽象化
+在服务容器IServiceProvider中注册依赖关系，注册发生在program.cs中
+服务会自动实例化依赖项并注入到使用它的类的构造函数里，并在不需要之后释放它
+定义依赖接口：
+public interface IMyDependency{void WriteMessage(string message);}
+由具体的依赖项实现该接口：
+public class MyDependency:IMyDependency{
+    public void WriteMessage(string message){
+        Console.WriteLine($"The message is {message}");
+    }
+}
+在program.cs注册：
+builder.Services.AddScoped<IMyDependency,MyDependency>();
+其中，addScoped指添加具有范围的服务
+在需要用到的类的构造函数的参数里直接写
+public IndexModel(IMyDependency mdpd){xxx;}
+
+有一部分服务，例如(ILogger<T>)是由框架提供的，不需要注册
+
+如果需要一次性注册很多东西，会装在addxxx拓展方法里
+后者在Microsoft.Extensions.DependencyInjection命名空间定义
+例如AddControllersWithViews等都是一次性注册很多服务

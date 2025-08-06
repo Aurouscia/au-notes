@@ -1,0 +1,29 @@
+http://servername/index.php/控制器/操作/参数/值
+例如：https://zz.jowei19.com/index.php/Test/hello/value/world
+前提：有一个Test类放在controller目录，里面有个hello方法，有个$value
+兼容模式：https://zz.jowei19.com/index.php/?s=Test/hello/value/world
+
+如果有两个参数，顺序随意
+id/5/name/lee
+
+如果类名有多个单词(驼峰命名了)
+那么地址栏里应该是全小写加下划线，否则不能识别
+例如：class helloWorld变成hello_world
+
+控制器目录可以在config/route.php里改变
+
+return json(数组)，可输出数组
+halt(输出值)，可中断程序运行
+
+use app\BaseController;
+class xxx extends BaseController;
+继承基础控制器类可以使用很多方法
+$this->request->action();可以获取当前方法名
+$this->app->getBasePath();可以获取路径
+
+error控制器类：function index{return '当前控制器不存在'}
+自定义错误
+
+多级控制器：
+在controller下创建目录group，里面些blog.php
+访问时group.blog/方法，中间是点

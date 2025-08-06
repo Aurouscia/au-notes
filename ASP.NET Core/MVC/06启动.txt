@@ -1,0 +1,39 @@
+program.cs里
+第一行var builder = WebApplication.CreateBuilder(args);
+会把当前目录设为contentRoot
+默认的web根目录为contentRoot/wwwroot
+如果要访问wwwroot/image/Myimg.jpg，使用：
+https://localhost:5001/image/Myimg.jpg
+src="~/images/Myimg.jpg"，其中~指的是网站根目录
+无参数的中间件配置app.UseStaticFiles()可以使wwwroot文件夹可以被访问
+
+如果需要使用wwwroot以外的静态文件
+
+builder.Service可以把服务添加到依赖关系注入容器
+实例化builder时就已经添加了许多默认的服务
+添加MVC的服务(默认存在)：
+builder.Services.AddControllersWithViews();
+添加数据库上下文的服务(创建EF控制器时自动添加这句)：
+builder.Services.AddDbContext<RazorPagesMovieContext>
+(options =>options.UseSqlServer(builder.Configuration.
+GetConnectionString("RPMovieContext")));
+从appsettings.json中读取连接字符串
+
+一些构造函数里可以写参数来从DI引入服务
+private readonly MvcMovieContext _context;
+public MoviesController(MvcMovieContext context)//会自动传入一个数据库上下文
+{
+     _context = context;
+}
+
+完成了对builder的设置后，就可以构建主机了
+var app = builder.Build();
+
+然后给应用添加中间件。
+中间件是用来组成请求管道的，都在httpcontext执行操作
+有些中间件是看当前环境来决定是否执行的，环境取决于一个环境变量
+从vs启动的项目默认是development模式
+在启动按钮右边的下拉菜单里的调试属性，里面可以看到
+ASPNETCORE_ENVIRONMENT=Development
+Development/Staging/Production
+如果不设置，默认是production模式，安全但不好检查错误(不会显示错误页面)

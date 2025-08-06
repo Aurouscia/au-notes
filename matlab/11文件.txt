@@ -1,0 +1,50 @@
+.m文件分为两种
+一种按顺序执行所有指令，没有输入和返回参数
+一种用function开头，有输入和返回参数
+
+函数名必须和文件名一致
+function output=name(input,input)
+% name:xxxxxxx
+
+命令文件：方法的基本流程
+在命令文件里面调用函数文件
+
+命令文件可以点击运行，但函数不能直接点击运行
+
+根据输入变量个数执行不同代码
+if nargin==1
+   out=xxxx;
+elseif nargin==2
+   out=xxxxx;
+
+全局变量
+function fun=f(xxx)
+global mmax
+
+>>global mmax
+>>mmax=10
+>>z=fun(xx)
+可以在函数外部对其设置值
+
+switch 1(1是这个switch的名字（？）)
+   case x<0
+       xxx;
+   case x>=0&x<1
+       xxx;
+   otherwise
+       xxx;
+end
+
+break：跳出所在的循环
+
+【通过MAT文件读写】
+mat文件是数据文件，可以永久保存结果
+不会因为软件重启或者clear而消失
+save abc A B C
+把ABC三个矩阵存储到abc.mat文件里
+load abc可以把东西拿出来放到工作区
+
+save
+把当前所有数据全部保存到matlab.mat
+load matlab
+全部拿出来

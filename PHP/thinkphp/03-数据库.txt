@@ -1,0 +1,243 @@
+config/database.php里设置数据库的名称和密码
+
+模型：直接与数据库交换信息的脚本
+创建与controller平级的model目录
+模型的名称应该与数据库里的表一致，否则不能成功找到表
+模型应该继承Model类，use think\model
+模型会自动连接数据库
+
+    public function dataTest(){
+        $user=Db::table('tab1')->select();//不用模型
+        return $user[0]['name'];
+    }
+    public function getUser(){
+        $user=tab1::select();//用模型
+        return $user;
+    }
+模型里写上protected $connection="xx"可以切换数据库
+
+查询：
+$user=Db::table('tab1')->where('id',2)->find();
+【getLastSql()】可以返回上一次生成的sql语句
+如果find()没有找到，会返回空数组
+find()只找一个，select()找多个
+
+获取一列的数据：
+$user=Db::table('tab1')->column('name');
+
+chunk函数：可以一次处理一部分数据，避免内存消耗过大（略）
+
+$cursor=Db::table('tab1')->cursor();
+foreach($cursor as $user)
+{dump($user);}
+
+Db::name('tab1')得到的是query数据
+$user=Db::name('tab1')->where("name","Alice")->order("id","desc")->find();
+在->find()之前，都是query类型的数据，find()后成为一条结果的数组
+如果用select会成为数据集对象
+
+如果每次都生成一个查询对象实例，会造成内存浪费，可以保存后反复使用：
+$userQuery=Db::name('tab1');
+$userFind=$userQuery->where('id',27)->find();
+链式查询里的设置【会保留在对象中】
+需要用removeOption清除
+$userQuery->removeOption('where')->select();
+
+插入数据：
+        $data=['name'=>'Judy'];
+        Db::name('tab1')->insert($data);
+返回值为1代表插入成功
+如果强行添加不存在的字段数据，会报错
+忽略异常数据：
+Db::name('tab1')->strict(false)->insert($data);
+如果用的mysql则支持replace写入
+insert时如果主键相同就会出错，replace则会修改旧的数据
+Db::name('tab1')->replace()->insert($data);
+其中使用replace函数切换为replace模式，最后依然用的是insert
+
+批量插入数据：
+$dataAll=[['name'=>'David'],['name'=>'Alice'];];
+Db::name('tab1')->insertAll($dataAll);
+也可以replace()
+
+save()新增
+会自动判断是新增还是修改(看是否存在主键)
+
+修改数据：
+$data=['name'=>'李白'];
+return Db::name('tab1')->where('id',228)->update($data);
+如果数据包含了主键，就可以省略掉where条件
+如果修改数据和原始数据一样，返回的影响行数就是0
+exp()调用mysql函数
+exp('email','UPPER(email)')->update();
+exp('要修改的字段','用函数算出的值')
+自增和自减
+inc('字段名',步长(可不填))
+dec('字段名',步长(可不填))
+静态方法raw：
+可实现函数和表达式
+Db::name('tab1')->where('id',228)->update([
+				'email'=>Db::raw('UPPER(email)')
+				'price'=>Db::raw('price+1')
+				]);
+删除数据
+根据主键删除
+Db::name('user')->delete(51);
+Db::name('user')->delete([48,49,50]);
+或者：根据where来删除
+Db::name('user')->where('id',47)->delete();
+清空数据表：Db::name('user')->delete(true);
+
+查询表达式where
+where('id','=',80)或者where('id',80);
+等于可以省略掉
+><,<,>,>=,<=都可以
+
+模糊查询
+where('email','like','xiao%')->select();
+如果写成一个数组：就会生成and连接的两个条件
+where('email','like',['xiao%,'wu%'])->select();
+如果第四个参数写个OR，就会变成or
+where('email','like',['xiao%,'wu%'],'or')->select();
+简略写法：
+whereLike('email','xiao%')->select()
+whereNotLike('email','xiao%')->select()
+
+between和in
+where('id','between','19,25')->select();
+where('id','between',[19,25])->select();
+whereBetween('id','19,25')->select();
+whereNotBetween(...)
+where('id','in','19,21,29')->select();
+where('id','in',[19,21,29])->select();
+whereIn(...)
+null表达式
+where('uid','null')->select();
+
+自定义查询
+where('id','exp','IN(19,25,21)')->select();
+whereExp('id','IN(19,25,21)')->select();
+
+时间查询
+where('create_time','>','2011-1-1');
+where('create_time','between',['2011-1-1','2012-1-1']);
+where('create_time','not between',['2011-1-1','2012-1-1']);
+whereYear('create_time');今年
+whereYear('create_time','lastYear');去年
+whereYear('create_time','2016')
+whereMonth(xxx)
+whereDay(xxx)
+whereDay('create_time','2016-6-27');年月要写齐了
+过去xx时间内：
+whereTime('create_time','-2 hours')->select()
+判断两个时间是否夹着当前时间
+whereBetweenTimeField('开始时间字段','结束时间字段')->select()
+
+聚合查询
+->count()，得到所有字段的数据条数
+->count('字段名')，得到某字段的数据条数（不包括null）
+->max('字段名')
+->min()
+->min('xx',false)，不把字符串转换为数值
+->avg()
+->sum()
+
+子查询
+fetchsql(true)->select()，不执行sql语句，返回之
+buildsql(true)，不执行sql语句，返回之，而且外面会加个括号
+$subQuery=Db::name('tab1')->field('uid')->where('gender','男')->buildsql(true);
+$result=Db::name('tab2')->where('id','exp','IN '.$subquery)->select()
+
+完全自定义
+$result=Db::query('select * from tp_user');
+$result=Db::execute('update tp_user set username="孙悟空" where id=29');
+
+where
+where(['gender'=>'男','price'=>100])
+或者
+where([['gender','=','男'],['price','=','100']])
+或者：不知道怎么拼装时
+whereRaw('gender="男" AND price IN (60,70,80)')
+高级方法：
+where('username|email','like','xiao');表示或关系
+where('username&email','like','xiao');表示且关系
+where(xx)->where()连缀，表示且关系
+where([xx])->where()会在前面的语句生成括号
+where([['id','>',0],['status','=',1],['email','like','%163%']])->select();多个字段
+whereOr([$map1,$map2])把多个语句用OR连接
+闭包查询
+where(function($query){$query->where('id','>',0);})
+数据绑定
+whereRaw('username LIKE :username AND status = :status',['username'=>'%小%','status'=>1])
+
+field
+->field('id','username')->select()
+指定要查询的字段
+或者写成数组['id','username'];
+别名：最终得到的数组索引是别名
+field('id,username as name')->select();
+屏蔽不要的：
+withoutfield('details')
+在新增时，验证字段的合法性（只要某些字段）
+field('username','email')->insert($data);
+可以运行sql函数
+field('gender,SUM(price)')
+
+alias
+给数据库起个别名
+alias('a');
+
+limit
+限制输出的数据条数
+limit(5)->select()
+从第n+1条开始显示m条
+limit(n,m);
+
+page
+page(1,5)相当于limit(0,5);
+page(2,5)相当于limit(5,5);
+
+order
+order('id','asc')
+order('id','desc')
+order(['create_time'=>'desc','price'=>'asc'])
+orderRaw('FIELD(username,"樱桃") DESC')把某个数据固定排在最前面
+
+group
+按某字段进行分组
+fieldRaw('gender,SUM(price)')->group('gender')->select()
+统计某性别的价格总和
+多字段分组：
+group('gender,password')
+
+having
+在分组之后按条件过滤
+group('gender')->having('SUM(price)>600');
+
+raw()
+where([['id','>',0],['status','exp',Db::raw('>=80')],['email','like','%163%']])->select();
+
+whereColumn
+比较两个字段
+whereColumn('update_time','=','create_time')
+
+事务处理
+需要使用InnoDB引擎
+数个sql查询是关联的，一定会同时进行或取消
+Db::transaction(function(){
+     Db::name('user')->where('id',19)->save(['price'=>Db::raw('price - 3')]);
+     Db::name('user')->where('id',20)->save(['price'=>Db::raw('price + 3')]);
+})
+
+获取器
+对得到的结果再进行一些处理
+$user = Db::name('tab1')->withAttr('email',function($value,$data){
+     此处$value是所有email，$data是对应的一行所有数据
+     return strtoupper($value);
+})
+
+数据集
+查询后的结果集
+->toArray()转为数组
+->shuffle()打乱
+->pop()删掉最后一个元素

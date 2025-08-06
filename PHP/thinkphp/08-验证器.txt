@@ -1,0 +1,29 @@
+<?php
+namespace app\validate;
+use think\Validate;
+
+class UserV extends Validate{
+    protected $rule=[
+        'name'=>'require|max:20',
+        'price'=>'number|between:1,100',
+        'email'=>'email'
+    ];
+    protected $message=[
+         'price.between'=>'价格必须在1-100之间',
+         'price.number'=>'价格必须是数字',
+         'name.max'=>'姓名不得大于20位'
+    ];
+}
+
+验证时：
+validate(['name'=>'abcd','price'=>120,'email'=>'abcd@163.com'],UserV::class);
+
+自定义规则：略
+场景验证和路由验证：略
+验证内置规则：略
+
+单个验证
+use facade\Validate(可能会和其他validate冲突)
+dump(Validate::isEmail('xxx@xxx.com'));
+dump(Validate::isRequire(''));是否为空
+dump(Validate::checkRule(10,'number|between:1,10'));

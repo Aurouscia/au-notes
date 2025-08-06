@@ -1,0 +1,265 @@
+会随着组件实例中变量变化而更新的文本
+<span>message:{{msg}}</span>
+
+只插入一次，不会更新的文本
+<span v-once>{{msg}}</span>
+
+{{}}会把html标签输出为文本
+要写能解析的原始html
+<span v-html="html字符串"></span>
+动态渲染html有安全隐患，不要把用户提供的内容插值
+
+{{}}里不只能写标识符，可以写任何js表达式
+<h1>{{ message.split('').reverse().join('') }}</h1>
+
+
+
+{{}}只能用来插入文字，要给一个动态值赋一个属性，我们需要用
+【v-bind指令】
+<div v-bind:id="dynamicId"></div>
+v-开头的html属性是vue模板关键字的一部分
+v-xx:后的部分是指令的参数，在这里，
+元素的id属性会与实例中的dynamicId属性绑定
+因为v-bind很常用，所以有个缩写
+<div :id="dynamicId"></div>
+
+
+
+用【v-on】来监听DOM事件
+<button v-on:click="increment">{{count}}</button>
+也有一个缩写：
+<button @click="increment">{{count}}</button>
+这里的increment指的是export default里面的函数
+
+可以直接写js语句
+也可以写函数名(不要括号)
+在没有括号的情况下，函数体那边可以收到一个事件对象
+也可以直接调用函数
+如果想同时传参和事件对象，需要写成：
+@click="addCounter(5,$event(固定))"
+绑定多个函数，则必须写括号
+@click="addCounter(5),addAge()"
+
+
+【事件修饰符】
+当嵌套的元素注册了同一个事件，内层的事件被触发，
+执行完后，外层的也会被触发，这个叫事件冒泡
+如果想阻止冒泡，就可以在子元素里写
+@click.stop="xxx"
+
+阻止默认行为(比如表单提交按钮的提交)
+<input type="submit" @click.prevent="submitClick">
+
+只触发一次
+@click.once="xxx"
+
+按某个按键才算数
+@keyup.enter="submit"
+@keyup.page-down="submit"（要用小写连字符格式）
+当event.key=xxx时才触发
+
+
+
+用【v-model】来双向绑定，监听某个Input的变化
+可以代替v-bind和v-on同时使用：
+<script>
+export default {
+  data() {
+    return {
+      text: ''
+    }
+  },
+  methods: {
+    onInput(e) {
+      this.text = e.target.value
+    }
+  }
+}
+</script>
+<template>
+  <input :value="text" @input="onInput" placeholder="Type here">
+  <p>{{ text }}</p>
+</template>
+
+可以替换成
+
+<input v-model="text">
+可以做一些输入框的合法性检验
+
+可以把多个勾选框的v-model指向一个数组
+fruits:[]
+<input type="checkbox" v-model="fruits" value="苹果"/>苹果
+<input type="checkbox" v-model="fruits" value="香蕉"/>香蕉
+<input type="checkbox" v-model="fruits" value="西瓜"/>西瓜
+<div>水果：{{fruits}}</div>
+这样就能通过勾勾实时更新数组内容
+
+绑定后的radioButton可以根据变量是否等于自己的value而改变是否选中
+gender:"男"
+<input type="radio" value="男" v-model="gender"/>男
+<input type="radio" value="女" v-model="gender"/>女
+<div>性别：{{gender}}</div>
+
+select标签
+<select v-model="city">
+  <option value="北京">北京</option>
+  <option value="上海">上海</option>
+  <option value="武汉">武汉</option>
+</select>
+<div>{{city}}</div>
+<select v-model="cities" multiple>
+  <option value="北京">北京</option>
+  <option value="上海">上海</option>
+  <option value="武汉">武汉</option>
+</select>
+<div>{{cities}}</div><br/>
+
+默认情况下，v-model在input事件发生时同步
+如果想节省性能，可以加上修饰符，写成v-model.lazy
+change事件后(失去焦点)才会同步
+
+v-model.number，自动转为数据类型(如果可以parseFloat的话)
+
+v-model.trim，自动去掉首尾空格
+
+
+使用【v-if】条件渲染
+<h1 v-if="布尔值">xxxx</h1>
+
+如果想条件渲染一堆东西，可以用没有任何影响的template标签括起来
+<template>
+   <xx></xx>
+   <template v-if="布尔值">
+       内容
+   </template>
+   xxxxxxx
+</template>
+
+v-if改变状态时，内部的事件监听器和子组件会被销毁和重建
+如果初始值为false，则不会做什么
+
+
+如果切换频繁，开销巨大，就应该使用v-show
+如果不怎么变或者一次性，就应该v-if
+
+
+使用【v-show】条件渲染
+<div v-show="isActive"></div
+不管真假，都会出现在DOM里，只是改变了css里面的display属性
+v-show不支持template也不能v-else
+
+
+
+
+使用【v-for】循环渲染
+<ul>
+    <li v-for="todo in todos" v-bind:key="todo.id">
+         {{todo.text}}
+    </li>
+</ul>
+这里的todo是一个局部变量，只能在v-for的元素内访问
+
+要改变列表的内容，可以对列表使用修改的函数
+或者替换整个列表
+
+<script>
+// give each todo a unique id
+let id = 0
+
+export default {
+  data() {
+    return {
+      newTodo: '',
+      todos: [
+        { id: id++, text: 'Learn HTML' },
+        { id: id++, text: 'Learn JavaScript' },
+        { id: id++, text: 'Learn Vue' }
+      ]
+    }
+  },
+  methods: {
+    addTodo() {
+      this.todos.push({ id: id++, text: this.newTodo })
+      this.newTodo = ''
+    },
+    removeTodo(todo) {
+      this.todos = this.todos.filter((t) => t !== todo)//lambda表达式
+    }
+  }
+}
+</script>
+<template>
+  <form @submit.prevent="addTodo">
+    <input v-model="newTodo">
+    <button>Add Todo</button>    
+  </form>
+  <ul>
+    <li v-for="todo in todos" :key="todo.id">
+      {{ todo.text }}
+      <button @click="removeTodo(todo)">X</button>
+    </li>
+  </ul>
+</template>
+
+如果需要获取下标的话，就应该加上可选的第二个参数：
+<li v-for="(item,index) in items" :key="index">
+
+也可以用v-for遍历对象里的属性
+这种时候第二个参数是键名，第三个是下标
+
+v-for遍历的每个元素都需要一个唯一的key属性
+才能有效更新DOM状态，提高性能
+否则添加删除时会影响后面的
+:key = "item.id"
+
+
+
+
+【v-bind的属性名也可以动态改变】
+<p v-bind:[attName]="dynaAtt">xxx</p>
+<button @click="attName='class'">改变指向的属性</button>
+或者
+mouseEvent:'mousedown'
+<button @[mouseEvent]="attName='class'">改变指向的属性</button>
+<button @click="mouseEvent='mouseover'">
+
+
+【class绑定】
+直接写字符串
+<div class="active"></div>
+
+写个json对象（内部可以多个）
+<div :class="{active:isActive , xxx:xxx}">      //v-bind:class={类名:布尔变量}
+这里的active这个class存在与否取决于dataproperty里的isActive的真假
+
+如果在data里定义了合适的json对象，那就可以直接写进去
+:class="对象名"
+也可以写进去一个返回对象的计算属性，让描述class的对象经过计算确定
+computed:{
+    classObject(){
+        return{
+            active: this.isActive && !this.error,
+            helloworld: this.error
+        }
+    }
+}
+
+可以把一个数组传给:class，应用一整个class列表
+:class="[activeClass, errorClass]"
+data(){
+   activeClass:'active',
+   errorClass:'text-danger'  
+}相当于：
+class="active text-danger"
+
+【内联style的绑定】
+直接写字符串：
+<p style="color:red">hello</p>
+写对象：
+和class一样 
+:style="{color(css属性名):变量名(属性值),fontSize: 变量名+'px'}"
+或者
+:style="styleObj"
+
+如果对象的键有连字符等不能识别的特殊符号，可以用单引号括起来
+:style="{'background-color':变量名}"

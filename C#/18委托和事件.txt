@@ -1,0 +1,48 @@
+把方法当作参数传递，用到委托
+委托是一个类型，可以赋值一个方法的引用
+
+delegate void IntMethodInvoker(int x);
+delegate + 方法签名
+可以指向带有一个int参数，返回值void的方法
+参数只知道类型就行，参数名字无关紧要
+
+例：用委托调用toString()
+为什么一切变量都能点出toString()：
+因为toString在最顶级的object类里
+定义一个委托类型：
+private delegate string GetAString();
+创建实例：
+GetAString a = new GetAString(x.ToString);
+构造方法的参数填一个方法名（不要括号，即不调用）
+现在a指向了x中的ToString方法
+string s = a();
+
+也可以：
+GetAString a = x.ToString;
+string s = a.Invoke();    相当于a()
+
+作为参数使用
+private delegate void PrintString()
+static void PrintStr(PrintString print)
+{print()}   print是这里的形参，暂时不知是什么函数
+
+void Method1(xxx){xxxxxxxxxx}
+PrintString method = Method1;
+PrintStr(method)
+
+method = Method2;
+PrintStr(method);
+
+【Action委托】
+系统预定义的委托类型
+没有返回值也没有参数
+所以只能指向没有参数，没有返回值的方法
+Action a = PrintString;
+泛型：可以改成有一个int参数的方法
+Action<int,int> a = xxxxx;
+
+【Func委托】
+系统预定义的委托类型
+指向的方法必须有一个返回值，用泛型指定
+Func<返回值类型>
+Func<参数1类型，参数2类型，返回值类型>

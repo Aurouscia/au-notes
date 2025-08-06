@@ -1,0 +1,28 @@
+首先未项目添加客户端库
+右键单击项目，提供程序选择unpkg
+搜索 @microsoft/signalr@latest
+选择特定文件：dist/browser里的signalr.js和signalr.min.js
+装进wwwroot文件夹某个地方
+
+创建"中心"，用于对所有客户端处理通信
+using Microsoft.AspNetCore.SignalR;
+namespace SignalRChat.Hubs
+{
+    public class ChatHub : Hub
+    {
+        public async Task SendMessage(string user, string message)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", user, message);
+        }
+    }
+}
+
+在program.cs中配置
+using SignalRChat.Hubs;
+builder.Services.AddSignalR();
+app.MapHub<ChatHub>("/chatHub");
+
+在页面中创建文本框和提交按钮
+用一个<ul id="messagesList"></ul>来显示从中心接受的消息
+在最底部写<script src="~/js/signalr/dist/browser/signalr.js"></script>
+和(自己写的)<script src="~/js/chat.js"></script>

@@ -1,0 +1,122 @@
+图片热点(图像地图)，一个图片上有多个链接
+<map>标记的属性，
+name指定热点地图名称
+id同样是名称，但是是新版
+<area>标记的属性
+shape:热点的形状，取值：rect(矩形),circle(圆形),polygon(多边形)
+coord:热点的坐标
+	矩形：coords="x1,y1,x2,y2"，确定左上角和右下角
+	圆形：coords="x,y,r"，确定圆心和半径
+	多边形：coords="x1,y1,x2,y2,x3,y3..."
+举例子：
+<img src="xxx.jpg" usemap="#xxmap" />
+<map id="xxmap" name="xxmap">
+    <area shape="rect" coords="50,50,100,100"
+    href="http://www.xx.com" />
+</map>
+软件里有画热点的工具，选中图片后按矩形/圆形的按钮
+
+多媒体标记
+包括声音，视频，Flash
+大多都是flash格式的
+视频格式.wmv  .dat  .mob  .rmvb
+都不能直接播放，需要安装相应的插件才能播放
+而且文件很大，不利于网络上播放
+一般将其他视频格式转换为flash在网页上播放
+软件：格式工厂
+flash格式的视频兼容性非常好，文件小，适合网络播放
+优酷等在线播放视频用的flash
+<embed>
+主要应用于netscape浏览器，不是W3C规范
+<object>
+主要应用于IE浏览器，是W3C规范
+W3C：指定web标准的权威机构
+》embed的属性
+src：flash文件地址
+width/height：宽度和高度
+Quality：flash播放质量，"high"或者"low"
+Pluginspage：如果指定的flash插件不存在，则从pluginspage指定的地方下载
+Type：指定文件格式类型
+Wmode：指flash的背景是否可以透明"transparent"
+》object的属性
+Classid：指定flash插件的ID号，一般存在于注册表
+codebase：和pluginspage一样
+<param>用于设置更细的属性，框在object里面
+<param name="movie" value="xxx/xxx.swf">
+为了兼容性最好两个一起用，<object>里套<embed>
+【具体写法不用记，可以直接copy】
+
+表单
+一个可以填写的框框，用来收集用户信息
+先填写，然后点击提交按钮
+信息会发送到服务器，由服务器的程序检查提交是否有效
+有效的话写入数据库保存，无效就返回一个错误信息
+因此表单的开发分为前台和后台
+表单由一组标记构成，下拉列表，按钮，上传文件均是
+<form>最大的标记，都得框在form标记里才行
+    用户名：<input type="text" name="username" size="40" />
+    密码：<input type="password" name="password" size="40" />
+    <input type="submit" name="submit" value="提交(按钮上的字)" />
+</form>
+form标记的属性
+Name：表单的名称，用于js和php操作控制表单使用（看填写是否合法）
+ID：和name一样，两个都要写
+action：指定表单数据的处理程序，一般是php，如action="login.php"
+method：提交数据的方法，值为get(默认)，post
+	get方式提交后，发给action指定程序表单各项值，&号分隔
+	xx/login.php?username=xxx&password=xxx&submit
+	这种方式安全性不好，因为密码都能看到
+	只能是ASCII字符，不能是其他东西
+	post方式提交后，将表单数据隐藏发送到action指定的程序，不可见
+	更安全，可以提交更多数据
+Enctype（仅post下使用）：表单数据的加密方式：
+	application/x-www-form-urlencoded：除了上传文件外的数据都行
+	mutipart/form-data	：上传附件必须用这个
+
+检验文件是否合法：在value发生改变时验证（onchange事件）
+<form name="f1" method="post" enctype="mutipart/form-data">
+<input type="file" name="uploadFile" 
+【onchange="checkFileName(this.value)"】/>
+上传文件的地方value是只读的
+</form>
+
+单行文本框：用户名，邮箱，qq号，公司地址
+<input name="xxx" type="text" value="默认值" size="宽度" maxlength="最大字符数" />
+type：指定文本框类型，取值text，password，radio(单选框)，checkbox(复选框)
+
+注意：在表格里套表单，应该<form>里面套<table>
+
+单选框：男女，已婚
+<input type="radio" name="sex" value="男" />先生
+<input type="radio" name="sex" value="女" />女士
+单选是一组互相排斥的选项，每次只能选一个，不能同时选择多个
+name一样的话会自动互相排斥
+value：发送到服务器的值，由于里面不能填东西，所以需要value
+checked="checked"默认勾选
+
+复选框
+<input type="checkbox" name="hobby" value="游戏" />游戏
+checked="checked"默认勾选
+一组name一样，最后传给php会成为一个数组
+
+上传文件
+<input type="file" name="xxxx" />（form的ectype必须选第二个）
+
+文本区域
+<textarea name="xxx" cols="宽度" rows="行数">默认文本<textarea/>
+
+下拉列表
+<select name="city">
+	<option value="北京">北京</option>
+	value即为发往服务器的值
+	selected是默认选中项
+</select>
+
+提交，重置按钮
+<input type="submit" name="xx" value="按钮上的字">
+<input type="reset" name="xx" value="按钮上的字">
+按下reset的按钮后，表单会恢复初始状态
+普通按钮：按下不会发生任何事，可以由js加入功能
+<input type="button" name="xx" value="xx">
+图片按钮：默认动作会提交表单
+<input type="image" src="图片的URL" xxx=xxx/>

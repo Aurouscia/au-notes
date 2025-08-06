@@ -1,0 +1,41 @@
+把一个容器的display设为flex或inline-flex，那么其直系子元素就会变成[flex元素]
+flex容器中的元素拥有默认值：
+    元素排列为一行 (flex-direction 属性的初始值是 row)。
+    元素从主轴的起始线开始。
+    元素不会在主维度方向拉伸，但是可以缩小。
+    元素被拉伸来填充交叉轴大小。
+    flex-basis 属性为 auto。
+    flex-wrap 属性为 nowrap
+
+主轴：flex-direction控制方向
+    row:让内部元素横着排，column:竖着排
+    row-reverse:反向
+交叉轴：与主轴垂直
+
+允许换行：flex-wrap:wrap/nowrap
+    每一行将被视为新的flex容器，元素空间分布不影响其他行
+    如果元素太大，一行放不下，而且flex-wrap:warp，则会自动换行
+    如果flex-wrap:nowrap，则会尝试缩小元素挤在一行内
+
+flex-flow
+    flex-direction和flex-wrap简写为一个属性
+    flex-flow:row wrap
+
+flex容器内元素的属性
+    flex-grow 定义了各个元素按什么权重瓜分剩下的可用空间（一般填正整数）
+    flex-shrink 定义了各个元素按什么权重收缩多出的空间（一般填正整数）
+    flex-basis 定义了该元素的空间大小（the size of that item in terms of the space）
+
+内部元素沿交叉轴方向对齐方式：align-items
+    （默认值）stretch：让所有元素拉伸到最高元素的高度
+    flex-start：顶部对齐
+    flex-end：底部对齐
+    center：中线对齐
+
+内部元素在主轴方向对齐方式：justify-content
+    stretch
+    （默认值）flex-start：顶着起始线
+    flex-end：顶着结束线
+    center：整体居中，元素间紧靠
+    space-around：在元素之间添加空间，使得第一个元素和最后一个元素和边缘有元素间距一半的空隙
+    space-between：在元素之间添加空间，使得第一个元素和最后一个元素都顶着边缘

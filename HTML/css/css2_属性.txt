@@ -1,0 +1,96 @@
+从上到下，从外到内
+
+任意body中的标记都可以看成盒子
+都可以定宽高
+都有内外边距（padding和margin）
+边框线（border）
+背景色（background-color）
+
+border: 1px solid #cccccc
+padding:5px 20px; 内填充分别表示上下和左右
+margin:50px auto;  上下50px，左右居中
+只写一个：代表上下左右四个方向
+三个：上，左右，下
+四个：上，右，下，左
+
+不同浏览器的margin和padding默认值不一样
+不设置可能会造成不同浏览器显示不一样
+想看各个元素的大小，可以看浏览器里的开发人员选项
+
+尺寸属性：
+Width和Height
+指定元素的宽度和高度，单位是px或者%
+
+字体属性
+font-family:设置字体
+font-weight:粗体，值为bold
+font-style:斜体，值为italic
+font-size:大小
+font:简写形式：值之间用空格隔开
+例子body{font:bold italic 24px 黑体;}
+
+如果要单独改几个字的字体等，排版不变
+用<span>把它框起来，再用css改
+span是行内元素，不会另起一行，div会
+
+文本属性
+color：文本颜色，取值：英文单词，十进制，16进制
+text-align：水平对齐，取值left center right
+text-decoration：文本修饰，取值：none underline overline line-through
+text-indent：首行缩进，单位为px
+letter-spaceing：字间距
+line-height：行高度，%或px
+
+列表属性
+List-style-type：列表的点点类型，取值none，disc，circle，square
+List-style-image：列表的点点图片，取值url(xxx/xx.jpg)
+List-style-position：点点的位置取值outside，inside
+List-style（简写形式）
+.someList{List-style:url(xx/xx.jpg) disc outside;}
+各个值之间用空格隔开
+
+例子：
+<style type="text/css">
+.news{
+    width:60%;
+    border:1px solid #cccccc
+    padding:10px 20px
+    margin:50px auto
+}
+.news h2{   表示news下的所有h2
+    margin:0px; padding:0px; font-family:黑体;}
+.news ul{ marigin=0px; padding:0px;}
+.news ul li {height:30px; line-height:30px;
+    list-style-type:inside（跑到<li>里面去了）}
+    list-style-image:url(images/li01.jpg)
+（设置行高可以让单行文本在容器中上下居中）
+（要多层，就让上padding为容器高减去字高除二）
+<div class="news">
+    <h2>标题</h2>
+    <ul>
+        <li><a>xxx</a></li>
+        <li><a>xxx</a></li>
+        <li><a>xxx</a></li>
+    </ul>
+</div>
+
+背景属性
+background-color 背景颜色
+background-image 背景图片，取值url(xx/xx.png)
+background-repeat 背景平铺，取值
+	no-repeat , repeat , repeat-x , repeat-y
+background-position，水平和垂直方向
+	left/center/right空格top/center/bottom;
+	50% 50%;
+	100px 200px;（距离左边和上面）
+background-attachment 是否随滚动条动
+	fixed/scroll
+简写形式background
+.box{background:url(images/xx.jpg) no-repeat center center}
+
+想让一行的一些字靠右显示（右浮动）
+<span></span>
+然后给这span加个float:right;
+
+display显示方式（是否隐藏）
+display:none，可以让整个div和里面的内容隐藏，下面的补上来

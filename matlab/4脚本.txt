@@ -1,0 +1,29 @@
+edit xxx   可创建或编辑一个脚本文件
+mean()   平均数函数
+
+直接在控制台中输入脚本名称（不用后缀）可以运行脚本
+
+【循环语句】
+for k = 1:n
+   xxxxx(K)=xxxx
+   xxxxxxxx
+end
+
+for k = 1:nsamples
+   iterationString = ['Iteration #',int2str(k)];
+   disp(iterationString)
+   currentData = rand(npoints,1);
+   sampleMean(k) = mean(currentData)     (没有分号)
+end
+overallMean = mean(sampleMean)
+
+【分支】
+if xxxx<xxx
+   xxxx
+elseif xxx>xxx    (elseif是连起来的)
+   xxxx
+else
+   xxx
+end
+
+右键某文件夹，添加到路径，可以访问里面的脚本

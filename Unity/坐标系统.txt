@@ -1,0 +1,56 @@
+【世界坐标】
+World Space
+在场景中表示所有游戏对象的绝对位置和方向
+每个物体，粒子，UI都有
+
+【局部坐标】
+Local Space
+每个物体独立的坐标系，原点为模型轴心点
+随着物体移动和旋转，表示物体间的相对位置和方向
+
+【屏幕坐标】
+Screen Space
+以像素为单位表示物体在屏幕中的位置
+左下角为原点(0,0)
+右方为X轴正方向，上方为Y轴正方向
+右上角为(Screen.width,Screen.height)
+前方为Z轴正方向，是物体到相机的距离
+
+【视口坐标】
+Viewport Space
+以比例表示物体在屏幕中位置
+XY都是0-1，Z为距离
+
+
+【世界与局部】
+屏幕坐标不能直接得到，需要转换
+transform.forward/right/up（可读可写）
+
+transform.TransformPoint()  
+把一个点由局部坐标转换为世界坐标
+t1.TransformPoint(0,1,0)
+表示某t1.的上方1单位世界位置
+（会受到t1位置，旋转，缩放影响）
+
+t1.TransformDirection()
+只受到t1旋转影响
+t1.TransformVector()
+受到旋转和缩放影响
+（功能不全的两个版本）
+
+反过来，t1.InverseTransformPoint()
+是世界坐标到局部坐标
+
+【屏幕与世界】
+Camera.c1.WorldToScreenPoint()
+xxxxxx.WorldToViewportPoint
+
+this.transform.position=Camera.main.screenPointToWorldPoint(screenPoint);
+【main相机】和名字无关，tag里打上mainCamera的那个是main相机
+没有必要每帧获取其引用，最好在start里找了存好
+
+【实例：限制物体在视野内】
+Vector3 screenPos = Camera.main.WorldToScreenPoint
+(this.transform.position);
+if(screenPos.x<=0&&horSpeed<0||xxx>=0&&...)
+   horSpeed=0;

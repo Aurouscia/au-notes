@@ -1,0 +1,57 @@
+create table test17_goods(
+goods_id int unsigned not null auto_increment,
+goods_name varchar(32) not null default '',
+goods_price decimal(10,2) not null default 0,
+category_id int unsigned,
+goods_image varchar(255) not null default '',
+goods_image_ori varchar(255) not null default '',
+goods_desc text,
+goods_number int unsigned not null default 0,
+is_on_sale tinyint not null default 1,
+primary key(goods_id)
+)charset=utf8;
+
+create table tab1(id int not null auto_increment,key varchar(32) not null default '',val varchar(255) not null default '' , primary key(id));
+
+加个多选题：
+ALTER TABLE `test17_goods` ADD `goods_promote` SET('精品','新品','热销') NOT NULL DEFAULT '' AFTER `goods_promote`
+【多选题这么插入：】
+insert into test17_goods (goods_promote) values
+(''),('新品'),('精品,热销'),('精品,新品,热销');
+或者：values (0),(7),(3)
+
+多选表单：
+<input type="checkbox" value="精品" name="goods_promote[]"/>精品
+<input type="checkbox" value="新品" checked name="goods_promote[]"/>新品
+<input type="checkbox" value="热销" name="goods_promote[]"/>热销
+name写成数组形式，会把value自动存进该数组里去
+
+类型或品牌，典型的多对一的关系，应该在多的这端建立关联字段
+如果需要数据库层面约束多对一的关系，可以添加外键约束
+
+图片存储的是图片url而不是本身
+上传的是原图，处理好后变成缩略图
+create table test17_category(
+category_id int unsigned not null auto_increment,
+primary key (category_id),
+);
+
+功能：添加商品的表单
+test17_index.php?p=back&c=Goods&a=add
+功能：处理添加数据
+test17_index.php?p=back&c=Goods&a=insert
+
+切换选项卡：使用JS
+各个table都堆在一起，JS控制
+要显示出来的那个写成style="display:table;"
+其他的都style="display:none;"
+如果一个form套住了所有的table，那么全都会提交上去
+
+checkbox，如果选中会提交value的值，如果不选中，$_POST会不存在这个index
+
+values前不写字段名也可以，但是要按顺序填所有字段
+$sql="insert into `test17_goods` xx values (null,'{$data['goods_name']}')"【数组元素需要一个大括号，否则不能正确解析】
+或者使用【sprintf函数】：
+$sql=sprintf("insert into `test17_goods` values (null,'%s')",$data['goods_name']);
+
+$data输入模型后转义一下：

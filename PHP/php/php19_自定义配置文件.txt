@@ -1,0 +1,20 @@
+<?php
+return array(
+  'db' =>array(
+      'host'=>'127.0.0.1',
+      'port'=>'3306',
+  ),
+  'app' =>array(
+       'default_platform' =>'back',
+   ),
+   'back' =>array(
+        'default_controller'=>'Manage',
+        'default_action' =>'index',
+   ),
+   'front'=>array(xxx)
+);
+将内容分为数个组放在里面
+framework类里加入：
+【$GLOBALS['config']】=require 'config.php';
+方法，载入配置文件
+之后整个项目都可以用

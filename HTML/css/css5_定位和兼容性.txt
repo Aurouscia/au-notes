@@ -1,0 +1,32 @@
+position：元素定位
+取值static，fixed，relative，absolute
+left/top/bottom/right：距离某边多远
+
+static(静态定位)默认情况下都是这个
+fixed(固定定位)
+	是相对于浏览器窗口进行的定位（和网页滚动无关）
+	将脱离普通文档流，【不再占用空间】，层级更高（类似于浮动）
+	在没指定坐标的情况下，将保持原来的位置
+	postion:fixed;right:10px;
+relative(相对定位)
+	是相对于自身原本位置的偏移
+	【依然占用原来的空间】，层级更高
+	没有指定坐标的情况下，将保持原来位置
+absolute(绝对定位)
+	相对于其祖辈最近的，有相对和绝对定位的元素进行偏移
+	如果一直往上找都没找到，就以body（左上角）定位
+应用：在商品右上角加爆炸形的“xx折”
+
+
+兼容性：
+不同浏览器对css解析不一样，
+造成同一个网页在不同浏览器下结果相差很多
+1.常用的全局css属性设置
+(1)清除所有标记内外边距
+(2)ol,ul{list-style:none}
+(3)全局字体颜色设置body{font-size:12px;color:#444;}
+(4)链接a{text-decoration:xxx;cursor:xxx;}  a:link{xxxx} a:hover{xxxx}
+(5)图片img{border:none;}
+(6)浮动和清除
+
+其他：略

@@ -1,0 +1,39 @@
+事务：
+之前，一条语句只用分号结束并得到执行
+这个一次性执行的过程可以称为一个事务
+数据库中的事务，是可以将多条语句的执行，当作一条语句来看待的内部机制
+事物可以看作一个容器，要么全部做成，要么都取消
+只要一个命令，就能执行里面的所有语句
+
+事务的基本实现流程：
+1.声明事务开始start transaction;
+	此时过程发生在内存中，没有实际上改变硬盘里的数据
+2.设定多条要执行的具体语句，比如insert，update，delete等
+3.判断是否需要执行该些语句，如果发生错误，回滚(rollback)(不执行任何语句)
+	如果不发生错误，生效(commit)
+
+事务模式：就是让每条执行语句是否当作“一个事务”的设定项
+Mysql默认安装好之后，其事务模式是，一条语句当作一个事务
+set autocommit=0后，会使得必须commit才能执行（我这里并不管用）
+
+start transaction;
+update tab3 set f2=f2-1 WHERE f1=1;
+update tab3 set f2=f2+1 where f1=10; 
+commit;
+ctrl+enter就会全部执行
+如果第二条出了问题，第一条也不会完成
+
+实际上：直接写两个语句
+update tab3 set f2=f2-1 WHERE f1=1;
+update tab3 set f2=f2+1 where f1=10; 
+第二个出问题了第一个也会执行
+
+【通过mysqli_error()检测是否发生错误，如果有错就rollback
+没错就commit】
+
+编程：（略）
+if 条件语句 then
+	begin xxx end;(类似于大括号，end后总要分号)
+else if 条件语句 then
+	begin xxx end;
+略

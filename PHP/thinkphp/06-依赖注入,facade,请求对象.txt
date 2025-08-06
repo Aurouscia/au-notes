@@ -1,0 +1,64 @@
+namespace app\model;
+use think\Model;
+class One extends Model
+{public $username='Mr.Lee';}
+
+namespace app\controller;
+user app\model\one;
+class Inject(){
+      protected $one;
+      public function __construct(One $one)  (限定了类型)
+      {$this->one=$one;}
+      public function index()
+      {return $this->one->username;}
+}
+通过类的方法传递对象，而且限制了对象的类型，自动实例化了
+
+facade
+namespace app\common;
+class Test
+{
+    public function hello(){xx}
+}
+在同一个目录下创建facade文件夹
+namespace app\facade;
+use think\Facade;
+class Test extends Facade{
+     protected static function getFacadeClass(){
+           {return 'app\common\Test';}
+}
+以后，就可以在控制器里静态调用
+Test::hello();
+
+请求对象
+方法一：依赖注入
+use think\Request;
+public function xx(Request $request){xxx}
+方法二：facade
+use think\facade\Request;
+Request::param('username');
+方法三：助手函数
+request()->param('username');
+除了用param获得里面的参数之外，还有一些固定的信息（略）
+param会自动识别get，post等
+过滤器默认关（略）
+
+请求对象获取变量
+Request对象支持get，post等方法获取的数据
+检测某变量是否已设置
+Request::has('id','get');
+获取变量：
+Request::param('变量名')
+Request::get()
+Request::post()
+::cookie,::session,::file,::route等等
+Request::param():获取所有变量
+
+获取请求类型
+可以使用Request::method()方法判断当前请求类型
+Request::header()获取头信息
+有些请求类型不能通过表单发出来，可以伪装类型
+在表单里写<input type="hidden" name="_method(固定)" value="PUT">
+method(true)忽略伪装，否则获取伪装后的请求
+
+缓存（略）不知道是干啥的

@@ -1,0 +1,18 @@
+用Text属性改其字
+顶部菜单可以令左对齐和右对齐
+
+如果想让其成为能访问的网址
+改个颜色，加个下划线（仿造）
+或者直接用linklabel更好（视觉效果更多）
+双击click/linkClick事件添加代码
+
+新建窗体，起名字为Form2
+在某函数中Form2 f2 = new f2()
+f2.ShowDialog();就可以让窗体显示出来
+里面的空间的modifier改成public
+就可以从外面f2.xxx访问到
+this.Close()关闭窗体
+
+如果关闭窗体时，有东西没填，就应该阻止关闭
+f2.FormClosing(object sender, FormClosingEventArgs e)
+这个e里面有一个cancel可以设为true，阻止关闭窗体

@@ -1,0 +1,87 @@
+Cascading Style Sheets
+根据需要修改某一个html元素的样式
+以后font就不用了
+html是结构标记，各个地方是什么东西
+CSS是表现，文本颜色大小对齐方式边框背景色
+以前：<p><font color="#FF0000">xx</font></p>
+现在：结构和表现要分离开：
+<style type="text/css">
+p{
+    Color:#FF00000
+    Font-size:24px
+    Background-color:#f0f0f0
+}
+</style>
+<p>xx</p>
+
+<style type="text/css">随便放哪都行，一般放在head里面
+h1（选择器）{
+    color:#FF0000;
+    text-align:center;
+    font-size:20px;（与标记里不同，这里要有单位）
+    width:400px;（任何元素都有）
+    border-bottom:2px dashed #0000ff;
+    background-color:#0c0c0c;
+}
+</style>
+
+一个<style>由多个样式规则构成
+一个样式规则由选择器和格式声明语句构成
+{}前的是选择器，里面的是多个格式声明语句
+选择器就是要定义样式的html元素
+格式声明语句由属性和属性值组成，中间冒号隔开，后面分号结尾
+
+
+通用选择器：星号将匹配所有html标记
+*{font-size:24px;}
+
+标签选择器：对应于某个html标记
+h1{color:#FF0000;}
+p{font-size:14px;line-height:150%;color:#9900cc}
+li{text-decoration:underline;cursor:pointer}
+必须是已经存在的标记
+
+类样式，只给class=xx的特定的用
+<style>
+.p2{font weight:bold;}（加个点，代表类样式）
+</style>
+<p class="p2">xxxx</p>
+
+id选择器，只给特定id属性的元素用
+<style>
+#xx{font weight:bold;}（加个井号，代表id样式）
+</style>
+html元素的id属性值必须唯一，相当于身份证号
+id主要用于js，一般不用来css
+
+div.box：class为box的div元素
+div#header：id为header的div元素
+
+多元素选择器：
+想匹配多个标记，就把各个之间用逗号隔开
+xx,xx,xx{xxx:xxx;}
+body,div,ul,li,ol,dt,dd,p,form,a{margin:0px;padding:0px;}
+这些元素都去除内外边距
+
+后代元素选择器：
+E F{color:#ffffff}
+E元素的所有后代(可多层)F元素增加样式，中间用空格隔开
+<div class="news">
+<div class="title"><h2>娱乐新闻</h2></div>
+</div>
+<style type="text/css">
+.news h2{width:400px}
+</style>
+
+子元素选择器
+E>F{color:#ff0000}
+E元素的子级(一层)增加样式，中间用>隔开
+.news>.title
+
+伪类选择器：给<a>链接增加css样式
+:link，:hover，:active，:visited
+a:link,a visited{color:#0000ff}
+a:hover{color:#990000}
+也可以只给一部分链接加样式：
+<a class="a1" href="xx">xxxx</a>
+a.a1:hover{color:xxx}

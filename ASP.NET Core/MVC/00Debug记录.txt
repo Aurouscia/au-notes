@@ -1,0 +1,31 @@
+您瞧瞧现在哪有bug，都让我de了
+
+管道上另一端无进程/登录失败
+可能是因为连接字符串里用户名密码写错了，或者根本没这个用户，或者用户权限不够
+应该在SSMS中创建该用户，设置正确的密码，设置正确的权限
+(需要在安全性-登录验证里选择SQL和windows验证)
+有些设置需要重启sql服务才能生效
+
+出现错误不会显示出来具体问题
+需要在我的电脑-属性-高级系统设置里设置环境变量，
+ASPNETCORE_ENVIRONMENT设为Development
+才会显示有用的报错信息
+
+事件查看器-windows日志-应用程序
+里面记录了aspnet框架和IIS的报错和提示信息
+
+表单提交后有一项是NULL，输入的数据不见了
+可能是因为表单处理action里的那个模型参数前的Bind修饰缺少了该属性
+public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ReleaseDate,Genre,Price,Rating")] Movie movie)
+
+Redirect(控制器和js)
+里的uri，应该写../控制器名/Action名
+
+Stream和StreamReader/Writer之类的东西用完了要及时dispose和close
+【FileInfo.Create()会创建一个stream，要注意close掉】
+
+让网页不会在手机上变得非常小字
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+
+
+提交表单返回405：action的参数和表单参数对不上导致的

@@ -1,0 +1,104 @@
+一个电脑可以有多个网卡，一个网卡可以有多个ip地址
+
+域名：字母数字和连字符，少于255个字符
+域名分层级  www.sina.com.cn
+范围最小的放左边，范围最大的放右边
+sina是域名的主体，com是域名类型，cn代表国家(顶级域名)
+com商业公司，net网络公司，mil军队，edu公共教育机构，gov政府部门
+org非盈利组织
+
+域名，给DNS解析【先在本地查询】再远程查询，
+得到ip地址，再访问ip地址
+
+本地DNS：
+C:\Windows\System32\drivers\etc里面有个host文件
+没有扩展名，是隐藏文件，可以使用任何编辑器打开
+
+特殊域名和ip：
+localhost 127.0.0.1代表自己，外部用户不能访问
+
+apache
+是服务器软件，安装了的电脑就是apache服务器
+跨平台：windows，linux，mac
+可以连接市场上所有数据库：Access，sqlServer，MySql
+配置文件是个文本文件，开源免费
+bin文件夹：
+装着apache主程序，可以直接运行的东西
+conf文件夹：
+全称configuration，是配置文件夹
+	httpd.conf主配置文件
+	vhost.conf虚拟主机的配置文件
+error产生的错误信息
+htdocs默认根目录，没设置的话就是这个，最好要与主程序分开，
+	以免卸载的时候损失数据和数据库设置
+logs运行时产生的日志文件，用于监测运行状态
+modules支持哪些组件
+
+在cmd里找到相关文件夹，输入httpd.exe -t可以检查配置文件哪里写错
+
+【编辑httpd.conf】使用记事本
+#开头的行是被注释掉的，屏蔽这一段
+改完之后必须重启才生效，因为conf文件在启动时读取
+
+同一个物理服务器可以做很多事情
+80端口：3w服务（apache默认）
+21端口：FTP服务（ftp服务器软件）
+110端口：邮箱服务
+Listen [IP地址可选:] 端口号
+Listen 114.514.1919.810:80监听自己某ip的80端口
+Listen 80，监听自己所有ip地址的80端口
+如果listen的不是80端口，是8000，那么访问的时候需要写
+127.0.0.1:8000才行
+
+ServerRoot设置：不要动
+	配置文件中的一些相对路径，相对的就是serverroot指定的
+DocumentRoot设置：网站的根目录
+	网站的内容全都放在里面，访问时http://localhost就会指向这里
+DirectoryIndex设置：进入网站会自动打开的文件，一般是网站首页
+	默认为index.html，index.php等等，只要有一个存在，就会直接打开
+	如果都没有，就会打开文件列表，对网站的安全很不好
+	可以设置某个目录的访问权限
+<Directory 路径></Directory>设置：配置某文件夹的访问权限
+	Options 设置目录的特性
+		none:关掉所有
+		all:开启所有(好像并不能这么写)
+		indexes:如果没有首页文件名，则显示目录列表
+	AllowOverride  允许覆盖
+		如果想让网站访问速度变快，有两种办法：全站静态化和伪静态
+		这里可以允许.htaccess(伪静态规则文件)中的配置覆盖apache的设置
+		取值none和all
+	Deny  禁止某些ip访问
+		Deny From All 任何ip都禁止访问
+		Deny From 192.168.3.5 192.168.4.2
+	Allow 允许某些ip访问
+		Allow From All 允许所有ip访问
+		Allow From xxx.xx.xx.xx
+	Order 设置deny和allow的生效顺序
+		Order Deny,Allow
+
+虚拟主机：
+【貌似NameVirtualHost在这个版本里已经停用了】
+将一台服务器划分若干小空间，每个空间放个网站，可以分别做各种事情
+分类：	基于域名：一个ip上有很多域名（用这个）
+	基于ip：很多ip，很多网卡
+NameVirtueHost 配置基于域名的虚拟主机的命令之一
+语法：NameVirtueHost [ip地址:]端口号
+	NameVirtualHost *:80 //所有ip的80端口
+	Include conf/vhost.conf(可能要自己创建)
+vhost.conf的格式
+<VirtualHost *:80>（必须和上面一致）
+	ServerName www.xxx.com  域名
+	DocumentRoot "E:\xxx" 这个虚拟网站根目录
+	DirectoryIndex index.php 设置首页
+</VirtualHost>
+如果要通过www.xxx.com访问本机，要去hosts文件里给本地DNS添加这个东西
+虚拟主机的优先级高于主配置，会覆盖，访问localhost匹配不到，默认显示第一个
+解决办法：把localhost也配个虚拟主机
+
+Alias  别名目录设置
+	可以将本网站外的其他目录挂载到当前网站来使用
+	Alias /目录别名 实际目录
+	Alias /music "d:\serverData\music"
+	可以把实际目录的那个文件夹拿来使用，起名为/music，用完自动删了
+	实际上/music并不存在
+	挂载的实际目录也要设置权限

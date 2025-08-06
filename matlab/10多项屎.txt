@@ -1,0 +1,27 @@
+polynomial
+P=[4,-5,7,-8]
+p=poly2sym(P)
+得到：
+p=4*x^3+...+7*x-8
+
+P：当矩阵用就是矩阵，当多项式用就是多项式
+P与p当多项式用没有区别
+
+如果输入方阵：是求特征多项式
+A=[xxx;xxx;xxx]
+P=poly(A)   特征多项式=|辣么大E-A|
+
+如果输入矢量：是由根创建多项式(反问题)
+P=poly(root)
+
+求多项式的根：
+roots(P)
+
+polyval计算多项式的值
+P=[1,4,4]
+polyval(P,2.5)即为P(2.5)
+polyval(P,A)，对矩阵里的数逐个代入多项式
+polyvalm()，把整个矩阵代入计算
+
+Q=polyder(P)
+求P的导函数(de'rivative)

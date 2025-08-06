@@ -1,0 +1,31 @@
+用引号括起来的东西叫字符串
+string s="xxxxx";
+int a=s.Length;
+s="123"+s;      用加法拼接
+char c=s[3];
+
+字符串的不可变性，
+重新对字符串赋值是修改了引用
+
+int res=s.CompareTo("xxx")
+逐个字符比较，完全相等时返回0
+否则返回1(s对应位置比xxx大)或者-1
+
+s.Replace("","")或者('','')
+替换字符或者字符串，
+可以用来删去特定段落（替换为空字符串）
+
+s.Split()字符串按指定的分割号拆成字符串组
+
+s.SubString()检索子字符串
+substring=s.Substring(4,7)从第四位开始截取七个
+只填一个参数：一直到结尾
+
+s.ToLower()
+s.ToUpper()
+s.Trim()删除首尾空白
+s.CopyTo()把指定字符放进一个数组中
+IndexOf('x')或者("xxx")找不到会返回-1
+IndexOfAny()
+Insert()一个字符串插进另一个字符串
+Join()合并字符串组

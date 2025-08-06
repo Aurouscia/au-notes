@@ -1,0 +1,39 @@
+    async fetchData() {
+      this.todoData = null
+      const res = await fetch(
+        `https://jsonplaceholder.typicode.com/todos/${this.todoId}`
+      )
+      this.todoData = await res.json()
+    }
+
+json的对象键的引号需不需要：
+可以不写，但是不写时，键必须是个有效的标识符
+如果需要在键名里面写特殊符号，就需要引号
+var obj=
+{
+     textDanger: 114514,
+    'text-danger': 114514
+}
+
+修改数组的方法
+arr[x]=xxx用索引
+push(x,y,z...)在末尾添加元素(可以写任意个)
+pop()从末尾删除元素(无参数)
+unshift(x,y,z...)在第一位添加元素(可以写任意个)
+shift()从数组的第一位删除(无参数)
+
+splice()
+用于删除(1-2个参数)：
+list.splice(索引位置)，从某位置往后全部删掉
+list.splice(索引位置，删除个数)
+用于插入(至少三个参数)：
+list.splice(索引位置，0(固定)，x,y,z...)在某位置插入x,y,z...
+用于替换(至少三个参数)：
+list.splice(索引位置，替换个数，x,y,z...)
+
+sort()
+sort()默认排序，从小到大
+sort(句柄)
+reverse()反转
+
+上述修改数组的方法都会被vue检测到

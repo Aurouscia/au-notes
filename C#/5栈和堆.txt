@@ -1,0 +1,25 @@
+单独定义的值类型会放在栈存储
+栈有上下之分，新定义的元素从下往上stack起来
+在函数的末尾，局部变量被释放，从上到下一个个删掉
+
+数组元素，类，字符串会被放在堆存储
+如果数组中装的是值类型，则直接存储数据
+如果装的是引用类型，则存储引用 
+
+Vector3(自定义类) v1 = new Vector3();
+v1.x = 100;
+Vector3 v2 = new Vector3();
+v2 = v1;(两者指向了同一内存)
+v2.x = 200;
+Console.WriteLine(v1.x);
+
+Vector3[] vArray = new Vector3[]{new Vector3,new Vector3,new Vector3};
+
+
+struct Student{
+      public int age;
+      public Student(int age){
+            this.age=age;}
+
+stu2=stu1;
+结构体是值类型，这里只传递了数据，而不是引用

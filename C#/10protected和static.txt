@@ -1,0 +1,20 @@
+public和private用来修饰字段和方法
+表示该字段能不能从类外部访问
+
+public类：可以从别的项目访问
+(Using xxxnamespace的时候)
+没有：就不行
+
+protected字段：
+protected int z;
+只有派生类能访问，对无关的类相当于private
+
+static修饰字段和方法
+public static int x;
+（不public无意义）
+被修饰的叫静态字段和方法(静态数据)
+所有实例所公有一份，只能通过类名(而非对象)访问
+构造对象时，不包括静态字段
+
+类中的static函数：
+函数调用的结果不会访问或者修改任何对象（非static）数据成员

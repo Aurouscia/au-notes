@@ -1,0 +1,85 @@
+【页面】
+页面需要在app.json里声明才能使用
+"pages":["pages/index/index","pages/logs/logs"]
+第一个默认是首页
+
+
+【动态渲染】
+把变量填进{{}}框里
+在page.js里，是一个函数，参数填一个json对象
+Page({
+data:{xxx}填数据
+onLoad(){}等生命周期事件
+insertNum:function(){}等自定义函数
+})
+
+
+
+【条件】
+<view wx:if="{{condition}}"> True </view>
+
+<view wx:if="{{length > 5}}"> 1 </view>
+<view wx:elif="{{length > 2}}"> 2 </view>
+<view wx:else> 3 </view>
+
+<block wx:if="{{true}}">
+  <view> view1 </view>
+  <view> view2 </view>
+</block>
+
+
+【列表】
+<view wx:for="{{array}}">
+  {{index}}: {{item.message}}
+</view>
+index和item为默认名称
+
+可以指定：
+<view wx:for="{{array}}" wx:for-index="idx" wx:for-item="itemName">
+  {{idx}}: {{itemName.message}}
+</view>
+
+<block wx:for="{{[1, 2, 3]}}">
+  <view> {{index}}: </view>
+  <view> {{item}} </view>
+</block>
+
+
+
+【动态改变列表时里面元素的标识符】
+字符串，代表在 for 循环的 array 中 item 的某个 property，该 property 的值需要是列表中唯一的字符串或数字，且不能动态改变。
+
+保留关键字 this 代表在 for 循环中的 item 本身，这种表示需要 item 本身是一个唯一的字符串或者数字，如：
+
+<switch wx:for="{{objectArray}}" 【wx:key="unique"】> {{item.id}} </switch>
+
+data: {
+    objectArray: [
+      {id: 5, unique: 'unique_5'},
+      {id: 4, unique: 'unique_4'},
+      {id: 3, unique: 'unique_3'},
+      {id: 2, unique: 'unique_2'},
+      {id: 1, unique: 'unique_1'},
+      {id: 0, unique: 'unique_0'},
+    ],
+}
+
+
+【组件(模板)】
+定义：
+<template name="xxx">
+<text>{{time}}</text>
+</template>
+使用：
+<template is="xxx" data="所需的数据">
+
+
+【引用】
+<import src="xxx.wxml">
+则可以在本文件中使用这个文件的template
+import标签没有递归性
+
+<include src="xxx.wxml">
+会将其中除了<template>和<wxs>外的代码复制到这个位置
+可以用来做header和footer
+

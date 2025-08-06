@@ -1,0 +1,48 @@
+@标记后可以跟razor保留字，也可以跟C#代码
+
+如果要写一个razor界面，第一个指令必须是@page指令
+
+@model指令可以指定传递到razor页面的模型类型
+
+@Html.DisplayNameFor(model => model.Movie[0].Title)
+@Html.DisplayFor(modelItem => item.Title)
+
+布局页
+_Layout.cshtml中的@RenderBody()行就是显示其他页面的位置
+
+@{ViewData['Title']="Index";}行设置了一个关联数组的一个值
+这个值会在layout用到
+<title>@ViewData["Title"] - Movie</title>
+
+razor的注释
+@*Markup removed for brevity.*@
+不会被发送到客户端
+
+<a class="xx" asp-page="/Movies/Index">Movie</a>
+其中的asp-page的属性值可以指向一个页面
+
+Pages/_ViewStart.cshtml文件中的@{Layout="_Layout";}
+将Pages下的所有razor页面的布局文件设置为_Layout.cshtml
+
+public async Task<IActionResult> OnPostAsync()
+{
+    if (!ModelState.IsValid)//查看模型检查结果
+    {
+        return Page();//返回当前页面
+    }
+    _context.Movie.Add(Movie);
+    await _context.SaveChangesAsync();//保存更改到数据库
+
+    return RedirectToPage("./Index");//重定向到index页面
+}
+RedirectToPage("/index")和("./index")是有区别的
+前者指Page文件夹中的index页面，后者指当前文件夹下的index页面
+
+如果想改变DisplayNameFor()显示的名称，可以在字段上加annotation
+[Display(Name = "Release Date")]
+
+如果想把属性绑定到get里同名的项，可以写：
+[BindProperty(SupportsGet = true)]
+public string SearchString { get; set; }
+这时在地址栏写xxx?searchstring=xxxx
+就会给其赋值

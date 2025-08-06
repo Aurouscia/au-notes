@@ -1,0 +1,90 @@
+在新建物体选项中的那个UI，里面的东西都是UGUI的
+【Canvas】
+绘制UI元素的载体，所有UI元素必须是canvas子级下面
+试图单独创建一个image时，会自动创建canvas作为其父级
+scene面板，要编辑UI，选择2D模式，第五个方框形工具
+这时可以方便地操作UI元素
+
+同一个画布里互相重叠时谁在前面：
+hierarchy面板中越靠下，层越前
+不同的画布互相重叠：
+使用sort Order或order in layer属性调整排序层
+
+画布的render mode：
+这两个为2D UI，会贴着画面保持静止
+
+Screen Space-Overlay  覆盖（UI会遮挡住画面中物体）
+此时一像素就是一米，世界坐标系和屏幕坐标系重合
+性能更好，优先使用之
+
+Screen Space-Camera  相机（可以让物体到UI前面）
+如果没有提供一个渲染摄像机，模式仍然为overlay
+相机在移动，调整FOV时，画布的参数会跟着受影响
+这时UI可以挡住物体，也可以被物体挡住
+可以调整画布到相机间隔（不调就是固定的）
+如果要用，最好别用主摄像机放进去，新建一个UICamera
+（不会让UI跟着主摄像机跑，节省性能）
+拽给画布，depth调到主摄像机上面
+其clear flag设为仅深度（只渲染物体，没物体的地方就是空的）
+culling mask只要UI
+同时主摄像机的cullingmask不要UI
+这时，可以把3D物体的层设置为UI，就会被UI摄像机渲染
+可以调整和其他图片之间的遮挡关系
+
+第三种模式：（UI与3D物体等同）
+想把字贴到3D物体上：使用world space模式
+字放到摄像机范围内才能看见
+不要调字的尺寸，调canvas的scale，然后把画布贴到物体表面
+
+
+【Rect Transform】
+在canvas下的image，其transform不太一样，
+但调用时还是输入transform
+这里的pos是轴心点相对于自身锚点的位置
+如果锚点分开了，这里就是left和right
+物体的左边和左锚点的像素差，物体的右边和右锚点的像素差
+
+【pivot】
+UI元素中间的空心圈就是轴心点(Pivot)
+在scene面板左上角(center/pivot)处选择pivot，
+可以调整空心圈的位置(center是调整本身位置)
+pivot决定了UI的“位置”和旋转轴心
+如果调整width和height，其扩大和缩小都是基于轴心点的
+
+调整其位置 .transform.pivot.x和y
+都是0，表示左下角。都是1，表示右上角（比例）
+
+【锚点】
+想为Image加入图片，没法直接拖入
+因为图片默认的类型是Texture，但图片组件里要sprite
+在图片导入选项里，选择Texture type为Sprite，点apply就行
+
+位置自适应：
+不论摄像机像素如何，图片依然在右上角不会出去
+每个UI都有个锚点（四个一组三角形）
+每个三角形分别对应UI的rect的一个顶点，相对静止
+每个三角形又相对屏幕静止，随着分辨率改变而移动
+
+如果把锚点的四个三角形分开，
+就意味着图片会被缩放（大小自适应）
+
+锚点和轴心点均可在rect里快捷设置
+（按住shift和alt有不同作用）
+
+【代码】
+transform.position访问其轴心点世界坐标
+世界坐标：原点指向它的vector3
+如果画布是overlay模式，世界坐标等同于屏幕坐标（一米一像素）
+transform.localPosition访问相对其父UI轴心点的位置
+
+RectTransform rtf = GetComponent<...>()
+或者 rtf = this.transform as RectTransform;
+rtf.position 就是 transform.position（继承过来的）
+rtf.anchoredPosition3D 即为编辑器里显示的Pos
+(轴心点相对于锚点的位置)
+
+rtf.anchorMin和Max 两个二维向量，存储的是锚点的四个点
+rtf.pivot
+
+rtf.rect.width和height获取UI的宽度和高度（只读）
+设置UI宽 rtf.SetSizeWithCurrentAnchors(xxx.axis.horizontal,250);

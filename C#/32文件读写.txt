@@ -1,0 +1,10 @@
+【使用静态类File】
+File.ReadAllBytes  可对任意文件
+返回一个字符组  
+
+File.ReadAllLines  针对文本文件
+每一行读取为一个字符串，返回一个字符串组
+
+File.ReadAllTexts  针对文本文件
+一整个读取为字符串
+

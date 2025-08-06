@@ -1,0 +1,67 @@
+上传：文件从浏览器传到服务器
+发生在浏览器发出请求时
+表单的数据有两种类型：
+字符串类型(字节流)
+文件类型(二进制编码)
+文件就是表单数据的一部分
+
+字符串类型存储在$_POST里(内存中)
+文件类型数据存储到上传临时目录
+
+表单提交时，浏览器会默认认为都是字符串
+需要通过form上增加属性来告知
+<form enctype="mutipart/form-data">
+
+临时文件：有效期为脚本周期(瞬间结束)
+所以需要把文件持久化存储
+Move_uploaded_file(上传临时地址，目标地址)
+$_FILES存储了上传的临时文件的信息(包括临时地址)
+
+uniqID()生成一个随机的字符串用作文件名（只有字母和数字）
+uniqID(前缀)，可标识逻辑含义
+
+fileinfo.dll扩展：
+自带检测文件的MIME类型的类和函数
+取代浏览器发送来的mime信息
+$finfo=new Finfo(FILEINFO_MIME_TYPE);
+获得一个可以检测mime类型的对象
+$mime_type=$finfo->file($tmp_file['tmp_name']);
+
+mkdir(地址)创建目录
+is_dir(地址)检测目录
+$subdir=date('YmdH').'/';
+if(!is_dir($upload_path.subdir))
+      {mkdir($upload_path.subdir)}
+子目录也要返回并存入数据表
+return $subdir.$upload_filename
+
+$_FILES['xx']的['error']里存储着当前未能成功上传文件的错误类型
+出问题了可以看看这个
+0：无错误
+1：超出php规定的最大文件大小
+	php.ini中的upload_max_filesize
+2：超出表单规定的最大文件大小
+	<input type="hidden" name="MAX_FILE_SIZE" value="600000">
+	可以通过这种方法规定表单上传文件大小
+3：只上传了部分文件
+4：没有上传文件(表单那里是空的)
+6：没有找到临时上传目录(权限控制)
+7：临时文件写入失败(权限/磁盘满了)
+
+php.ini的_POST最大文件限制
+post_max_size=8M这个应该改
+如果超过，会造成_POST数组为空
+
+多文件：
+php.ini的一次请求的最大文件数量
+max_file_uploads=20
+
+每个文件会在$_FILES里面产生一个数组元素，索引为表单name
+如果name用数组命名name=xxx[下标写不写都行]，就会使得_FILES的结果改变
+例子：商品相册，不知道会有多少张图的
+$_FILES[xxx]：依然有五个元素
+分别表示三个名字的数组
+分别表示三个类型的数组
+。。。
+没有办法直接获取某一个文件的上传信息
+方法：遍历任意元素，用$key访问元素

@@ -1,0 +1,2 @@
+fetch(url).then((res)=>{console.log(res.json())})
+这里的json()会把body解析为json

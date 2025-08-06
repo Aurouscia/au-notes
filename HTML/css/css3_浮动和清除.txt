@@ -1,0 +1,47 @@
+float：使得html元素向左或右浮动，取值为left/right
+浮动的元素会朝某个方向移动直到碰到包围框的边
+或者上个浮动框的边上(有先后顺序)为止
+浮动的元素将脱离普通文档流，不再占用空间
+
+<style type="text/css">
+.news .div1{width:200px;height:200px;background-color:#FF0000;}
+.news .div2{width:200px;height:200px;background-color:#00FF00;}
+.news .div2{width:200px;height:200px;background-color:#00FF00;}
+</style>
+<div class="news">
+   <div class="div1"></div>
+   <div class="div2"></div>
+   <div class="div3"></div>
+</div>
+这种情况下因为div是块元素，三个div会上下叠起来，都占整个网页宽
+
+如果让div1的css里加一个float:right;
+那么div1就会朝右移动到news的边上
+那么第二个元素就会补上其位置，包围元素高度变为两个div
+如果再让div2的css里加一个float:right;
+那么div2就会朝右怼到div1的左边被挡住
+包围元素高度变为一个div
+如果让div3朝右浮动
+包围元素高度变为2（边框）
+（浮动的元素将脱离普通文档流，不再占用空间）
+浮动元素的层级高于普通文档流
+
+如果全部左浮动，右边位置不够了，就会另起一行排剩下的
+
+给行内元素加宽高没有用，其大小由内容决定
+但是加了浮动之后【就会变成块元素】
+
+如果里面有由百分比决定大小的元素，
+那么浮动元素是不会缩小的（否则会循环依赖）
+
+段落的换行与浮动无关，自动换行不会把一个单词切成两半
+一堆字母中间必须有空格才会自动换行，否则会突出去
+
+清除浮动，clear属性
+清除上面的浮动特性
+如何让包围元素在视觉上(其实浮动元素没高度)包住浮动元素？
+在包围层的下面，加一个“清除元素”(空的div)
+<div class="clear"></div>
+css里写
+.clear{clear:left/right/both;}
+清除浮动后的其他元素，将恢复默认排版

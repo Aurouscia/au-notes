@@ -1,0 +1,31 @@
+Event
+
+class Program{
+   public delegate void MyDelegate();
+   public 【event】 MyDelegate del1;
+   static void Main(){
+      Program p = new Program();
+      p.del1 = Test1;
+      p.del1();
+   }
+   static void Test1(){
+      xxxxx;}
+
+声明委托时加一个event，声明的就是事件
+只能作为类的成员声明
+
+
+被观察者可以连接多个观察者
+例如：
+猫    老鼠，蟑螂
+开始按钮   加载场景，播放音乐
+被观察者状态改变时会通知观察者做一些事情
+
+
+一般被观察者的Action都不让外部(通过对象)调用
+cat.catCome();容易出问题
+但是改成private就没法注册了
+写成public event Action catCome;
+该委托就只能出现在注册的语句中，不能直接调用了
+
+事件是一种受限制的委托

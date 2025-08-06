@@ -1,0 +1,43 @@
+php.ini中
+extension=php_gd2.dll启用
+
+创建新画布
+imageCreate(宽,高)
+imageCreateTrueColor(宽,高)
+基于图片创建画布
+imageCreateFromJPEG(url)
+imageCreateFromPNG(url)
+imageCreateFromGIF(url)
+
+如果要在画布上使用某种颜色，需要把颜色分配到画布上
+$green=imageColorAllocate($img,R,G,B)
+
+画上一笔
+imageFill($img,X,Y,$green)
+左上角是0,0，右下角是width-1,height-1
+
+写字符串
+imageString($img,$font(1-5的整数),$x,$y,$code,$color)
+得到画布大小：imageSX(画布)，imageSY(画布)
+得到内置字体大小：imageFontWidth(字体号)，imageFontHeight(字体号)
+
+输出画布
+header('Content-Type:image/png;');
+imagePNG/JPEG($img,'./xxx.png');
+如果没有第二个参数，代表直接输出
+输出到某html的图片上：
+img src="test17_index.php?p=back&c=Admin&a=captcha"
+    public function captchaAction(){
+        $t_captcha=new captcha();
+        $t_captcha->generate();
+    }
+    function generate()里imagePNG($img)，就会输出到这个src所在的图片位置
+一种排除错误方式：直接用浏览器请求src里的东西
+【将header注释掉】将会以字符形式显示结果，可以显示错误信息
+如果在输出图片前有【别的输出】会出错(把前面的输出当成了图片的一部分)
+可能是任何形式的输出，包括<?php前的空格和换行(可能是其他文件的)
+也有可能是utf8的BOM文件签名(隐藏字符)
+图片程序需要严格控制输出
+
+销毁画布资源
+imageDestroy($img)

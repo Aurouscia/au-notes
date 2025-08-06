@@ -1,0 +1,38 @@
+文本和特性都是数据，程序是用来处理数据的
+程序本身(包括类)也是数据
+
+有关程序及其类型的数据被称为元数据，保存在程序集中
+一个运行中的程序查看自己或者其他程序集的元数据叫反射
+
+预定义类型(int,string) BCL中的类型(Console) 自定义类型(MyClass)
+BCL声明了一个叫Type的抽象类，用来包含类的信息
+
+程序中的每个类，都由CLR创建一个Type类型的对象与之对应
+实例与Type对象没有关系
+Type对象中存储了这个类的成员（不包含其数据）
+
+【获取Type对象】
+MyClass mc = new MyClass();
+Type type = mc.GetType();//通过对象获取这个对象的所属类
+Type type = typeof(className)
+
+type.Name 获取类名
+type.Namespace 获取所在命名空间
+FieldInfo[] array1 = type.GetFields();获取public字段，private不行
+PropertyInfo[] array2=type.GetProperties();获取public属性
+MethodInfo[] array3=type.GetMethods();获取public方法
+
+【程序集】
+窗体应用程序的Properties里有个AssemblyInfo.cs
+里面可以设置包括名字在内的信息
+
+程序集由很多类构成
+exe和dll是程序集，项目编译后会变成程序集
+一般在bin/debug里面
+MyClass mc=new MyClass();
+Assembly ass=my.GetType().Assembly 获取程序集信息
+ass.Fullname 完整名，包含了项目名(namespace)，版本等信息
+Type[] types = ass.GetTypes() 获取所有类
+
+Assembly ass1=Assembly.Load("name");
+Assembly ass2=Assembly.LoadFrom("Path")

@@ -1,0 +1,74 @@
+之前有个方法叫异步委托，action.BeginInvoke()
+新版的.net中已经弃用不再支持
+
+【Thread类】
+Thread.Sleep(毫秒数)  等待一段时间
+Thread.CurrentThread.ManagedThreadId  取得当前线程id
+
+构造时为线程指定一个函数
+using System.Threading
+Thread t=new Thread(函数名);
+t.Start();
+
+或者用lambda表达式写个匿名函数：
+Thread t=new Thread(()=>{函数体});  （空括号，因为没有参数）
+t.Start
+
+【可以有一个参数，可以没有】参数必须是object类型
+static void DownloadFile(object fileName){xxx;}
+
+Thread t=new Thread(函数名);
+【t.Start(任意类型参数(另一边要能接收))】
+参数在Start的时候给
+
+【或者】自建一个类（并不是Thread）
+把需要的多个数据给某个对象，里面有个非static方法
+把这个方法给Thread构造函数就行了
+
+class MyThread
+{
+  private string fileName;
+  private string filePath;
+  public MyThread(string fileName, string filePath)
+  {xxxxxxx;}
+
+  public void DownFile(){xxxxx;}
+}
+
+class Program {
+MyThread mt=new MyThread("xxx","xxx");
+Thread t = new Thread(mt.DownFile);
+t.Start();
+
+【线程池子】
+需要更多线程时就会自动添加，不需要时会自动减少
+一般用来完成短时间的小任务
+不可以改优先级，不可以改为前台，不可以改名字
+
+Test必须有一个object参数（WaitCallBack）
+ThreadPool.QueueUserWorkItem(Test);
+ThreadPool.QueueUserWorkItem(Test);
+ThreadPool.QueueUserWorkItem(Test);
+ThreadPool.QueueUserWorkItem(Test);
+ThreadPool.QueueUserWorkItem(Test);
+ThreadPool.QueueUserWorkItem(Test);
+
+【任务】
+Task t=new Task(Action或者方法隐式转换为Action)
+t.Start()
+貌似不能有参数
+
+TaskFactory tf=new TaskFactory();
+Task t = tf.StartNew(Test);
+
+连续任务：可以控制先后关系
+Task t1=new Task(Test1);
+Task t2=t1.ContinueWith(Test2);
+t1做完之后才去做t2
+Task t3=t1.ContinueWith(Test2);
+
+任务层次结构：
+在任务里面新开一个任务，就是子任务，异步执行
+（不同于线程，线程没有父子关系）
+父任务有个WaitingForChildrenToComplete状态
+子任务完事后会变成RunToCompletion

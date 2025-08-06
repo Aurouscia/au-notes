@@ -1,0 +1,13 @@
+父类中的Start方法写成：
+protected virtual void Start()
+{XXXA}
+
+子类的Start方法写成：
+protected override void Start()
+{
+   base.Start();
+   XXXB
+}
+
+会先调用XXXA再是XXXB
+父类和子类的Start都能写东西了

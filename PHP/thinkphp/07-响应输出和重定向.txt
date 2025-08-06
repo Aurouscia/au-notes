@@ -1,0 +1,17 @@
+默认输出的是html
+return $data相当于
+return response($data)
+return response($data)->code(304)
+return json($data)->code(304)，数据类型不同，效果一样
+return json($data)->code(304)->header(['Cache-controller'=>'no-cache']);
+
+重定向，需要return执行
+return redirect('http://www.baidu.com');
+return redirect('ds/5');
+return redirect('/address/details/id/5',304);
+return redirect('/address/details/id/5',304)->with('name','Lee');
+附加session信息
+redirect(xx)->remember();记住当前url
+redirect('1')->restore();返回之前记住的url
+
+url('address/back');生成完整url

@@ -1,0 +1,58 @@
+列表List是一种集合类
+有很多类型一样的数据的时候，使用数组
+但是数组大小固定，也不方便添加删减
+
+【搜索所有满足要求的项】
+            List<string> list = new List<string>() { "34","56"};
+            list.Add("132");
+            list.Add("5");
+            List<string> res = list.FindAll(x=> { return x.Length == 2; });
+            foreach (var item in res)
+            {
+                Console.WriteLine(item);
+            }
+或者
+        List<string> listFind = list.FindAll(delegate(string s){  
+           return s.Contains("saurus");  
+        });  
+或者
+    private bool EndWithSaurus(string s)  
+    {  
+        if ((s.Length > 5) && (s.Substring(s.Length - 6).ToLower() == "saurus"))  
+            return true;  
+        else  
+            return false;  
+    } 
+     List<string> subList = list.FindAll(EndWithSaurus);//传入了一个方法名   
+
+列表可以存储任何类型的数据，<>里填类型
+List<int>scoreList = new List<int>();
+也可以匿名类型创建
+var scoreList = new List<int>();
+可以填初始值
+var scoreList = new List<int>(){1,2,3};
+
+scoreList.Add(12);
+Console.WriteLine(scoreList[0]);通过索引访问数据
+访问参数不可以超出范围
+
+Insert(位置，数据)
+会把后面的元素往后挤一位，
+只能插在最后一位往前的
+RemoveAt()
+IndexOf()    正向寻找某元素的索引
+LastIndexOf()    反向寻找
+如果没有找到就返回-1
+Sort()    从小到大的排序
+
+构造函数里可以填一个初始大小
+当位置不够用时，大小会自动扩大为原来的两倍
+scoreList.Capacity获取容量大小
+scoreList.Count获取元素数量
+
+列表的遍历
+for(int i=0,i<list.Count,i++)
+{list[i]xxxxx}
+
+foreach(int temp in list)
+{tempxxxxx;}

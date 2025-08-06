@@ -1,0 +1,47 @@
+多个线程访问同一个变量时，发生【争用条件】
+
+namespace MutiThreading
+{
+    class MyThreadObject
+    {
+        private int state = 5;
+
+        public void ChangeState()
+        {
+            state++;
+            if (state == 5)  //如果多个线程都执行这个方法，逻辑上会出错
+            { Console.WriteLine("state=5"); }
+            state = 5;
+        }
+    }
+
+    class Program
+    {
+        static void Test(object o1)
+        {
+            MyThreadObject mto = o1 as MyThreadObject;
+            while (true)
+            {
+                lock (mto)//该块只能让一个线程进入，其他的在外面排队
+                {
+                    mto.ChangeState();
+                }//释放
+             }
+        }
+        static void Main(string[] args)
+        {
+            MyThreadObject mto = new MyThreadObject();
+            Thread t = new Thread(Test);
+            t.Start(mto);
+
+            new Thread(Test).Start(mto);
+            Console.ReadKey();
+        }
+    }
+}
+
+【死锁】
+lock(s1){lock(s2){xxxx;}}
+lock(s2){lock(s1){xxxx;}}
+
+避免方法：固定一个锁定顺序，不要交替申请

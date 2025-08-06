@@ -1,0 +1,102 @@
+【c#泛型集合】
+不方便说要存几个时
+可以实现自动放入，插入，移除等功能
+List<数据类型>
+//本质：User[]    new User[];
+List<User> ul2 = new List<User>(20);
+ul2.Add(u1);
+ul2.Insert(0, u3);
+ul2.RemoveAt(1);
+User u4 = ul2[1];
+for(int i = 0; i < ul2.Count; i++)
+{
+       User u = ul2[i];
+}
+
+【字典集合】
+需要经常寻找某个元素时
+//根据键 快速查找元素
+Dictionary<string（键）, User> dic = new Dictionary<string, User>();
+dic.Add("key", new User("CZ", "123"));
+User u5 = dic["key"];//查找一个键为"key"的User
+
+【继承】
+namespace jicheng【改项目名称要手动改namespace】
+{
+    class Human
+    {      
+        public string Name { get; set; }
+        protected int a;【只有自己和继承自己的类能用】
+    }
+    class Student:Human//可以使用human类里的属性了，名字年龄之类的属性可以不用写
+    但只有public和protected的才能用
+    {
+        public int Score { get; set; }
+    }
+}
+            Student stu01 = new Student();
+            string str=stu01.Name;
+
+            //父类型的引用指向子类对象
+            Human human02 = new Student();
+            //【此时观察human02，发现类型是Student】
+            //但human02只能使用父类成员
+            Student stu02 = (Student)human02;
+            //stu02.Score要访问子类成员，则转换为子类对象(实际上也就是Student对象)
+
+            Teacher tch03 = (Teacher)human02;//【瞎转】运行时会报错
+            tch03.salary = 1000;//内存中没有地方存这个
+            //human创建时没有salary的位置，只有name和score
+
+            Teacher tch04 = human02 as Teacher;
+            //如果转换失败，则不会抛出异常
+            tch04.salary = 1000;//但是tch04的位置是空的，因为转换失败根本没赋值
+            //会报错：【NullReferenceException】
+            //也就是 null.salary = 1000;
+
+【static静态】
+能修饰：成员变量，构造函数，方法，类
+没static的：就叫实例xx
+public static int instanceCount;
+Console.WriteLine(【Student.instanceCount】);用类名点
+
+静态成员变量属于类，类被加载时初始化，且只有一份
+类：出现类名时即“加载”
+存储在“静态区”，所有对象共享
+实例成员变量属于对象，在每个对象被new时初始化，每个对象一份
+
+在没有对象时就要访问的成员
+
+【静态构造函数】
+static Student(){ }
+实例构造函数：初始化类的实例数据成员
+（其实放外面也差不多，但是初始化放在构造函数里面比较规范）
+	private Random random;
+	public Student(){random=new Random()}
+静态构造函数：初始化类的静态数据成员，执行时机：【仅在类加载时调用一次】
+静态的数据成员最好是这里初始化
+错误提示："非静态字段要求对象的引用"：即静态代码块只能访问静态成员
+【类内的方法】
+并不在对象的内存空间里，而是所有对象共用，
+对象调用方法时把自己的引用传给方法，然后栈上会有个栈帧来运行这个方法
+stu03.Fun2();其实自动传递了stu03的引用作为参数
+然后顺着引用找到对象内的方法
+所以静态的方法（由类点出来）
+没有传递任何对象引用，无法运算实例数据
+
+【静态类】
+适合工具类，例如：
+Math.Floor()，Math.Sin()
+可以直接用，但是如果是实例类，就必须
+Math math = new Math();太麻烦了
+Random random = new Random();
+random.Next(1,101);
+
+【结构体】
+与类差不多，但是类是引用类型，结构体是值类型，
+存取速度快一些，适用于大量的小型相关变量（位置，颜色）
+缺点：变量多时会占用大量栈空间
+struct abc
+{可以有字段，属性，方法}
+不能包含显式无参数构造函数，因为自带的那个不能被替换
+懒得记了，参见教程视频P108

@@ -1,0 +1,12 @@
+any任意元素不为0就返回真
+all所有元素不为0就返回真
+xor异或
+isempty是否空
+isequal是否相等
+isnumeric判断是否为数值型
+islogical判断是否为逻辑型
+logical数值型转换为逻辑型
+find寻找非零元素
+isnan判断不定数
+isinf判断无限
+isfinite判断有限

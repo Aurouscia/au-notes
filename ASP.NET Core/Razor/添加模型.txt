@@ -1,0 +1,27 @@
+创建一个Models文件夹，写入需要的属性(可以使用DataAnnotation)
+必须有一个int ID字段让数据库获得主键
+
+工具-NuGet包管理器-管理解决方案的包
+安装Microsoft.EntityFrameworkCore.Design
+
+创建Pages/XXX文件夹，用来装增删改查页面
+右键文件夹，添加"已搭建基架的新项"
+选择Razor Pages using Entity Framework(CRUD)
+
+会出现对话框，在里面选择要创建EF框架的模型
+再按加号自动生成一个数据上下文类名
+数据上下文类会放在Data文件夹里
+Pages/XXX里会出现几个新页
+Program.cs中会添加using和service.addDbContext()
+
+添加数据库迁移
+工具-NuGet包管理器-包管理器控制台
+Add-Migration InitalCreate
+Update-DataBase
+连接失败的话，应该在appsettings.json里检查连接字符串
+
+如果要为模型添加新字段，在修改cshtml文件的基础上，还要更新数据库
+在NuGet包管理器的控制台里输入
+Add-Migration Rating
+Update-Database
+名称“Rating”是任意的，用于对迁移文件进行命名。 为迁移文件使用有意义的名称是有帮助的。

@@ -1,0 +1,116 @@
+cookie会增加网络带宽使用，数据安全性低
+因为cookie存在浏览器这边
+
+session：会话数据存储于服务器端
+每个会话建立一个独立的数据区，每个区有唯一的标志
+同时浏览器端存储该唯一标志，作配对使用
+
+每个脚本都要使用session_start()函数
+开启这么个机制(一般默认是关的)
+增删改查都使用$_SESSION完成，每个元素都是个session数据
+就当作一个普通数组来操作
+unset($_SESSION['xxx'])
+
+存入session数据时，会存一个sessionID到浏览器里
+服务器端这边会存储在操作系统的临时目录里
+
+sessionID就是个cookie，所以有一些属性
+有效期：会话周期结束
+有效路径：本和子路径
+是否仅安全连接：否
+如果需要更改sessionID的属性
+得用ini_set()在开启session前设置
+或者session_set_cookie_params()设置（推荐）
+session_set_cookie_params(有效期(不是时间戳，就是秒数)，有效路径，有效域，是否仅安全传输，是否仅http);
+【要在session_start()之前才行】
+这时设置的是当前会话的所有数据的设置
+
+和一般的cookie不一样，session可以是任何类型(除了资源)
+（因为浏览器那边存储的仅仅是id）
+存在服务器这边的是一个序列化过的字符串
+但是下标只能是字符串
+
+【和header一样，session_start和setcookie前面都不能有输出】
+php标签外的标签也不行
+
+session_start之后，判断浏览器请求是否携带ID
+如果带了就直接使用，如果没有，就生成一个分配给浏览器
+还要初始化$_SESSION变量(从session数据区读取并反序列化)
+脚本结束后，判断session机制是否还开着，
+然后序列化到session数据区里去
+
+session_destroy()，销毁对应的数据区并关闭机制
+$_SESSION里的数据还没有消失
+
+清除session的所有数据：
+session_destroy();
+unset($_session);
+setcookie('PHPSESSID','',time()-1)
+清空session数据：
+$_SESSION=array()，变量还在但内容没有了
+
+重写session的存储机制：
+便于管理大量的session数据，便于web服务器集群共享session
+方案：装进数据库里
+自定义一个存储处理函数，将其设置为session机制的存储函数
+session_set_save_handler(六个参数)
+分别是开始处理器，结束处理器，读处理器，写处理器，删处理器，垃圾回收处理器
+【要在session_start之前做，并保证session不自动开启】
+可以弄个.htaccess文件里写：php_flag session.auto_start 0(一般不用)
+
+创建一个装session的数据表
+create table session(session_id varchar(40) not null default '',session_content text,primary key(session_id))charset = utf8;
+
+要把session入库写成工具类，装在framework下的tools里面
+
+session写时：
+Insert into .... on duplicate key update ......
+或者replace，语法与insert一致，主键冲突则替换，不存在则插入
+
+垃圾回收：
+开启session机制时，有概率(1/1000)执行垃圾回收操作
+可以通过        ini_set('session.gc_divisor','2');设置分母
+
+<?php
+class sessionDB{
+    private $DAO;
+    private $max_lifetime=600;
+    public function __construct(){
+        session_set_save_handler(
+            //当需要传递方法句柄时，需要一个数组，前边是方法所属对象或类，后面是方法名
+            array($this,'userSessionBegin'),
+            array($this,'userSessionEnd'),
+            array($this,'userSessionRead'),
+            array($this,'userSessionWrite'),
+            array($this,'userSessionDelete'),
+            array($this,'userSessionGC')
+        );
+        ini_set('session.gc_divisor','200');
+        session_start();
+    }
+    function userSessionBegin(){
+        $this->DAO=sqlObj::getInstance();
+        return true;
+    }
+    function userSessionEnd(){
+        return true;
+    }
+    function userSessionRead($sess_id){
+        //去session数据库读取
+        $sql = "select session_content from test17_session where session_id = '$sess_id'";
+        return (string)$this->DAO->getOne($sql);
+    }
+    function userSessionWrite($sess_id,$sess_content){
+        $sql="replace into test17_session values('$sess_id','$sess_content',unix_timestamp())";
+        return $this->DAO->query($sql);
+    }
+    function userSessionDelete(){
+        //用户调用session_destroy()时调用
+        $sql="delete from test17_session where session_id='$sess_id'";
+        return $this->DAO->query($sql);
+    }
+    function userSessionGC(){
+        $sql="delete from test17_session where session_time<unix_timestamp()-$this->max_lifetime";
+        return $this->DAO->query($sql);
+    }
+}

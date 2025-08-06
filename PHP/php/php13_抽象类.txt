@@ -1,0 +1,68 @@
+抽象类
+在正常定义类的前面，加上关键字abstract
+那就构成抽象类
+abstract class 类名{xxx}
+抽象类是不能实例化的类
+可以用来规范一些类的共同特性，但又不需要实例化
+专门做父类，用来给其他类继承
+
+抽象方法
+function前面加上abstract 就是抽象方法
+抽象方法没有方法体(也不含大括号)的方法定义头【后面跟上分号】
+配合抽象类来实现对下级类的行为规范（这个类里必须有xx方法）
+要求下级类必须完成(实现/重写)该方法，不允许不重写
+如果一个方法定义为抽象方法，则所在的类必须为抽象类
+
+重载
+php中不能定义多个同名函数，所以函数不能重载
+php的重载指的是另一个概念，
+属性重载：如果使用一个不存在的属性，
+就会去自动调用类中预先定义好的某个方法去处理数据
+方法重载：如果使用一个不存在的方法，
+就会去自动调用类中预先定义好的某个方法去处理行为
+属性有四种使用情形
+取值，赋值，判断是否存在isset()，销毁unset()
+当上面四种场景中，那个属性不存在的情况下，该对象如何应对的问题
+取值：自动调用__get()方法
+赋值：自动调用__set()方法
+判断是否存在：自动调用__isset()方法
+销毁：自动调用__unset方法
+前提：类中都要预先定义好这些方法
+__get($propName)会自动传入那个属性的名字
+__set($propName,$value)
+实用：
+$undefProps=array();//用于存储不存在的属性
+function __get($propName){
+	if(isset($this->undefProps[$propName])){
+		return $this->$this->undefProps[$propName];
+	}return "不存在的属性";
+function __set($propName,$value){
+	$this->undefProps[$propName]=$value;
+}
+当使用了一个不存在的方法：
+会自动调用__call()
+实用：
+function __call($name,$array){
+	$count=count($array);【获取数组内容物个数】
+	if($count==0)
+		f1();
+	else if($count==2)
+		return f2($array[0],$array[1]);
+}
+当调用一个不存在的静态方法时，会
+__callStatic
+
+接口：
+interface xxx{
+	常量
+	方法头
+}
+接口中只能有常量和方法头，不能有属性和方法体
+接口是比抽象类更抽象的
+实现接口使用Implement关键字
+class maque extends bird implements flyanimal{xxx}
+对于接口中的方法头，实现它的类可以继续声明为抽象，转交给下一个类，也可以自己实现之
+一个类可以实现多个接口
+implements 接口1，接口2
+一个接口继承另一个接口使用extends
+interface 接口1 extends 接口2{xxx定义}

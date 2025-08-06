@@ -1,0 +1,71 @@
+让一个类的字段和函数作为基础，
+在其上添加字段和函数作为一个新类
+(除非重写某个函数)
+许多类共享一些功能时使用
+叫做继承
+
+C#不支持多重继承
+
+class Enemy（父类）
+{
+private float hp;
+private float HP;
+{
+get{return hp;}
+set{hp = value}
+}
+private void AI(){xxxxx;}
+}
+
+class Boss:Enemy
+{
+public void Attack(){xxxxxx;}
+hp = 100;（错误）
+HP = 100;（正确）只能访问父类的public字段
+}
+
+父类声明的对象，可以使用子类构造(反过来不行)
+这样构造出来的父类对象可以转换为子类
+Enemy enemy = new Boss();
+（实际上还是Boss，拥有Boss的所有字段和函数）
+（主要是看用什么构造函数）
+Boss boss = (Boss)enemy;
+一般的父类对象无法转换为子类
+
+车 车1 = new 汽车();
+
+
+【虚方法】
+父类中：加上虚方法标签
+private virtual void XXX(){xxx}
+子类中：定义一个一模一样返回值，名字和参数（签名相同）的函数
+加上override标签
+private override void XXX(){xxx}
+
+这时，不管在哪里调用（哪怕是父类的函数中调用）
+这个东西，都会指向本子类override之后的那个函数
+
+不管父类还是子类声明的对象，
+只要构造函数所在的类里有这个override，
+都会调用override之后的函数
+
+如果许多enemy的move方法都不一样，
+但Enemy类中的AI方法里需要用到move方法
+这时就可以virtual定义move方法
+再让每个EnemyType类分别override自己的move
+不override的话就默认用virtual里的
+
+
+【隐藏方法】（容易引起混乱）
+如果基类和派生类中存在签名相同的函数
+但没有virtual和override这一对标签
+基类那个方法就会被隐藏，叫隐藏方法
+只是隐藏了，没有消失
+public new void Move(){xxxx;}（这new写不写无所谓）
+
+如果使用父类声明(不管是谁的构造函数)
+调用那个方法会调用父类的，不会隐藏
+
+如果使用子类声明
+调用那个方法会调用子类的，父类中的那个会被隐藏
+

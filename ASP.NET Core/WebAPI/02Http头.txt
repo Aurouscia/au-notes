@@ -1,0 +1,5 @@
+            string value = $"WECHATPAY2-SHA256-RSA2048 {auth}";
+            request.Headers.Add("Authorization", value);
+            request.Headers.Add(HeaderNames.Accept, "application/json");
+            request.Headers.Add(HeaderNames.UserAgent, "Unknown");
+此处request为httpRequestMessage类对象

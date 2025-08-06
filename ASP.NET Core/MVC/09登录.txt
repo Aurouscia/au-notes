@@ -1,0 +1,21 @@
+app.UseAuthentication();在请求中获取用户信息，确认用户登录过
+app.UseAuthorization();看此次请求是否通过，看该用户有没有权限的条件
+
+builder.Services.AddAuthentication(option =>
+{
+    option.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, option =>
+{
+    option.LoginPath = "";//如果鉴权失败，跳转到这个登录页面
+    option.AccessDeniedPath = "";
+});
+
+需要验证身份的action，顶上标注[Authorize]
+也可以写在controller类顶上，使整个控制器有权限限制
+如果只标记authorize，那就对应program.cs的默认授权渠道
+也可以写 Authorize(AuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme)
+如果需要进一步要求用户身份满足什么条件
+Authorize(Roles="Admin")
+
+如果有多个authorize，里面分别有role，必须同时满足才行
+如果role写在同一个authorize里面，Roles="Admin,User"，则是或关系

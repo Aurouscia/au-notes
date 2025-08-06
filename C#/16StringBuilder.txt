@@ -1,0 +1,13 @@
+不停地拼接字符串，会产生大量垃圾
+StringBuilder里面的字符可以变
+
+using System.Text
+StringBuiler sb = new StringBuilder("初始字符串");
+StringBuiler sb = new StringBuilder(int初始长度);
+StringBuiler sb = new StringBuilder("xxx"，长度);
+
+sb.Append("xxxx");
+sb.ToString();
+sb.Insert()
+sb.Remove()
+sb.Replace()

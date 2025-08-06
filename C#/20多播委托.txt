@@ -1,0 +1,24 @@
+一个委托调用几个方法叫多播委托
+static void Test1(){}
+static void Test1(){}
+static void Main(string[] args){
+Action a = Test1;
+a = Test2;
+//先指向Test1后指向Test2
+a += Test1;
+//添加一个方法的引用
+a -= Test2;
+//去掉一个方法的引用
+if(a!=null)
+   a();
+else
+   出现异常
+}
+
+按顺序执行，如果其中一步出问题了就会停止
+
+Delegate[] delegates = a.GetInvocationList();
+foreach(Delegate de in delegates)
+{
+    de.DynamicInvoke();
+}

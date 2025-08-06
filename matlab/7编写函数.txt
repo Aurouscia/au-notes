@@ -1,0 +1,5 @@
+function r = rank(A,tol)
+函数体
+
+nargin：输入参数个数
+nargout：输出参数个数

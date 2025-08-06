@@ -1,0 +1,12 @@
+wsl是windows提供的运行linux系统的扩展功能
+
+https://learn.microsoft.com/zh-cn/windows/wsl/install#upgrade-version-from-wsl-1-to-wsl-2
+
+wsl 分为1，2两个版本，可以通过powershell命令
+wsl -l -v来判断目前的linux发行版的运行状态和wsl版本
+
+如果需要从wsl1升级到2，则需要根据上面链接的指示
+1.启用虚拟机组件
+2.安装内核包
+3.wsl --set-version Ubuntu 2
+注意以上操作需要在powershell管理员权限下进行，cmd不行

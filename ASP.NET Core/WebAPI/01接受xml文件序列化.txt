@@ -1,0 +1,5 @@
+在.netcore webAPI里，传递来的xml数据必须解析为一个对象才好处理
+所以首先弄清xml数据的格式，在models文件夹建立一个对应的类
+[Httppost]的方法的参数写上该类，就会试图把传递来的数据解析为对象
+会一个个尝试已有的输入序列化方法，所以在program.cs里添加xml解析支持即可
+builder.Services.AddControllers().AddXmlSerializerFormatters();

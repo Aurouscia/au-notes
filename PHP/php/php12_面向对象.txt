@@ -1,0 +1,66 @@
+类的对象传值是值传递
+但复制的是对象标识(指向数据)
+所以看起来像是引用传递
+如果写$obj2=&$obj1，则两个数据指向同一个标识
+如果写$obj2=$obj1，则两个数据分别指向两个标识，最终都指向同一个数据
+
+class 类名{
+	private 私有变量
+	protected 仅本类和子类
+	public 公共变量
+	function __construct($xxxx){//构造函数【前面是两个下划线】
+		$this->xxx=$xxxx;//箭头右侧的变量不需要美元符号
+	}
+	function __destruct(){xxx}//析构函数，变量消失时调用
+	private function()//私有函数
+}
+
+类的继承：使用extends关键字
+class Laptop extends Computer{xxx}
+子类创建时并不会执行父类的构造函数（？？）
+function __construct(xxx){
+	parent::__construct();
+}//需要用这种格式调用父类的构造函数
+如果从子类使用父类的私有属性，什么都不会发生，也不会报错
+
+子类如果有与父类中同名的函数，就会发生覆盖
+同样的，可以在覆盖函数里面先写parent::xxxx();
+这样就只是对父类那个函数的补充
+
+final
+被声明为final的class不能被继承，被声明为final的函数不能被覆盖
+
+静态
+static $houseCount
+访问：self::$houseCount或者通过类名xx::$houseCount
+
+类常数
+const XXX='xxx';
+访问：self::或者通过类名
+
+工厂类
+class factory{
+	static function getInstance($className){
+		$obj1=new $className();
+		return $obj1;
+	}
+}
+$obj1 = factory::getInstance("A");获取A类的一个对象
+
+单例：
+应用中的某些需求：使用它的时候全程都只需要一个对象
+如果某个类只允许其创建出一个对象，即使进行多次创建也只能得到一个对象
+class B{
+	public $v1=10;
+	private static $instance;
+	private function __construct(){}//使得外部不能new对象
+	public static function getNew(){
+		if(!(isset(self::$instance)){
+			B::$instance=new self;
+		}
+		return B::$instance;
+	}
+}
+$s1=B::getNew();
+$s1可用，而且再new并不会创建新对象，而是返回之前同一个对象
+可以在不同的程序中创建同一个类

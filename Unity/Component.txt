@@ -1,0 +1,184 @@
+【脚本】
+即为.cs后缀的文本文件
+【语法结构】
+using 命名空间：否则，使用其他命名空间的类要点出来
+命名空间：为了避免类重名
+public class 类名:MonoBehaviour
+{
+        void 方法名()
+        {
+                Debug.Log("调试显示信息");
+                print("调试显示信息");
+        }
+}
+【文件名必须与类名一致】
+写好的脚本必须附加到物体上才执行
+附加到游戏物体的脚本类必须从MonoBehaviour类继承
+写属性也没用，因为编辑器里没法看到
+【不要在脚本里写构造函数】
+
+一个脚本就是一个类，附加到物体上之后就会创建一个对象
+Update方法每帧调用一次，不用就删掉以节省性能
+
+【修改脚本模板】(创建时的样子)
+D:\Unity\Editor\Data\Resources\ScriptTemplates
+【修改默认脚本编辑器】Edit-Preferences-External Tools-External Script Editor
+
+【【脚本生命周期】】
+也叫：必然事件，消息
+指满足某种条件时，unity引擎自动调用的函数
+
+写一个公开字段，就可以在组件栏修改，以修改之后的数据为准
+因为：脚本里写的是类(默认数据)，挂到物体上是对象，组件栏修改的是对象的数据
+
+【常用特性】
+在编辑器中显示私有变量，但别的类不能访问
+[SerializeField]
+private int a;
+在编辑器中隐藏公开变量，别的类可以访问
+[HideInInspector]
+public int b;
+设置编辑器中能调节的数据范围，会出来一滑条
+[Range(0,100)]
+public int c;
+
+this.name可以返回物体的名称
+【Unity内的随机数】
+private int a= Random.Range(1,101);(必须放方法里(??))
+
+特殊的函数名，不可以写错了：
+****************初始阶段*****************
+【Awake()】【创建游戏对象时】一次
+可用来判断是否执行此脚本this.enable=true;
+可用来初始化(new 数组/随机数生成器)
+【Start()】【脚本启用时执行】一次
+所有物体的Awake都执行完了之后，再执行所有物体的Start
+也用来初始化
+【OnEnable()】【脚本启用时执行】每次
+****************物理阶段*****************
+不可以在这些频繁调用的函数里new任何对象否则会产生大量垃圾
+做的事情尽量少
+【FixedUpdate()】
+每隔固定时间做一次(0.02秒)不会受到渲染时间的影响
+适用于对物体做物理操作，让物体运动
+【Update()】
+每次渲染场景执行一次，执行间隔不固定
+适用于处理游戏逻辑
+【LateUpdate()】
+在Update执行之后执行，适用于跟随逻辑，其实是同一帧
+****************输入阶段****************
+【OnMouseEnter】
+鼠标移入碰撞箱时
+【OnMouseOver】
+鼠标经过碰撞箱时
+【OnMouseExit】
+鼠标离开碰撞箱时
+【OnMouseDown】
+在碰撞箱按下时
+【OnMouseUp】
+在碰撞箱松开时
+*****************场景渲染*****************
+【OnBecameVisible】仅一帧
+当Mesh Renderer在某些相机上可见时调用
+【OnBecameInvisible】仅一帧
+当在任何相机上都不可见时调用
+*****************结束阶段*****************
+【OnDisable】
+【OnDestroy】
+【OnApplicationQuit】
+完整版去这里查：
+https://docs.unity3d.com/ScriptReference/MonoBehaviour.html
+
+【Unity调试找逻辑错误】
+print(变量);(MonoBehavior提供)
+Debug.Log(变量);【release版本一定要删掉】
+菜单栏Window-General-Console可调出unity控制台窗口
+：collapse折叠相同项目，可以计数有几个
+另一种方法：
+写一个public的变量，可以在【Inspector里面实时观察变化】
+
+【在vs中调试】记得保存修改再调试
+1.加断点
+2.调试栏里选择：附加unity调试程序
+3.在unity里面点开始游戏
+到断点时会自动跳回vs，记得点继续(而不是下一句)unity才能继续运行
+框住一个表达式，右键【快速监视】可以尝试不同的表达式的结果
+在断点卡住时可以通过【即时窗口】计算表达式
+【单帧调试】
+先禁用断点，然后在unity里运行到想要的位置暂停住
+启用断点后，按单帧执行，就能查看这一帧内的运行情况
+
+【常用API】
+快速在游戏界面做出一个简单的按钮
+private void 【OnGUI】(){
+    if(GUILayout.Button("按钮上的字符"))
+        Debug.Log("OK");//按按钮之后执行一帧什么东西
+}
+在unity设置里面改external tools为vs2019后才能让类标记为绿色
+这时，选中类名后按f12可以导航到类的定义
+[Obsolete]废弃的类，后面有提示更新到什么地方去了
+
+【Component类提供了查找(当前，后代，先辈)组件的功能】
+想访问某个游戏物体的tag，可以拿任意一个组件的引用点出来
+因为：Component类有个tag的属性
+而那些组件都是Component类的子类，所以可以访问到
+在脚本里可：
+this.transform.position = new Vector3(1, 1, 1);
+有些组件没法直接访问，要用
+GetComponent<组件名>()
+var allComp=this.GetComponent<Component>()可以返回所有组件
+foreach(var item in allComp)
+{print(item.GetType());}
+
+if (GUILayout.Button("Color"))【把自己和儿子都变红】
+{//获取后代物体的指定类型组件(从自己开始)
+      var allComp = this.【GetComponentsInChildren】<MeshRenderer>();
+      foreach(var item in allComp)
+      {
+           item.material.color = Color.red;
+      }
+}
+GetComponentInChildren<>:找一个
+例如：在一个人物中找到audioSource
+
+【显示为Enumerable的类可以这么遍历】
+foreach(Transform child in this.transform)
+      print(child.name);
+找到每个子物体(仅一代)的变换组件
+
+localPosition 相对于父物体轴心点的位置
+Position 相对于原点的位置
+localScale 相对于父物体缩放比例
+lossyScale(只读) 可理解为：物体与模型缩放比例(自身*父物体)
+
+【transform增量函数】
+this.transform.Translate(Vector3.up*3);
+this.transform.Translate(1,0,0);（有个可以填三个float的重载，并不是可以这么写向量）
+this.transform.Translate(1,0,0,Space.World);（指定相对于坐标系）
+this.transform.Rotate(0,10,0);或vector3
+this.transform.RotateAround(指定轴心点，指定轴，旋转角度)
+if (GUILayout.RepeatButton("RotateL"))【按下生效的按钮】
+{transform.RotateAround(Vector3.zero, Vector3.up, 20 * Time.deltaTime);}
+【Time.deltaTime一帧的秒数】
+if (GUILayout.Button("moveRoot"))
+       transform.root/parent.Translate(1, 0, 0);获取【根物体/父物体】的transform
+
+public Transform tf;
+【公开的transform，可以将别的物体拖进去来设置这个transform】
+transform.SetParent(tf,bool);【程序运行中，修改父物体】
+有一个重载可以决定是否改动世界坐标
+transform.Find("子物体名称/孙物体路径")
+【查找子物体并返回transform】
+查找孙子要写路径，如果路径会变，就不要这么用
+SetParent(null)【子方解除父子关系】
+DetachChildren()【父方解除所有儿子】
+
+int transform.childCount;
+Transform transform.Getchild(i)【子物体索引】查找
+Inspector面板中，同级对象的先后顺序【与索引号对应】
+SetAsFirstSibling()和拖到最上面一个效果
+SetSiblingIndex()
+
+Vector3.Distance();可以计算距离
+
+【Inspector左上角的图标，可以给物体加可视化名片】

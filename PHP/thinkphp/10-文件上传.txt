@@ -1,0 +1,14 @@
+<input type="file" name="img">
+$file=Request::file('img');
+$info=Filesystem::putFile('topic',$file);  返回文件的地址
+文件位置默认配置在config\filesystem.php
+
+<input type="file" name="img[]">
+<input type="file" name="img[]">
+<input type="file" name="img[]">
+$file=Request::file('img');
+$info=[];
+foreach($files as $file){
+      $info[]=Filesystem::putFile('topic',$file);
+
+$validate=Validate::rule(['image'=>'file|fileExt:jpg,png,gif']);

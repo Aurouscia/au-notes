@@ -1,0 +1,53 @@
+创建目录
+mkdir(目录地址，权限，是否递归创建(默认false))
+例子1
+        $subdir=date('YmdH').'/';
+        if(!is_dir($this->upload_path.$subdir)){
+            mkdir($this->upload_path.$subdir);
+        }
+例子2
+        $path='./path/to/somewhere';
+        mkdir($path);
+        如果没有to文件夹，somewhere文件夹就无法创建
+        mkdir($path,0,true);
+        会自动创建路径上的一串文件夹(如果不存在)
+返回值表示是否成功
+
+删除文件夹
+rmdir(目录地址)
+只能删除空文件夹
+
+移动或改名
+rename(旧地址，新地址)
+返回值表示是否成功
+该函数也支持文件移动和改名
+
+获取目录内容(文件)
+1.打开目录，得到一个目录句柄(数据流)
+	$dir_handle=opendir($path);
+2.读取目录内文件
+	文件名=readdir(目录句柄)
+	一次读取一个文件/子目录，同时向下移动指针，读取不到返回false
+	会读到两个逻辑子目录，“.”和“..”,分别表示当前目录和上级目录
+3.关闭目录closedir(目录句柄)
+	清除句柄资源
+
+function readDir($path){
+$dir_handle=openDir($path);
+while(false!==$file=readdir($dir_handle)(避免受到文件名为0的文件的影响)){
+     if($file=='.'||$file=='..') {continue;}(逻辑子目录不需要处理)
+     echo $file.'<br>';
+     if(is_dir($path.'/'.$file)){
+         readDir($path.'/'.$file);
+     }
+}
+}
+
+print_r()：类似于var_dump()，可以打印数组
+
+unlink(文件地址)：删除文件
+
+目录地址的字符集问题
+iconv('gbk','utf-8',$str)
+字符串的编码转换
+php代码里写的中文utf-8和磁盘里的文件名的中文gbk编码不一样

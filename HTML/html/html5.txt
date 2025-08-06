@@ -1,0 +1,43 @@
+框架
+主要用于电子书，帮助手册，企业网站后台管理
+把一个浏览器窗口划分为几个，可以同时显示几个html页面
+前台基本没有这么做的，因为需要高版本的浏览器，最好IE
+
+【<frameset>与<body>只能二选一】
+框架由框架集<frameset>和框架页<frame>构成
+一个上下框架：
+<frameset rows="180,*(星号表示自动)">
+    <frame src="xxxx.html" />（在上面显示某html）
+    <frame src="xxx.html" />
+</frameset>
+》frameset常用属性：
+Cols:划分列的框架，如cols="180,10,*"
+	也可以cols="20%,50%,*"
+rows:划分行框架，同cols
+frameborder:是否显示框架边框线，取值yes和no
+border:框线粗细
+bordercolor:框线颜色
+》frame常用属性
+src：引入一个html文件
+scrolling：设置滚动条显示,auto,yes,no
+noresize：不能调整大小
+name：设置当前框架的名称，用于链接的target
+这时的<a>的target：链接的东西在哪个窗口打开
+	_blank，_self，_parent，xxFrame（名字由主框架那定义）
+当<frame>的位置被<frameset>取代
+就是框架套框架	
+
+如果想恢复原状，可以把链接的target指向_top，src=主框架
+
+浮动框架(行内框架)
+可以用于多个页面中显示同一个东西方便修改
+在网页中开一个小窗口，在里面显示网页的内容
+<iframe>写在<body>里面
+<iframe>错误信息</iframe>
+src：引入网页
+width/height：尺寸
+frameborder：是否显示边框yes/no
+scrolling：是否显示滚动条auto,yes,no
+align：和图片的align一样，left,top，可以实现框架和文本混排
+hspace：边框和外面内容的左右边距
+vspace：上下

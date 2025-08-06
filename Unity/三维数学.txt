@@ -1,0 +1,70 @@
+【lerp线性插值】
+用来计算两个数值间，用比例确定的某个数
+Mathf.Lerp(起点，终点，比例)
+返回：在起点和终点之间“比例”的数值
+如果在update中，返回值就给该“起点”，则会每次向前10%
+速度以指数下降
+例：cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, 60, 0.1f);
+但最终无法抵达终点，需要推一把
+if (Mathf.【Abs绝对值】(cam.fieldOfView - 20) < 0.05f)
+       cam.fieldOfView = 20;
+
+【Vector3三维向量】
+Debug.DrawLine(transform.position, Vector3.zero, Color.red, Time.deltaTime);
+获取长度：
+vec1.magnitude
+Vector3.Distance(vec1,vec2)
+获取方向(单位化)：
+      表达式：vec2=vec1.normalized;
+                    vec2=vec1/vec1.magnitude;【向量的数乘】
+      改动自身：vec1.Normalize();
+向量之间可以直接加减，xyz自动完成
+方向：指向被减向量，大小：两点间距，注意：“实际位置“从坐标原点出发
+求角度：Vector3.Angle(vec,vec)
+【角度弧度转换】
+float r1 = d1*Mathf.PI/180
+float r1 = d1*Mathf.Deg2Rad(一个常数)
+float d1 = r1*Mathf.Rad2Deg
+【三角函数】
+Mathf.Asin(float radian)
+Mathf.Sin(float radian)
+【将点从自身坐标，转换为世界坐标系】（?）
+Vector3 worldCord = tf.TransformPoint(0,0,1) 
+相当于：tf.forward
+同理：tf.up和tf.right
+【点乘和叉乘】
+Vector3 Vector3.Cross(vec,vec)用于：作垂线，判断两向量相对位置
+float Vector3.Dot(vec,vec)
+
+【欧拉角】
+使用三个角度值角度来保存方向
+编辑器里的rotation就是欧拉角
+虽然使用vector3存储，但实际上并不是向量，没有大小和方向的概念
+XZ轴沿自身坐标系转，【Y沿世界坐标系转】
+访问：transform.EulerAngles
+优点：三个数字表达方向，占用空间小
+          沿坐标轴旋转为角度，符合人的思考方式
+          不存在非法数字
+缺点：
+一个方向可以对应多个欧拉角
+无法判断不同的欧拉角的方向是否相同
+0,5,0=0,365,0
+0,-5,0=0,365,0
+250,0,0=290,180,180
+unity引擎限制了:
+如果通过改动欧拉角来旋转，
+会有角度范围：-90<x<90  0<y,z<360
+【万向节死锁】
+当x=±90时，yz轴重合，失去一个自由度
+
+【四元数】
+用四个数表示旋转
+又一个三维向量(XYZ)和一个标量(W)组成
+绕该三维向量的轴旋转w弧度
+Quaternion qt = transform.rotation
+transform.rotation = Quaternion.Euler(0,50,0);欧拉角转换为四元数
+四元数之间相乘表示组合旋转
+始终沿着【自身的xyz轴】旋转
+transform.rotation *= Quaternion.Euler(1,0,0);（相当于rotate函数）
+不存在死锁
+不易单独改一个数，可能异常

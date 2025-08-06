@@ -1,0 +1,12 @@
+mesh = xxx.GetComponent<MeshFilter>().mesh;
+Vector3[] vertices = mesh.vertices;
+for(int i = 0; i < vertices.Length; i++)
+{
+xxxx;
+}
+mesh.vertices=vertices;
+mesh.RecalculateBounds();
+【重计算其边界框以在相机中正确显示】
+
+mesh.bounds=new Bounds(Vector3.zero,new Vector3(float.MaxValue,~,~))
+【使网格永远在所有相机渲染】

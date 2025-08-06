@@ -1,0 +1,87 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Count_down : MonoBehaviour 
+{
+    public int totalSec = 120;
+    private Text ctdNumTxt;
+
+    private void Awake()
+    {
+【简单方便，但间隔无法改变】
+        ctdNumTxt = this.GetComponent<Text>();
+
+        //monobehavior提供的:
+        //(方法名，第一次执行时间，每次间隔)
+        InvokeRepeating("Timer4", 0, 1);
+        //InvokeRepeating("Timer3", 0, 1);
+    }
+
+    private void Update()
+    {
+        //Timer1();
+        //或者Timer2();
+
+        /*
+        性能很差的反例
+        if (totalSec > 0)
+        {
+            totalSec -= 1 * Time.deltaTime;
+            min = (int)totalSec / 60;
+            sec = (int)totalSec % 60;
+            ctdNumTxt.text = string.Format("{0:d2}:{1:d2}", min, sec);
+            if (totalSec <= 10)
+                ctdNumTxt.color = Color.red;
+        }*/
+    }
+
+
+    private float nextTime = 0;//或别的数
+    private void Timer1()
+    {【先做再等待，可以马上开始执行，例子：自动武器】
+        if (totalSec >= 0)//或其他判断条件
+        {
+            if (Time.time >= nextTime)
+            {
+                ctdNumTxt.text = string.Format("{0:d2}:{1:d2}", totalSec / 60, totalSec % 60);
+                nextTime=Time.time+1;【可以修改时间间隔】
+                totalSec--;
+            }
+        }
+    }
+
+
+    private float accu;
+    private void Timer2()
+    {
+        if (totalSec >= 0)//或其他判断条件
+        {【先等待再做，例：巡逻的人】
+            accu += Time.deltaTime;
+            if (accu >= 1)【可以修改时间间隔】
+            {
+                ctdNumTxt.text = string.Format("{0:d2}:{1:d2}", totalSec / 60, totalSec % 60);
+                totalSec--;
+                accu = 0;//清零
+            }
+        }
+    }
+
+
+    private void Timer3()
+    {
+        if (totalSec > 0)
+        {
+            ctdNumTxt.text = string.Format("{0:d2}:{1:d2}", totalSec / 60, totalSec % 60);
+            totalSec--;
+        }
+    }
+    private void Timer4()
+    {
+        ctdNumTxt.text = string.Format("{0:d2}:{1:d2}", totalSec / 60, totalSec % 60);
+        totalSec--;
+        if (totalSec < 0)
+            CancelInvoke("Timer4");
+    }
+}

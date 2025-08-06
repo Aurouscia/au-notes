@@ -1,0 +1,19 @@
+构造函数：与类同名的函数(见2号文件)
+
+class DerivedClass:BaseClass{
+      public DerivedClass():base()
+      {xxxxx}
+}
+表示先使用父类无参数的构造函数
+然后再执行xxxxx的部分
+（有没有Base都会这样）
+
+class BaseClass{
+      int x;
+      public BaseClass(int x){this.x = x;}
+}
+class DerivedClass:BaseClass{
+      int y;
+      public DerivedClass(int x,int y):base(x){this.y=y;}
+会先调用父类的对应的构造方法(把X传递过去)
+然后执行自己的部分

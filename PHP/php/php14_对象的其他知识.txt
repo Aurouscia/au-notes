@@ -1,0 +1,88 @@
+类的自动加载
+当懒得引入类所在的文件时，可以使用自动加载
+需要某个类的时候，会自动使用__autoload函数
+function __autoload($className){
+	require "./library/".$className.".class.php";}
+$o1 = new A();
+spl_autoload_register('函数名');
+注册多个能代替__autoload的函数(如果分布在很多个文件中)
+找不到类时会依次寻找注册过的类
+
+对象的克隆
+浅度克隆：clone关键字(不是函数)
+$o2=clone $o1;，只能克隆值类型，引用类型还是同一个
+深度克隆：__clone()方法
+这个方法在clone时自动调用，可以在里面写些东西
+function __clone()
+	{$this->b1=clone $this->b1}
+$o2=clone $o1;
+
+对象的遍历
+可以把对象当作数组来遍历：
+class A{
+	public $s1=1;
+	protected $s2=2;
+}
+foreach($o1 as $key => $value){
+	echo "<br/>属性：$key=$value";
+}
+实例：遍历对象的部分属性
+function fetchSomeProp($arr){
+	foreach($this as $key=>$value){
+		if(【in_array($key,$arr)】)
+			{echo "<br/>属性：$key=$value";}
+		}
+	}
+}
+$o1->fetchSomeProp(array('a1','a2'));
+
+智能类(之前写过)
+$o1=new stdclass();
+里面没有属性，但是往里写属性它就会记下来，后面可以读取
+
+数组转换为对象
+	会把数组的键名当作属性名，值为对应值
+	但是无法读取以数字为下标的属性了
+Null转为对象
+	会变成stdClass
+标量转换为对象
+	对象会含一个属性，名为scalar，里面存着之前的值
+
+类型约束
+function f1(类名 $p1){xxx}只能使用该类的对象
+function f1(接口名 $p1){xxx}只能使用实现该接口的对象
+function f1(array $p1){xxx}只能是数组
+function f1(callable $p1){xxx}只能是个函数，此时称为回调函数
+
+与类有关的魔术常量
+__CLASS__获取所在的类名
+__METHOD__获取所在的方法名
+get_class($this)得到类名（必须有个对象）
+
+序列化：
+把变量存储为一个字符串(可以放进txt文件或者数据库)
+到时候再拿出来
+$str=serialize($xxx)
+file_put_content("文本文件路径",$str);
+反序列化：
+$str=file_get_content("文本文件路径");
+$v1=unserialize($str);
+
+__sleep() __wakeup()没看懂什么意思
+
+__tostring()方法，把一个对象当作字符串看待时，会自动调用这个
+__invoke()方法，把一个对象当作函数使用的时候，会自动调用这个
+
+class_exist()
+interface_exist()
+get_class()
+get_parent_class()
+get_class_methods()
+get_class_vars()
+get_object_vars()
+$o1 instanceOf A;
+
+static的第三种用法：
+function f1(){
+	static::f2()//此时指的是调用f1这个方法的的那个类
+	self::f2()//此时指的是当前这个类}

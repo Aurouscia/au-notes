@@ -1,0 +1,6 @@
+搜索windows功能
+勾选IIS，保存
+在.net官网下载.net runtime hosting bundle，会自动安装
+在vs里右键解决方案，发布到某个文件夹（最好是D盘根目录，否则有权限问题）
+在IIS里创建网站，物理路径指向之前发布的文件夹
+

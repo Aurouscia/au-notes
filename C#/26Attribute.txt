@@ -1,0 +1,57 @@
+attribute
+用来保存部分程序结构，增加元数据的特殊类
+获取使用之的(包括IDE，CLR，对象浏览器)，叫消费者
+
+【Obsolete】
+某程序开发程序很长，
+可能某些方法有了更先进的解决方案
+但旧的方法还有地方引用，不好直接删除
+在方法的上面加个特性，用来提醒别人不要再使用这个弃用的方法
+[Obsolete("请使用xxx替代",true/false)]
+static void XXX(){}
+如果第二个参数写false，强行使用还是不会有问题的
+如果写true，无法编译
+
+【Conditional】
+#define macroName
+using xxx
+[Conditional("macroName")]
+static void XXX(){}
+可以用一个宏是否存在（注释）来控制所有某方法执行与否
+条件不满足，这个方法依然会被编译
+
+【调用者特性】
+在函数的参数里写，由编译器自动传递过来
+static void XX(string str,[CallerFilePath]string fileName="",[CallerLineNumber]int lineNumber=0,[CallerMemberName]string methodName="")
+{里面可以直接用}
+
+【DebuggerStepThrough】
+[DebuggerStepThrough]
+static void XXX(){}
+确定某方法小而不会出问题的时候，
+可以加上这个特性，单步执行时不会进入方法里面
+
+【自定义特性】
+一个特性也是一个类，名字必须以Attribute结尾
+（使用的时候不用写那个Attribute）
+必须继承自System.Attribute
+前面加上sealed，使其不能被继承
+用来表示目标结构的一些状态
+定义一些字段属性，一般没有方法
+先指定该类能用到哪些程序结构
+[AttributeUsage(AttributeTargets(枚举).xxxxx)]
+class xyzAttribute
+public string Description{get;set;}
+public string Version{get;set;}
+构造方法（可选）：使用的时候必须给个字符串 
+public MyTestAttribute(string des)
+{this.Description = des}
+
+[My("xxxx",Version=100)]
+可以在括号里直接给属性赋值
+
+Type type = typeof(Program);
+object[] array = type.GetCustomAttributes(false);
+MyAttribute ma1 = array[0] 【as】 MyAttribute;
+
+(大概是拆装箱吧)

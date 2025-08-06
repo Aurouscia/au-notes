@@ -1,0 +1,76 @@
+中间件是一种装配到应用管道以处理请求和响应的软件
+请求管道中的每个中间件组件负责调用管道中的下一个组件，或使管道短路。
+ 当中间件短路时，它被称为“终端中间件”，因为它阻止中间件进一步处理请求。
+每个中间件都在下一个中间件(如果有)的前后工作，就像栈一样。
+
+中间件的顺序非常重要，见
+https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-7.0
+
+用 Use 将多个请求委托链接在一起。
+Use参数里写上异步匿名方法，其中next表示下一个委托
+app.Use(async (context, next) =>
+{
+    // Do work that can write to the Response.
+    await next.Invoke();
+    // Do logging or other work that doesn't write to the Response.
+});
+不执行next.Invoke表示短路(可以省去不必要的工作例如直接返回静态文件)
+app.Run(async context =>
+{
+    await context.Response.WriteAsync("Hello from 2nd delegate.");
+});
+Run委托不会收到next参数，必为管道终端
+
+program.cs的最后是app.Run()函数，这个没有参数的run和上面的run是两个意思
+
+Map可以定义管道分支
+app.Map("/map1", HandleMapTest1);
+app.Map("/map2", HandleMapTest2);
+app.Run(async context =>
+{
+    await context.Response.WriteAsync("Hello from non-Map delegate. <p>");
+});
+app.Run();
+static void HandleMapTest1(IApplicationBuilder app)
+{
+    app.Run(async context =>
+    {
+        await context.Response.WriteAsync("Map Test 1");
+    });
+}
+static void HandleMapTest2(IApplicationBuilder app)
+{
+    app.Run(async context =>
+    {
+        await context.Response.WriteAsync("Map Test 2");
+    });
+}
+对以上代码，localhost:xxx和localhost:xxx/map1会收到不一样的Response
+也可以写匿名委托和嵌套：
+app.Map("/level1", level1App => {
+    level1App.Map("/level2a", level2AApp => {
+        // "/level1/level2a" processing
+    });
+    level1App.Map("/level2b", level2BApp => {
+        // "/level1/level2b" processing
+    });
+});
+
+MapWhen(Func<HttpContext,bool>,Action<IAppBuilder>)，带条件的分支
+app.MapWhen(context => context.Request.Query.ContainsKey("branch"), HandleBranch);
+app.Run(async context =>
+{
+    await context.Response.WriteAsync("Hello from non-Map delegate. <p>");
+});
+app.Run();
+static void HandleBranch(IApplicationBuilder app)
+{
+    app.Run(async context =>
+    {
+        var branchVer = context.Request.Query["branch"];
+        await context.Response.WriteAsync($"Branch used = {branchVer}");
+    });
+}
+
+UseWhen也有，可以按条件加入可以继续管道的中间件
+UseWhen(Func<HttpContext,bool>,Action<IAppBuilder>)

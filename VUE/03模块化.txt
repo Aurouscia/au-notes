@@ -1,0 +1,90 @@
+组件是带有名称的可复用【实例】
+同一个组件静态定义如果被使用(实例化)多次，
+其data(){}数据是不相干的
+所以data不能写成静态的json，需要是一个函数(有局部作用域)
+
+一个组件里可以渲染子组件
+最好是用可以复用的小组件组成树状结构构成整个应用
+
+首先导入
+import ChildComp from './ChildComp.vue'
+然后在export default里注册子组件
+export default{
+   component:{
+       ChildComp1
+       //或者ChildComp:ChildComp
+   }
+}
+最后在模板里直接写
+<ChildComp/>就可以使用
+
+
+子组件不能直接使用父组件的数据
+子组件可以通过props来接受父级的输入（单向流动）
+
+首先要声明能接受的props
+在子组件里面：
+export default{
+   props:['msg']
+   props:{
+       msg:[String,Number]  //写成对象可以进行类型限制
+   }
+   props:{
+       msg:{
+           type:String,
+           default:"Hello"//进一步写成对象可以指定默认值
+           required: false //是否必要
+           validator:function(value){
+                xxxxxxxxxx return true/false
+                例如：return ['xxx','xxx','xxx'].
+           }
+       }
+   }
+}
+
+
+声明了之后，这个属性就可以用this访问
+在父级组件中，写：
+<ChildComp :msg="'greeting'">
+预防没有传递参数，可以用||写：
+<template>
+  <h2>{{ msg || 'No props passed yet' }}</h2>
+</template>
+
+不要手动修改props里的东西
+
+
+
+
+子组件可以通过emits来给父组件传递参数，用触发自定义事件的方式
+在子组件中写：
+<script>
+export default {
+  emits: ['response'],//声明自定义事件
+  created() {//生命周期-创建时
+    this.$emit('response', 'hello from child')//触发某事件并输入参数
+//第一个参数为事件名，后面的自定义
+  }
+}
+</script>
+父组件这边用v-on监听这个自定义事件：
+<ChildComp v-on:response="(x)=>childMsg=x"/>
+<ChildComp v-on:response="函数名"/>
+可以通过这里的函数来接受参数
+
+
+
+【$refs】
+父组件访问子组件的数据
+<SubComp ref="独特id"></SubComp>
+
+
+
+slot
+父组件可以通过slot向子组件传递模板碎片
+子组件中写：
+<slot/>或者<slot>未传递</slot>
+父组件写：
+<ChildComp>
+要传递的东西
+</ChildComp>

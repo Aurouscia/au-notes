@@ -1,0 +1,35 @@
+Func<int,int>square=x=>x*x;
+int a=square(5);
+
+Action<string> greet = name=>
+{
+string greeting="Hello"+name;
+Console.WriteLine(greeting);
+}
+greet("World");
+
+如果只有一个输入参数，那么括号可选
+Func<double,double>cube=x=>x*x*x;
+如果有两个或更多输入参数，使用逗号分隔
+Func<int,int,bool> testForEquality=(x,y)=>x==y;
+如果编译器无法推断输入参数类型，可以手动指定
+Func<int,string,bool>isTooLong=(int x,string s)=>s.Length>x;
+
+可以对元组进行操作
+Func<(int n1, int n2, int n3), (int, int, int)> doubleThem = ns => (2 * ns.n1, 2 * ns.n2, 2 * ns.n3);
+var numbers = (2, 3, 4);
+var doubledNumbers = doubleThem(numbers);
+Console.WriteLine($"The set {numbers} doubled: {doubledNumbers}");
+
+int[] numbers = { 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 };
+int oddNumbers = numbers.Count(n => n % 2 == 1);
+
+int[] numbers = { 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 };
+var firstNumbersLessThanSix = numbers.TakeWhile(n => n < 6);
+Console.WriteLine(string.Join(" ", firstNumbersLessThanSix));
+
+如果无法推断返回值类型，可以手动指定
+var choose = object (bool b) => b ? 1 : "two";
+
+lambda表达式中的变量如果与外面的局部变量同名，会发生捕获
+使用static避免捕获发生

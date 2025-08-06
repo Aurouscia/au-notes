@@ -1,0 +1,28 @@
+public class Enemy : MonoBehaviour
+{
+    public float HP;
+}
+
+public class EnemyLowest : MonoBehaviour
+{
+    public Enemy GetHPLowestEnemy(Enemy[] allenemies)
+    {
+        Enemy lowest = allenemies[0];
+        for(int i = 1; i < allenemies.Length; i++)
+        {
+            if (lowest.HP > allenemies[i].HP)
+                lowest = allenemies[i];
+        }
+        return lowest;
+    }
+    private void OnGUI()
+    {
+        if (GUILayout.Button("寻找血量最低敌人"))
+        {
+            Enemy lowest = GetHPLowestEnemy(Object.FindObjectsOfType<Enemy>());
+            //FindObject(s)OfType<>()查找场景中所有Enemy类型的引用
+            lowest.GetComponent<MeshRenderer>().material.color = Color.red;
+            //根据Enemy类型引用，获取其他组件类型引用
+        }
+    }
+}

@@ -1,0 +1,22 @@
+static void Test1(int arg1,int arg2)
+{return arg1+arg2;}
+
+static void Main(){
+Func<int,int,int> sum=Test1;
+
+sum = delegate(int arg1,int arg2)
+{
+    return arg1+arg2;
+};
+
+匿名方法就是没有名字的方法，可以赋给一个委托，
+没有办法在别的地方调用
+
+
+lambda表达式可以代替匿名方法，写得更简单
+同样定义了一个方法
+sum=(arg1,arg2)=>arg1+arg2;
+参数的类型由前面的委托决定，不需要写
+参数只有一个的时候，不需要括号
+语句只有一句的时候，不需要大括号，也可以不写return
+可以在语句中访问外部参数（最好是不怎么动的，否则不易控制）

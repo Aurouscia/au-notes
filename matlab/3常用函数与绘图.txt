@@ -1,0 +1,21 @@
+whos   命令察看工作区信息
+退出后工作区变量不会保留，需要【手动存取】
+save myfile.mat
+load myfile.mat
+
+myText = 'Hello, world';
+otherText = 'You''re right'
+longText = [myText,' - ',otherText]
+f = 71;
+c = (f-32)/1.8;
+tempText = ['Temperature is ',num2str(c)]   数字转字符串函数
+
+max()   找一个矩阵中最大的数/将两个矩阵同一位置更大的数组成新的矩阵
+a=max()
+[a,location]=max()   如果接收两个输出，可以返回最大值位置
+
+disp()   相当于WriteLine(str)
+clc   清除控制台所有内容
+
+函数名称和左括号，等几秒后会显示格式
+

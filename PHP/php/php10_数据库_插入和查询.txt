@@ -1,0 +1,206 @@
+数据库设计三范式
+
+1.原子性 储存的数据应该有不可再分性
+不要把多个信息塞进一个字段里
+2.唯一性 每一行数据应该有个可以唯一区分的特征，不能有部分依赖关系
+	可以设定一个字段为主键，或者多个字段为主键(联合主键)
+	如果确定一个表中的某个数据A，则可以确定表中的另一个数据B，
+	则称为B依赖于A，应该使非主键依赖于主键
+	什么叫部分依赖：如果确定一个表中的某个数据组合(A,B)
+	则可以确定C，就叫C依赖于AB
+	但如果有个数据D只依赖于A，那么D就是部分依赖于A
+
+	不良示例：
+	学生姓名 课程名称 学分 成绩
+	成绩由学生姓名和课程名共同决定，但学分只由课程名称决定
+	正确改良：
+	拆成学生表，课程表和成绩表三张表
+	成绩表中是联合主键，代表某人在某课程中的得分
+3.独立性 消除依赖传递
+	C依赖B，B依赖A
+	不良示例：
+	学生姓名 所在院系 院系电话
+	这时应该拆成学生表和院系表两个表
+	将学生表中的院系ID外键到院系表主键
+
+数据插入
+insert into 表名(字段名列表) values(值列表),(值列表),(值列表)
+insert into 表名(字段名列表) select 字段名列表 from 表名
+insert into 表名 set 字段名1=值1，字段名2=值2
+方法一和方法二均可以一次插入多条数据
+插入数据的单位是"行"
+字符串和时间必须加单引号
+auto_increment和timestamp的字段名不应该出现
+load data infile '完整路径和文件名' into table 表名
+文件应该是写的整整齐齐的txt
+
+删除数据
+delete from 表名 [where条件] [order排序] [limit限定]
+删除也以行为单位
+不写where的话会清空整个表
+后两个一般不用
+truncate table 表名
+清空整个表，auto_increment会从头开始
+
+修改数据
+update 表名 set 字段名1=值表达式1,字段名2=值表达式2,.... [where条件][order排序][limit限定]
+update tab5 set f1=12.34,f2=34.56,f3='xx' where id=1003;
+
+复制表
+create table 新表名 like 原表名//完全复制
+create table 表名 select * from 表名
+create table 表名 select * from 表名 where 1=3(不要里面的数据)
+insert into 表名 select * from 表名
+show create table 表明，可以得到创建表的语句，改变名字再次使用可以得到一个一样的表
+
+查询语句
+select [all/distinct] 字段/表达式列表 from xxx where xxx group by xxxx having xxx order by xxx limit xxx
+select 语句就是从数据源中取出一定的数据作为返回结果(数据集)
+通常数据源就是表，也可以使用直接数据
+	select 5*6+7
+	select now()
+	select 5,8+9,now()，都能生成一个小表
+可以为其加上字段名
+	select 5 as f1,8+9 as f2,now() as f3
+要从表中提取数据，必须使用from
+from表了之后可以对提取的数据进行计算
+	select id*10,concat(xuanxiang,'-',xuanxiang) as xx from xxtable;
+也可以对表的数据和直接数据同时取出
+也可以同时从不同的表提取数据
+	select setTest.id,enumTest.xuanxiang from setTest,enumTest;
+all/distinct
+是否消除完全重复行，不写默认就是all
+from
+设定数据从哪个表取来，可以是多个
+where
+	设定查询条件，可以不与语句挂钩比如where true/false
+	一般都与语句挂钩where id=1000
+	可以使用运算符+-*/%><=(<>不等于)(=>大于等于)
+	逻辑运算符and or not
+	xxx is null
+		xxx is not null
+		空值应该用is运算符，而不是等于号，否则无法识别
+	between xx and xx
+		相当于>=xx and <=xx
+	xxx in (值1，值2)
+		相当于xxx=值1 or xxx=值2
+	模糊查找
+		xx like 'xxx'
+		此处%代表任意数量字符，_代表一个字符，例如：
+		select * from tab4 where f4 like 'ab%';
+		查找结果的f4字段会是:abc abcde等形式(ab开头的)
+		select * from tab4 where f4 like 'ab_'
+		查找结果的f4字段会是:abc ab2 ab3等形式
+		最常见的模糊查找：'%xxx%'，只要含有这个词就会被查找到
+		还可以%xx_等方式结合
+		如果要查找的字符包括%_'三种字符，则需要转义
+		\%,\',\_
+	group by 查找某个字段重复的行，聚集成几个组
+		变成组之后，每行会损失很多信息，只留下部分信息
+		首先是该组的本身依据值，比如按相同品牌分组
+		还能输出某字段在该组内的最大最小值，平均值，和
+		select (只能)brand,count(*) as 数量,max(price) as 最高价值,avg(price) as
+			平均价值 from product【group by brand】;
+		count(*)获取该组的数量，只能用星号作为参数
+		max()，获取某字段在该组中的最大值
+		min()  sum()  avg()
+		可以同时group by两个字段，这样就会分类出两个字段都相同的行
+	having 针对group by中的组的选择条件(只能选择那些与组挂钩的)
+		select count(*) as 数量, max(xx) as 最大值 from tab1 group by f2【having count(*)>3】
+		也可以直接使用前面的字段别名：
+		select count(*) as 数量, max(xx) as 最大值 from tab1 group by f2【having 数量>3】
+	order by 指定排序方式
+		对前面from where group by having的结果按某些字段的大小进行排序
+		可以指定ASC(默认)和DESC(倒序)
+		如果指定多个排序方式，则在第一种相同的情况下按后面的排序
+		select * from product order by chandi, price desc
+	limit [起始行号start] ,要取出的行数num
+		表示将前面取得的排好序的数据，对之指定取得局部连续的若干条
+		起始行号，默认为0
+		要取得的行数：如果从起始行号开始没有这么多行，则提前结束
+		一般用来让网页显示内容时分页
+			分页条件：人为指定每页显示条数，$pagesize=5;
+			取得第n页数据select * from 表名 limit (n-1)*$pagesize,$pagesize;
+
+交叉连接：
+笛卡尔积：cross join
+	select * from tab2 cross join tab3 where f2>777 and id>15
+	可以把两个表排列组合拼起来变成一个临时的新表
+内连接：inner join xxx on xx=xx
+	select * from tab2 as t2 inner join tab3 as t3 on t2.f1 = t3.c1;
+	相当于加上了条件的笛卡尔积
+一般来说：不带条件的笛卡尔积无意义，因为里面存在大量无意义的拼接数据
+也可以只显示部分数据：
+select t1.id,pwd,t2.f2 from tab2 as t1 join tab3 as t2 on t1.id=t2.f1 where 1
+(用了as别名之后就全都用别名来指代)
+左连接：left join
+	强行显示左边所有数据
+	右边的用NULL补齐
+右连接：right join
+	恰恰相反
+	
+举例：
+找出SONY4G手机所属类别名称
+	select t2.protype_name from product as t1 inner join product_type as t2
+	on t1.protype_id=t2.protype.id
+	where pro_name like '%SONY%' and pro_name like '%4G手机%'
+找出属于手机的产品
+	select【t1.*】from product as t1 inner join product_type as t2
+	on t1.protype_id=t2.protype_id where t2.protype name='手机';
+有一个比赛列表，里面有双方球队id，和比分，有一个球队列表，有球队id和名字，现在要显示比分
+	此时必须连接两次球队列表，分别获得两个球队的名字
+	select t1.t_name【as t1_name】,m.t1_score,m.t2_score,t2.t_name【as t2_name】,from match as m left join
+	【team as t1】on m.t1_id=t1.t_id left join【team as t2】on m.t2_id=t2.t_id
+	如果要连接两次同一个表，就需要用不同的别名
+	由于两个列的名字一样，需要给那两个列起别名
+
+
+子查询：
+如果一个select查询语句中，又出现了select，则称后者为子查询
+子查询可以放在select后面，也可以放在from后面，也可以放在where后面（应该符合数据需求）
+放在select后面的是一个(一行一列)数据结果
+放在from后面的可以是任意结果，可以给一个别名
+放在where后面的可以是一个数据或者一行/列数据
+分别是：
+作为主查询的结果数据：select c1,(select f1 from tab2) as f11 from tab1;(标量)（有鬼用？）
+作为主查询的条件数据：select c1 from tab1 where c1 in(select f1 from tab2);(列向量)
+作为主查询的来源数据：select c1 from(select f1,f2 from tab2)as t2 where xxx(任意结果)
+常用：
+子查询结果用比较运算符产生布尔
+	例子：找出大于平均价的商品
+	子查询找平均价，主查询找商品
+	select * from product where price>(select avg(price) as avg_price from product)
+使用in子查询
+	where 字段值 in (列子查询(若干个数据值))
+	【表示该操作数等于该子查询中任意一个值，就算满足条件】
+	例子：找出所有所属类别带"电"字的产品
+	先找出所有带"电"字的类别的id
+	再找出这些类别的产品
+	select * from product where protype_id in(select protype_id from product_type where protype_name like '%电%')
+	相当于select * from product where protype_id in(2,3);
+使用any子查询(和any是同义词)
+	where 字段值 比较运算符 any(列子查询(若干个数据值))
+	【表示该操作数根那若干个数据值比较，有一个满足就算满足条件】
+	如果写=any，就相当于in
+使用all子查询
+	where 字段值 比较运算符 all(列子查询(若干个数据值))
+	【表示该操作数根那若干个数据值比较，所有满足才算满足条件】
+	例子：找出最高价格的产品
+	select * from product where price >= all(select price from product);
+	或者 select * from product where price = (select max(price) from product);
+使用exists的子查询
+	where exists(子查询)
+	如果该子查询有结果数据，(只要>=一行)，就返回true
+	举例：找出具有在售商品的类别
+	select * from pro_type where exist(select * from pro_type where product.protype_id = pro_type.protype_id) 
+
+联合查询
+就是把两个select语句的结果层叠到一起，称为一个大结果(上下拼在一起)
+字段以第一张表的为准
+select xx from xx
+union
+select xx from xx
+显然：字段数必须一样
+
+数据控制语言（权限）：略
+

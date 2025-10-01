@@ -1,0 +1,2 @@
+git clone http://<用户名>@<域名>/<路径>
+即可clone时指定使用什么用户名，运行后git credential manager会冒出来，输入密码即可

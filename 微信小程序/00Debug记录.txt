@@ -1,3 +1,0 @@
-wx.redirectTo会造成全局变量消失
-
-text套text会造成内层text消失，包括其带的属性

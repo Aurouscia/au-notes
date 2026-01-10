@@ -12,3 +12,6 @@ A message like Server is listening on [ 'any' <ipv4> 1433] should be listed.
 This message indicates that the instance of SQL Server is listening on all IP addresses on this computer (for IP version 4) and TCP port 1433. (TCP port 1433 is usually the port that's used by the Database Engine or the default instance of SQL Server. Only one instance of SQL Server can use this port. If more than one instance of SQL Server is installed, some instances must use other port numbers.) Note down the port number used by the SQL Server instance that you're trying to connect to.
 
 如果不是1433，那么SMSS登录或者连接字符串的主机名就要填<ip>逗号<端口号>
+
+在新版sqlserver上，efcore默认使用的named pipe连接与sqlserver默认的名称对不上，应该手动指定tcp连接
+在连接字符串的Server前加“tcp:”前缀即可，例如“tcp:localhost,1433”

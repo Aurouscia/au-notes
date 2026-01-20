@@ -10,3 +10,5 @@
         // 再开始/结束录音
         manager.start({ duration: 60000, lang: 'zh_CN' })
     ```
+
+2. 支付宝小程序中，已经在`pages.json`注册的vue文件，不能再作为组件使用（script不会执行）

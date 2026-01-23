@@ -8,6 +8,7 @@ nvm_completion="/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 # 别名
 alias ll="ls -l -a"
 alias rc="source ~/.zshrc"
+alias mp="cd ~/my-projects"
 
 # cd后执行
 chpwd() {
@@ -20,10 +21,16 @@ chpwd() {
     [[ $in_now == $need16_prefix || $in_now == $need16_prefix/* ]] && now_in_tree=true
     [[ $in_old == $need16_prefix || $in_old == $need16_prefix/* ]] && old_in_tree=true
 
-    case "$old_in_tree,$now_in_tree" in
-        false,true)  nvm use 16      ;;   # 进入树
-        true,false)  nvm use default ;;   # 离开树
-    esac
+    if [[ $1 == 'is_init' ]]; then
+        if [[ $now_in_tree == true ]]; then
+            nvm use 16
+        fi
+    else
+        case "$old_in_tree,$now_in_tree" in
+            false,true)  nvm use 16      ;;   # 进入树
+            true,false)  nvm use default ;;   # 离开树
+        esac
+    fi
     
     # my项目中检测git用户名是否正确
     my_name=Au
@@ -42,6 +49,6 @@ chpwd() {
     fi
 }
 # zshrc时触发一次
-chpwd
+chpwd 'is_init'
 
 # 末尾是脚本管理的开关

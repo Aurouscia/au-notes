@@ -1,0 +1,253 @@
+#!/usr/bin/env zsh
+
+# Git filter script to show commits by specific user within given days or specific date
+# Usage: git-filter-me [days|date] [format]
+# Examples: 
+#   git-filter-me                    # last 7 days (default), default format
+#   git-filter-me 7                  # last 7 days, default format
+#   git-filter-me 9-7                # September 7th of current year, default format
+#   git-filter-me 7 "%ci | %s | %an" # last 7 days, custom format
+#   git-filter-me 2022-9-7 "%h | %s" # September 7th, 2022, custom format
+
+target_user="wangcz"
+default_format="%ci | %s"
+
+# Parse parameters
+format="$default_format"
+
+if [[ $# -eq 0 ]]; then
+    days=7
+    echo "No parameter provided, using default: $days days"
+elif [[ $# -eq 1 ]]; then
+    param=$1
+    
+    # Check for help flags
+    if [[ "$param" == "-h" ]] || [[ "$param" == "--help" ]]; then
+        echo "Usage: $0 [days|date] [format]"
+        echo ""
+        echo "Git filter script to show commits by specific user within given days or specific date"
+        echo ""
+        echo "Parameters:"
+        echo "  days     - Number of days to look back (e.g., 7, 30)"
+        echo "  date     - Specific date in MM-DD or YYYY-MM-DD format (e.g., 9-7, 2022-9-7)"
+        echo "  format   - Git log format string (e.g., '%h | %s | %an')"
+        echo ""
+        echo "Examples:"
+        echo "  $0                    # last 7 days (default), default format"
+        echo "  $0 7                  # last 7 days, default format"
+        echo "  $0 9-7                # September 7th of current year, default format"
+        echo "  $0 7 '%ci | %s | %an' # last 7 days, custom format"
+        echo "  $0 2022-9-7 '%h | %s' # September 7th, 2022, custom format"
+        echo "  $0 '%h | %an'         # last 7 days, custom format"
+        echo ""
+        echo "Default format: %ci | %s (commit date | subject)"
+        echo "Common format options:"
+        echo "  %h - abbreviated commit hash"
+        echo "  %H - full commit hash"
+        echo "  %ci - committer date (ISO format)"
+        echo "  %s - subject"
+        echo "  %an - author name"
+        echo "  %ae - author email"
+        exit 0
+    fi
+    
+    # Check if parameter contains dash (date format)
+    if [[ "$param" == *"-"* ]]; then
+        # Handle date format
+        if [[ "$param" =~ ^[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+            # Format: MM-DD (current year)
+            current_year=$(date +%Y)
+            target_date="$current_year-$param"
+            date_mode=true
+        elif [[ "$param" =~ ^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+            # Format: YYYY-MM-DD
+            target_date="$param"
+            date_mode=true
+        else
+            echo "Error: Invalid date format. Use MM-DD or YYYY-MM-DD"
+            exit 1
+        fi
+        
+        # Validate date using a more compatible approach
+        # Try to parse the date and extract year, month, day
+        IFS='-' read -r year month day <<< "$target_date"
+        
+        # Remove leading zeros to avoid octal interpretation
+        month=$((10#$month))
+        day=$((10#$day))
+        
+        # Basic validation for month and day ranges
+        if [[ "$month" -lt 1 || "$month" -gt 12 ]]; then
+            echo "Error: Invalid month: $month (must be 1-12)"
+            exit 1
+        fi
+        
+        if [[ "$day" -lt 1 || "$day" -gt 31 ]]; then
+            echo "Error: Invalid day: $day (must be 1-31)"
+            exit 1
+        fi
+        
+        # Additional validation for months with less than 31 days
+        case "$month" in
+            4|6|9|11)
+                if [[ "$day" -gt 30 ]]; then
+                    echo "Error: Invalid date: $target_date (month $month has only 30 days)"
+                    exit 1
+                fi
+                ;;
+            2)
+                # February - check for leap year
+                if [[ $((year % 4)) -ne 0 ]] || [[ $((year % 100)) -eq 0 && $((year % 400)) -ne 0 ]]; then
+                    # Not a leap year
+                    if [[ "$day" -gt 28 ]]; then
+                        echo "Error: Invalid date: $target_date (February $year has only 28 days)"
+                        exit 1
+                    fi
+                else
+                    # Leap year
+                    if [[ "$day" -gt 29 ]]; then
+                        echo "Error: Invalid date: $target_date (February $year has only 29 days)"
+                        exit 1
+                    fi
+                fi
+                ;;
+        esac
+        
+        echo "Searching commits by $target_user on $target_date..."
+    else
+        # Check if it looks like a format string (contains %, |, or spaces)
+        if [[ "$param" == *"%"* ]] || [[ "$param" == *"|"* ]] || [[ "$param" == *" "* ]]; then
+            # It's likely a format string
+            format="$param"
+            days=7
+            echo "Using custom format: $format"
+            echo "Searching commits by $target_user in the last $days days..."
+        else
+            # Handle days format
+            if ! [[ "$param" =~ ^[0-9]+$ ]] || [[ "$param" -le 0 ]]; then
+                echo "Error: Days must be a positive integer, or use date format (MM-DD or YYYY-MM-DD)"
+                exit 1
+            fi
+            days=$param
+            echo "Searching commits by $target_user in the last $days days..."
+        fi
+    fi
+elif [[ $# -eq 2 ]]; then
+    # Two parameters: days/date and format
+    param=$1
+    format="$2"
+    
+    # Check if parameter contains dash (date format)
+    if [[ "$param" == *"-"* ]]; then
+        # Handle date format
+        if [[ "$param" =~ ^[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+            # Format: MM-DD (current year)
+            current_year=$(date +%Y)
+            target_date="$current_year-$param"
+            date_mode=true
+        elif [[ "$param" =~ ^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+            # Format: YYYY-MM-DD
+            target_date="$param"
+            date_mode=true
+        else
+            echo "Error: Invalid date format. Use MM-DD or YYYY-MM-DD"
+            exit 1
+        fi
+        
+        # Validate date using a more compatible approach
+        # Try to parse the date and extract year, month, day
+        IFS='-' read -r year month day <<< "$target_date"
+        
+        # Remove leading zeros to avoid octal interpretation
+        month=$((10#$month))
+        day=$((10#$day))
+        
+        # Basic validation for month and day ranges
+        if [[ "$month" -lt 1 || "$month" -gt 12 ]]; then
+            echo "Error: Invalid month: $month (must be 1-12)"
+            exit 1
+        fi
+        
+        if [[ "$day" -lt 1 || "$day" -gt 31 ]]; then
+            echo "Error: Invalid day: $day (must be 1-31)"
+            exit 1
+        fi
+        
+        # Additional validation for months with less than 31 days
+        case "$month" in
+            4|6|9|11)
+                if [[ "$day" -gt 30 ]]; then
+                    echo "Error: Invalid date: $target_date (month $month has only 30 days)"
+                    exit 1
+                fi
+                ;;
+            2)
+                # February - check for leap year
+                if [[ $((year % 4)) -ne 0 ]] || [[ $((year % 100)) -eq 0 && $((year % 400)) -ne 0 ]]; then
+                    # Not a leap year
+                    if [[ "$day" -gt 28 ]]; then
+                        echo "Error: Invalid date: $target_date (February $year has only 28 days)"
+                        exit 1
+                    fi
+                else
+                    # Leap year
+                    if [[ "$day" -gt 29 ]]; then
+                        echo "Error: Invalid date: $target_date (February $year has only 29 days)"
+                        exit 1
+                    fi
+                fi
+                ;;
+        esac
+        
+        echo "Searching commits by $target_user on $target_date..."
+        echo "Using custom format: $format"
+    elif [[ "$param" =~ ^[0-9]+$ ]]; then
+        # Handle days format
+        if [[ "$param" -le 0 ]]; then
+            echo "Error: Days must be a positive integer, or use date format (MM-DD or YYYY-MM-DD)"
+            exit 1
+        fi
+        days=$param
+        echo "Searching commits by $target_user in the last $days days..."
+        echo "Using custom format: $format"
+    else
+        echo "Error: First parameter must be days (number) or date (MM-DD or YYYY-MM-DD)"
+        exit 1
+    fi
+else
+    echo "Usage: $0 [days|date] [format]"
+    echo "Examples:"
+    echo "  $0                    # last 7 days (default), default format"
+    echo "  $0 7                  # last 7 days, default format"
+    echo "  $0 9-7                # September 7th of current year, default format"
+    echo "  $0 7 \"%ci | %s | %an\" # last 7 days, custom format"
+    echo "  $0 2022-9-7 \"%h | %s\" # September 7th, 2022, custom format"
+    exit 1
+fi
+
+echo "=================================================="
+
+# Use appropriate git log command based on mode
+if [[ "$date_mode" == "true" ]]; then
+    # Search for commits on specific date
+    git log --author="$target_user" --since="$target_date 00:00:00" --until="$target_date 23:59:59" --pretty=format:"$format" --reverse
+else
+    # Search for commits within last N days
+    git log --author="$target_user" --since="$days days ago" --pretty=format:"$format" --reverse
+fi
+
+# Check if any commits were found
+if [[ $? -ne 0 ]]; then
+    echo "Error: Git command failed"
+    exit 1
+fi
+
+# Count the number of commits found
+if [[ "$date_mode" == "true" ]]; then
+    commit_count=$(git log --author="$target_user" --since="$target_date 00:00:00" --until="$target_date 23:59:59" --pretty=format:"%H" | wc -l | tr -d ' ')
+else
+    commit_count=$(git log --author="$target_user" --since="$days days ago" --pretty=format:"%H" | wc -l | tr -d ' ')
+fi
+
+echo "=================================================="
+echo "Total commits found: $commit_count"

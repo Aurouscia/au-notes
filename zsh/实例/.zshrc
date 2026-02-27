@@ -9,10 +9,14 @@ nvm_completion="/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 alias ll="ls -l -a"
 alias rc="source ~/.zshrc"
 alias mp="cd ~/my-projects"
+alias yj="cd ~/yh-projects/ycjob"
+alias dotnet9="/opt/homebrew/Cellar/dotnet@9/9.0.112/libexec/dotnet"
 
 # cd后执行
 chpwd() {
     local need16_prefix='/Users/au/yh-projects'
+    local node_version_in_tree=16
+    local node_version_default=24
     local in_now=$PWD
     local in_old=$OLDPWD
 
@@ -23,12 +27,16 @@ chpwd() {
 
     if [[ $1 == 'is_init' ]]; then
         if [[ $now_in_tree == true ]]; then
-            nvm use 16
+            nvm use $node_version_in_tree
+        else
+            if [[ $(node -v) != v${node_version_default}* ]]; then
+                nvm use $node_version_default
+            fi
         fi
     else
         case "$old_in_tree,$now_in_tree" in
-            false,true)  nvm use 16      ;;   # 进入树
-            true,false)  nvm use default ;;   # 离开树
+            false,true)  nvm use $node_version_in_tree ;;   # 进入树
+            true,false)  nvm use $node_version_default ;;   # 离开树
         esac
     fi
     

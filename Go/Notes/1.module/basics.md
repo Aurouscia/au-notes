@@ -44,6 +44,9 @@ require (
 )
 ```
 
+- go 1.26 新行为：使用 go mod init 时，go.mod 中的版本是当前版本-1
+- go 行会影响项目中可用的特性（go 1.25 的项目无法使用 1.26 的新特性）
+
 ### 5. 模块路径规范
 
 - 本地开发：可以使用简单名称如 `myproject`
@@ -61,3 +64,21 @@ go env -w GOPROXY=https://goproxy.cn,direct
 # 或设置环境变量
 export GOPROXY=https://goproxy.cn,direct
 ```
+
+### 7. 自动工具链切换
+
+go 运行时会根据本地设置（默认为auto）以及项目要求（toolchain行和依赖项），自动下载并运行对应版本的工具链
+
+本地设置为：
+- `GOTOOLCHAIN`环境变量
+- 用户级：`~/.config/go/env`
+- 系统级：`$GOROOT/go.env`
+
+可选值：
+- local → 使用捆绑工具链（不切换）
+- name → 使用指定工具链
+- name+auto → 进入智能选择流程
+    - 读取 go.work 或 go.mod 的 toolchain 行
+    - 如果比name更高，则自动使用该版本
+
+自动下载的工具链存储在`~/go/pkg/mod/golang.org/toolchain@*`（会越堆越多，不会自动清理，可手动安全删除）

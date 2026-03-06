@@ -4,12 +4,12 @@
 
 ### 1. 什么是 Go Module（模块）
 
-Go Module 是 Go 1.11 引入的依赖管理系统，用于管理项目的依赖包和版本。
+Go Module 是 Go 1.11 引入的依赖管理系统，用于管理项目的依赖模块和版本。
 
 ### 2. 关键文件
 
 - **go.mod**：定义模块名称、Go 版本和依赖项
-- **go.sum**：记录依赖包的加密校验和，确保依赖完整性
+- **go.sum**：记录依赖模块的加密校验和，确保依赖完整性
 
 ### 3. 常用命令
 
@@ -32,6 +32,11 @@ go mod tidy
 go mod graph
 ```
 
+注意：
+- 如果是 workspace 项目中的依赖，且还未发布模块到远程，则 go mod tidy 无法成功
+- 因为 tidy 会确保这个模块在别处也能成功引用依赖，会试图从远程下载而不是使用 workspace 内的
+- 原因：go mod xxx 系列命令都只针对当前模块，感知不到 workspace 配置
+
 ### 4. go.mod 文件结构
 
 ```
@@ -44,15 +49,16 @@ require (
 )
 ```
 
+- module 行是 go.mod 的第一行，后跟模块名，模块名为 git 仓库 url
+- go.mod 中的 require 指定依赖模块的版本（锁定），而源码中的 import 仅指定依赖模块的名称（声明）
 - go 1.26 新行为：使用 go mod init 时，go.mod 中的版本是当前版本-1
-- go 行会影响项目中可用的特性（go 1.25 的项目无法使用 1.26 的新特性）
+- go 行会影响项目中可用的特性（例如 go 1.25 的项目无法使用 1.26 的新特性）
+- 在 workspace 中，无需 require（可能还未发布，url无效）也可以 import 工作区内其他模块
 
 ### 5. 模块路径规范
 
 - 本地开发：可以使用简单名称如 `myproject`
-- 开源项目：建议使用代码托管地址，如 `github.com/username/repo`
-
----
+- 开源项目：必须使用代码托管地址，如 `github.com/username/repo`
 
 ### 6. 镜像
 
@@ -82,3 +88,30 @@ go 运行时会根据本地设置（默认为auto）以及项目要求（toolcha
     - 如果比name更高，则自动使用该版本
 
 自动下载的工具链存储在`~/go/pkg/mod/golang.org/toolchain@*`（会越堆越多，不会自动清理，可手动安全删除）
+
+### 8. Package
+
+- 每个 go 文件的第一行为 package + 包名
+- 包名必须与 go 文件所属的目录同名，例如`package utils`，否则会导致各种工具识别异常
+
+例如：在模块 `example.com/myadder` 中有目录 `utils`，其中的文件均为 `package utils`
+
+导入时：
+```go
+import (
+	"fmt"
+	"example.com/myadder/utils" // 模块名 包名
+)
+
+utils.Add(1, 2) // 通过包名，可调用里面的公共函数
+```
+
+如果两个模块的包同名了，必须使用 alias：
+```go
+import (
+	"fmt"
+	autils "example.com/myadder/utils"
+    butils "example.com/mysubber/utils"
+)
+```
+然后通过 autils 和 butils 调用里面的公共函数

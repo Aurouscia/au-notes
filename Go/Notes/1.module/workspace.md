@@ -50,9 +50,7 @@ use (
 replace example.com/old => ./local/old
 ```
 
-### 5. 使用场景
-
-**场景 1：同时开发多个相关模块**
+### 5. 使用场景：同时开发多个相关模块
 
 ```
 myproject/
@@ -60,13 +58,6 @@ myproject/
 ├── frontend/      # 前端应用模块
 ├── backend/       # 后端服务模块
 └── shared/        # 共享库模块
-```
-
-**场景 2：本地替换依赖进行调试**
-
-```go
-// 在 go.work 中使用 replace 指令，使用本地包代替远程包
-replace github.com/mycompany/library => ../library
 ```
 
 ### 6. 工作区 vs 模块
@@ -95,7 +86,12 @@ replace github.com/mycompany/library => ../library
    - 本地修改可以立即被其他模块感知，无需提交或打 tag
    - 这使得多模块联合开发和调试变得高效
 
-4. **replace 指令的优先级**
+4. **replace 指令**
+   - 用法（本地临时替换）
+      ```go
+      // 在 go.work 中使用 replace 指令，使用本地包代替远程包
+      replace github.com/mycompany/library => ../library
+      ```
    - `go.work` 中的 `replace` 指令**优先于** `go.mod` 中的 `replace`
    - 主要用于覆盖不同工作空间模块中冲突的替换
 

@@ -49,10 +49,10 @@ require (
 )
 ```
 
-- module 行是 go.mod 的第一行，后跟模块名，模块名为 git 仓库 url
+- module 行是 go.mod 的第一行，后跟模块名，模块名为 git 仓库导入路径
 - go.mod 中的 require 指定依赖模块的版本（锁定），而源码中的 import 仅指定依赖模块的名称（声明）
 - go 1.26 新行为：使用 go mod init 时，go.mod 中的版本是当前版本-1
-- go 行会影响项目中可用的特性（例如 go 1.25 的项目无法使用 1.26 的新特性）
+- go 行会影响项目中可用的特性（例如 go 1.25 的项目无法使用 1.26 的新特性，否则 gopls 等开发环境会警告）
 - 在 workspace 中，无需 require（可能还未发布，url无效）也可以 import 工作区内其他模块
 
 ### 5. 模块路径规范

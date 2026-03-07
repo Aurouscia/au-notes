@@ -100,7 +100,7 @@ go 运行时会根据本地设置（默认为auto）以及项目要求（toolcha
 ```go
 import (
 	"fmt"
-	"example.com/myadder/utils" // 模块名 包名
+	"example.com/myadder/utils" // 模块名+模块内路径（按约定，路径结尾应与包名一致）
 )
 
 utils.Add(1, 2) // 通过包名，可调用里面的公共函数

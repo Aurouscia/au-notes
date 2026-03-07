@@ -9,4 +9,6 @@
 
 ## 2.variable - 变量与常量
 
-- 状态：暂未开始
+- exam1-concepts.md：概念题 ⏳ 待完成
+- exam2-practice/：实践题 ⏳ 待完成
+- 状态：进行中

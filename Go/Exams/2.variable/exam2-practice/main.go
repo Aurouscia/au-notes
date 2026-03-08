@@ -16,5 +16,5 @@ func main() {
 	a, b := 10, 20
 	fmt.Printf("交换前：a=%d, b=%d\n", a, b)
 	a, b = b, a
-	fmt.Printf("交换前：a=%d, b=%d\n", a, b)
+	fmt.Printf("交换前：a=%d, b=%d\n", a, b) // ❌ 注释错误，应为"交换后"
 }

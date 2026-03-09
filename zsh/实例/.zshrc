@@ -5,6 +5,10 @@ nvm_sh="/opt/homebrew/opt/nvm/nvm.sh"
 nvm_completion="/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 [ -s "$nvm_completion" ] && source "$nvm_completion"
 
+# go
+export GOPROXY=https://goproxy.cn,direct
+[ -d "$HOME/go/bin" ] && export PATH="$PATH:$HOME/go/bin"
+
 # 别名
 alias ll="ls -l -a"
 alias rc="source ~/.zshrc"
@@ -27,16 +31,16 @@ chpwd() {
 
     if [[ $1 == 'is_init' ]]; then
         if [[ $now_in_tree == true ]]; then
-            nvm use $node_version_in_tree
+            nvm use $node_version_in_tree >/dev/null 2>&1 # 通过重定向到 null 来静默
         else
             if [[ $(node -v) != v${node_version_default}* ]]; then
-                nvm use $node_version_default
+                nvm use $node_version_default >/dev/null 2>&1
             fi
         fi
     else
         case "$old_in_tree,$now_in_tree" in
-            false,true)  nvm use $node_version_in_tree ;;   # 进入树
-            true,false)  nvm use $node_version_default ;;   # 离开树
+            false,true)  nvm use $node_version_in_tree >/dev/null 2>&1 ;;   # 进入树
+            true,false)  nvm use $node_version_default >/dev/null 2>&1 ;;   # 离开树
         esac
     fi
     

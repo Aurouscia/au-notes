@@ -105,6 +105,8 @@ const Pi = 3.14159
 const MaxSize = 100
 ```
 
+关键点：`const` 不指定类型得到的是无类型常量（untyped constant），可以灵活赋值（类似于隐式转换）
+
 ### 2.2 多常量声明
 
 ```go

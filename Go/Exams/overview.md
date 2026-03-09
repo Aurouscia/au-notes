@@ -15,6 +15,6 @@
 
 ## 3.control-flow - 流程控制
 
-- exam1-concepts.md：概念题 ⏳ 待完成
-- exam2-practice/：实践题（猜数字游戏）⏳ 待完成
-- 状态：进行中
+- exam1-concepts.md：概念题 ✅ 需要加强（switch case 规则、fallthrough 行为、for-range 语法细节）
+- exam2-practice/：实践题（猜数字游戏）✅ 优秀
+- 状态：已完成

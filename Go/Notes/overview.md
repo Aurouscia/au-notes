@@ -8,5 +8,10 @@
 
 ## 2.variable - 变量与常量
 
+- basics.md ✅
+- 复习次数：0
+
+## 3.control-flow - 流程控制
+
 - basics.md ⏳ 当前学习
 - 复习次数：0

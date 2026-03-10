@@ -9,9 +9,11 @@
 
 ## 2.variable - 变量与常量
 
-- exam1-concepts.md：概念题 ✅ 需要加强（无类型常量、短变量声明复用理解有误）
-- exam2-practice/：实践题 ✅ 基本正确（注释有误）
-- 状态：已完成
+- exam1-basic-concepts.md：概念题 ✅ 需要加强（无类型常量、短变量声明复用理解有误）
+- exam2-basic-practice/：实践题 ✅ 基本正确（注释有误）
+- exam3-array-slice-concepts.md：数组与切片概念题 ⏳ 待完成
+- exam4-array-slice-practice/：数组与切片实践题 ⏳ 待完成
+- 状态：进行中
 
 ## 3.control-flow - 流程控制
 

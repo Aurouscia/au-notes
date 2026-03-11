@@ -32,11 +32,15 @@ func Transpose(matrix [][]int) [][]int {
 	// 请在此实现
 	rowCount := len(matrix)
 	colCount := len(matrix[0])
-	res [][]int
-	for c:=0; c<colCount; c++ {
-		for r:=0; r<rowCount;
-	} 
-	return nil
+	res := [][]int{}
+	for c := 0; c < colCount; c++ {
+		row := []int{}
+		for r := 0; r < rowCount; r++ {
+			row = append(row, matrix[r][c])
+		}
+		res = append(res, row)
+	}
+	return res
 }
 
 func main() {

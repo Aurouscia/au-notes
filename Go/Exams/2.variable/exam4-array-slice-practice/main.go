@@ -33,6 +33,7 @@ func Transpose(matrix [][]int) [][]int {
 	rowCount := len(matrix)
 	colCount := len(matrix[0])
 	res := [][]int{}
+	// 也可以：var res [][]int // append 时会自动从 nil 变为空数组！
 	for c := 0; c < colCount; c++ {
 		row := []int{}
 		for r := 0; r < rowCount; r++ {

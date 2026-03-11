@@ -4,19 +4,38 @@ import "fmt"
 
 // ReverseArray 反转数组（不修改原数组）
 func ReverseArray(arr [5]int) [5]int {
-	// 请在此实现
-	return [5]int{}
+	var res [5]int
+	for i := 0; i < 5; i++ {
+		res[5-i-1] = arr[i]
+	}
+	return res
 }
 
 // Unique 切片去重（保持顺序）
 func Unique(s []int) []int {
-	// 请在此实现
-	return nil
+	var res []int
+OuterLoop:
+	for i := 0; i < len(s); i++ {
+		var target = s[i]
+		for j := 0; j < len(res); j++ {
+			if target == res[j] {
+				continue OuterLoop
+			}
+		}
+		res = append(res, target)
+	}
+	return res
 }
 
 // Transpose 矩阵转置
 func Transpose(matrix [][]int) [][]int {
 	// 请在此实现
+	rowCount := len(matrix)
+	colCount := len(matrix[0])
+	res [][]int
+	for c:=0; c<colCount; c++ {
+		for r:=0; r<rowCount;
+	} 
 	return nil
 }
 

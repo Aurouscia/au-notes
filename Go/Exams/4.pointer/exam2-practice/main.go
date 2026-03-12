@@ -4,13 +4,18 @@ import "fmt"
 
 // Swap 交换两个指针指向的值
 func Swap(a, b *int) {
-	// 请在此实现
+	var temp = *a
+	*a = *b
+	*b = temp
 }
 
 // SumArray 计算数组元素之和（通过指针）
 func SumArray(arr *[5]int) int {
-	// 请在此实现
-	return 0
+	sum := 0
+	for x := range *arr {
+		sum += x
+	}
+	return sum
 }
 
 // Person 结构体
@@ -21,8 +26,10 @@ type Person struct {
 
 // NewPerson 使用 new 创建并初始化 Person
 func NewPerson(name string, age int) *Person {
-	// 请在此实现
-	return nil
+	var p = new(Person)
+	(*p).Name = name
+	(*p).Age = age
+	return p
 }
 
 func main() {

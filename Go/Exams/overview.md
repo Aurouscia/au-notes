@@ -13,6 +13,8 @@
 - exam2-basic-practice/：实践题 ✅ 基本正确（注释有误）
 - exam3-array-slice-concepts.md：数组与切片概念题 ✅ 已完成
 - exam4-array-slice-practice/：数组与切片实践题 ✅ 已完成
+- exam5-struct-concepts.md：结构体概念题 ✅ 需要加强（值接收者方法无法修改原结构体）
+- exam6-struct-practice/：结构体实践题 ✅ 已完成
 - 状态：已完成
 
 ## 3.control-flow - 流程控制

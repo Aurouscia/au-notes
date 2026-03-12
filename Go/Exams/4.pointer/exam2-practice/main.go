@@ -10,9 +10,11 @@ func Swap(a, b *int) {
 }
 
 // SumArray 计算数组元素之和（通过指针）
+// ❌有误：原实现 for x := range *arr 获取的是索引而非值
+// 已修正为 for _, x := range *arr
 func SumArray(arr *[5]int) int {
 	sum := 0
-	for x := range *arr {
+	for _, x := range *arr {
 		sum += x
 	}
 	return sum

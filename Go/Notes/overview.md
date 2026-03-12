@@ -18,5 +18,5 @@
 
 ## 4.pointer - 指针
 
-- basics.md ⏳ 当前学习
+- basics.md ✅
 - 复习次数：0

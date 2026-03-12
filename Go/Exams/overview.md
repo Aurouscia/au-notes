@@ -23,4 +23,7 @@
 
 ## 4.pointer - 指针
 
-- 状态：待创建
+- exam1-concepts.md：概念题 ✅ 已完成
+- exam2-practice/：实践题 ✅ 已完成（修正了 for-range 用法）
+- exam3-fix-bug/：纠错题 ✅ 已完成
+- 状态：已完成

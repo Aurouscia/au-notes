@@ -30,4 +30,6 @@ func main() {
 	var person *Person
 	SetPerson(&person, "Bob", 25)
 	fmt.Println("Person:", *person)
+
+	// 补充：也可以在外面初始化指针：var person = &Person{}
 }

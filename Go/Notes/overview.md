@@ -13,5 +13,10 @@
 
 ## 3.control-flow - 流程控制
 
+- basics.md ✅
+- 复习次数：0
+
+## 4.pointer - 指针
+
 - basics.md ⏳ 当前学习
 - 复习次数：0

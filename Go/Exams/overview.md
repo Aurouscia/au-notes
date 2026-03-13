@@ -29,3 +29,9 @@
 - exam2-practice/：实践题 ✅ 已完成（修正了 for-range 用法）
 - exam3-fix-bug/：纠错题 ✅ 已完成
 - 状态：已完成
+
+## 5.function - 函数
+
+- exam1-concepts.md：概念题（填空、判断、简答）⏳ 待完成
+- exam2-practice/：实践题（计算器函数实现）⏳ 待完成
+- 状态：进行中

@@ -26,6 +26,7 @@ func MakeMemoizedFib() func(int) int {
 			return cached
 		}
 		// fib 数列里没有 0，0 可认为 cache miss
+		// ❌有误：实际上 fib 数列第一项是 0，如果需要判断 cache miss，可使用 map[int]*int，使用 nil 表示“无值”
 		var res int
 		if x <= 1 {
 			res = 1

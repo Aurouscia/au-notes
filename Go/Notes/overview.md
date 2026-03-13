@@ -30,3 +30,8 @@
 - basics.md ✅
 - advanced.md ✅
 - 复习次数：0
+
+## 6.interface - 接口
+
+- basics.md ⏳ 当前学习
+- 复习次数：0

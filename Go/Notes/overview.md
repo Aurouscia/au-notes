@@ -24,3 +24,8 @@
 
 - basics.md ✅
 - 复习次数：0
+
+## 5.function - 函数
+
+- basics.md ⏳ 当前学习
+- 复习次数：0

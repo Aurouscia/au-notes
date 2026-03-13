@@ -23,11 +23,11 @@ func Divide(a, b float64) (float64, error) {
 	return a / b, nil
 }
 
-func CalculateAll(a, b float64) (addRes, subRes, mutRes, divRes float64) {
+func CalculateAll(a, b float64) (addRes, subRes, mulRes, divRes float64, divErr error) {
 	addRes = Add(a, b)
 	subRes = Subtract(a, b)
-	mutRes = Multiply(a, b)
-	divRes, _ = Divide(a, b)
+	mulRes = Multiply(a, b)
+	divRes, divErr = Divide(a, b)
 	return
 }
 
@@ -63,8 +63,8 @@ func main() {
 		fmt.Println("3/0=", divRes)
 	}
 
-	var r1, r2, _, _ = CalculateAll(3, 2)
-	fmt.Println("CalculateAll(3, 2) 前两个返回值：", r1, r2)
+	var r1, r2, r3, _, _ = CalculateAll(3, 2)
+	fmt.Println("CalculateAll(3, 2) 前三个返回值：", r1, r2, r3)
 
 	var area, cir = Rectangle(3, 4)
 	fmt.Println("3*4 矩形的面积和周长：", area, cir)

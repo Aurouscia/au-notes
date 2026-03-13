@@ -32,6 +32,6 @@
 
 ## 5.function - 函数
 
-- exam1-concepts.md：概念题（填空、判断、简答）⏳ 待完成
-- exam2-practice/：实践题（计算器函数实现）⏳ 待完成
-- 状态：进行中
+- exam1-concepts.md：概念题（填空、判断、简答）✅ 需要加强（裸返回概念理解有误）
+- exam2-practice/：实践题（计算器函数实现）✅ 优秀
+- 状态：已完成

@@ -34,6 +34,6 @@
 
 - exam1-concepts.md：概念题（填空、判断、简答）✅ 需要加强（裸返回概念理解有误）
 - exam2-practice/：实践题（计算器函数实现）✅ 优秀
-- exam3-advanced-concepts.md：高级特性概念题 ⏳ 待完成
-- exam4-advanced-practice/：高级特性实践题 ⏳ 待完成
-- 状态：进行中
+- exam3-advanced-concepts.md：高级特性概念题 ✅ 优秀
+- exam4-advanced-practice/：高级特性实践题 ✅ 优秀
+- 状态：已完成

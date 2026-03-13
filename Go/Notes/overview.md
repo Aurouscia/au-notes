@@ -12,7 +12,7 @@
 - array.md ✅
 - slice.md ✅
 - fmt.md ✅
-- struct.md ⏳ 当前学习
+- struct.md ✅
 - 复习次数：0
 
 ## 3.control-flow - 流程控制
@@ -28,5 +28,5 @@
 ## 5.function - 函数
 
 - basics.md ✅
-- advanced.md ⏳ 当前学习
+- advanced.md ✅
 - 复习次数：0

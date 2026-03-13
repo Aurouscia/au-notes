@@ -27,5 +27,6 @@
 
 ## 5.function - 函数
 
-- basics.md ⏳ 当前学习
+- basics.md ✅
+- advanced.md ⏳ 当前学习
 - 复习次数：0

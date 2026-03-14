@@ -40,6 +40,6 @@
 
 ## 6.interface - 接口
 
-- exam1-concepts.md：概念题（填空、判断、简答）⏳ 待完成
-- exam2-practice/：实践题（图形计算程序）⏳ 待完成
-- 状态：进行中
+- exam1-concepts.md：概念题（填空、判断、简答）✅ 需要加强（类型断言零值、接口组合、值类型不能自动取地址）
+- exam2-practice/：实践题（图形计算程序）✅ 需要加强（fmt.Stringer 方法名）
+- 状态：已完成

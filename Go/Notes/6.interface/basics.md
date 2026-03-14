@@ -244,7 +244,7 @@ func (b *Book) Save() {
 
 | 接收者类型 | 值变量 | 指针变量 |
 |-----------|--------|---------|
-| 值接收者 | ✅ 实现 | ✅ 实现 |
+| 值接收者 | ✅ 实现 | ✅ 实现（自动解引用） |
 | 指针接收者 | ❌ 不实现 | ✅ 实现 |
 
 ```go
@@ -255,6 +255,74 @@ var printer Printer
 
 printer = b  // ✅ Book 实现了 Print()
 printer = p  // ✅ *Book 也实现了 Print()
+```
+
+### 6.1 自动解引用机制
+
+当指针类型赋值给接口时，Go 会自动解引用：
+
+```go
+// Book 实现了 Print() 方法（值接收者）
+// 这意味着：
+// - Book 实现了 Printer
+// - *Book 也实现了 Printer（自动解引用）
+
+p := &Book{Title: "Go"}
+var printer Printer = p  // ✅ 合法
+// 内部逻辑：(*p).Print() 被调用时会自动解引用
+```
+
+**但反过来不行**：
+
+```go
+// *File 实现了 Save() 方法（指针接收者）
+// 这意味着：
+// - *File 实现了 Saver
+// - File 不实现 Saver（无法自动取地址）
+
+type Saver interface {
+    Save()
+}
+
+type File struct {
+    Data []byte
+}
+
+func (f *File) Save() {  // 指针接收者
+    // 保存...
+}
+
+var f File = File{}
+var s Saver = f  // ❌ 编译错误：File 没有实现 Save()
+                 // 因为 f 是值，无法自动获取其地址
+```
+
+**为什么值不能自动取地址？**
+- 值变量可能存储在只读的内存区域（如常量）
+- 自动取地址会引入不确定性
+- Go 语言设计上避免这种隐式操作
+
+### 6.2 方法集总结
+
+| 类型 | 方法集 |
+|------|--------|
+| `T`（值） | 所有 `(t T)` 接收者的方法 |
+| `*T`（指针） | 所有 `(t T)` 和 `(t *T)` 接收者的方法 |
+
+```go
+type MyInt int
+
+func (i MyInt) Add(n int) int   // 值接收者
+func (i *MyInt) Mul(n int)      // 指针接收者
+
+var a MyInt = 10
+var b *MyInt = &a
+
+a.Add(5)   // ✅
+a.Mul(2)   // ❌ 编译错误
+
+b.Add(5)   // ✅ 自动解引用
+b.Mul(2)   // ✅
 ```
 
 ## 7. 常见标准库接口

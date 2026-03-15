@@ -30,10 +30,12 @@ type BaseCounter struct {
 func NewBaseCounter(name string) *BaseCounter {
 	var res = BaseCounter{value: 0, Name: name}
 	return &res
+	// 建议：可以直接 return &BaseCounter{value: 0, Name: name}，无需中间变量
 }
 
 // 请使用指针接收者实现 MutableCounter 接口的所有方法
 
+// 建议：Get 和 String 方法可以使用值接收者，但通常与 Add/Reset 保持一致使用指针接收者更统一
 func (c BaseCounter) Get() int {
 	return c.value
 }
@@ -52,15 +54,19 @@ func (c *BaseCounter) Reset() {
 
 // SafeCounter 线程安全计数器（可选挑战）
 type SafeCounter struct {
-	mu sync.Mutex
-	BaseCounter
+	mu          sync.Mutex
+	BaseCounter // 嵌入 BaseCounter
 }
+
+// 注意：嵌入 BaseCounter 后，SafeCounter 继承了 BaseCounter 的方法
+// 但 Add/Reset 需要重新实现以保证线程安全
 
 // 请同样实现 MutableCounter 接口（使用指针接收者）
 func (c *SafeCounter) Add(n int) {
 	c.mu.Lock()
 	c.value += n
 	c.mu.Unlock()
+	// 建议：使用 defer c.mu.Unlock() 避免忘记解锁，或在复杂逻辑中确保解锁
 }
 
 func (c *SafeCounter) Reset() {
@@ -92,6 +98,8 @@ type Registry struct {
 // 请实现 Registry 的 Register 和 Create 方法
 func (r *Registry) Register(typeName string, factory CounterFactory) {
 	r.factories[typeName] = factory
+	// 注意：如果 r.factories 为 nil，这里会 panic
+	// 建议：在 Registry 构造函数中初始化 map，或在这里检查 nil
 }
 func (r *Registry) Create(typeName string, name string) (MutableCounter, error) {
 	c, ok := r.factories[typeName]
@@ -135,6 +143,10 @@ func FindByName(counters []Counter, name string) (Counter, bool) {
 				return bc, true
 			}
 		}
+		// ❌ 问题：类型断言为 BaseCounter 值类型会失败
+		// 因为 counters 中存储的是 *BaseCounter，不是 BaseCounter
+		// 应该改为：bc, isCounter := c.(*BaseCounter)
+		// 更好的做法：定义 NamedCounter 接口，断言接口而不是具体类型
 	}
 	fmt.Println()
 	return nil, false
@@ -160,7 +172,10 @@ func main() {
 	ProcessCounter(counter)
 
 	fmt.Println("sum:", SumCounters(counter, mutableCounter))
+	// 输出 sum: 0，因为 SumCounters 返回 0（有 bug）
+
 	someCounter, found := FindByName([]Counter{counter, mutableCounter}, "counter2")
+	// found 会是 false，因为 FindByName 类型断言错误
 	if found {
 		mc := someCounter.(MutableCounter)
 		mc.Add(50)
@@ -187,5 +202,10 @@ func main() {
 		case *SafeCounter:
 			fmt.Println("是safeCounter")
 		}
+		// 建议：使用 switch v := c.(type) 获取具体值
+		// switch v := c.(type) {
+		// case *BaseCounter:
+		//     fmt.Println("BaseCounter name:", v.Name)
+		// ...
 	}
 }

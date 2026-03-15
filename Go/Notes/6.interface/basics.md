@@ -367,6 +367,8 @@ fmt.Println(Person{"Alice", 30})  // Alice (30岁)
 
 ## 8. 接口设计最佳实践
 
+### 8.1 基本原则
+
 1. **接口要小**：方法越少越好，遵循"单一职责"
 2. **隐式实现**：不要显式声明实现关系
 3. **接受接口，返回具体类型**：函数参数用接口，返回值用具体类型
@@ -388,6 +390,75 @@ type ReadWriter interface {
     Writer
 }
 ```
+
+### 8.2 类型断言最佳实践：优先断言为接口
+
+**原则**：类型断言时，优先断言为接口（能力）而不是具体类型（实现）。
+
+#### ❌ 不好的做法：断言为具体类型
+
+```go
+// 只能处理 *BaseCounter，新增其他类型时需要修改代码
+func FindByName(counters []Counter, name string) (Counter, bool) {
+    for _, c := range counters {
+        // 紧耦合：绑定到具体实现
+        if bc, ok := c.(*BaseCounter); ok && bc.Name == name {
+            return c, true
+        }
+    }
+    return nil, false
+}
+```
+
+**问题**：
+- 新增 `*SafeCounter` 时，函数无法处理
+- 需要修改函数才能支持新类型
+- 违反"开闭原则"
+
+#### ✅ 好的做法：断言为接口
+
+```go
+// 定义能力接口（只需要 Name 方法）
+type NamedCounter interface {
+    Counter
+    Name() string
+}
+
+// 任何实现了 Name() 的 Counter 都可以被查找
+func FindByName(counters []Counter, name string) (Counter, bool) {
+    for _, c := range counters {
+        // 松耦合：只关心能力，不关心具体类型
+        if nc, ok := c.(NamedCounter); ok && nc.Name() == name {
+            return c, true
+        }
+    }
+    return nil, false
+}
+```
+
+**优点**：
+- `*BaseCounter`、`*SafeCounter`、任何新类型都能处理
+- 无需修改函数代码
+- 符合"面向接口编程"
+
+#### 对比总结
+
+| 场景 | 推荐方式 | 原因 |
+|------|---------|------|
+| 只需要某些方法 | ✅ 断言为接口 | 松耦合，可扩展 |
+| 需要访问特定字段 | 断言为具体类型 | 如 `bc.value`（私有字段）|
+| 需要类型特有的行为 | 断言为具体类型 | 如 `safeCounter.mu.Lock()` |
+
+#### 实际例子
+
+```go
+// 标准库 io.Copy：只关心是否能读写，不关心具体类型
+func Copy(dst Writer, src Reader) (written int64, err error)
+
+// 可以是 *os.File、*bytes.Buffer、*strings.Reader 等任何实现
+```
+
+> **核心思想**："接受接口，返回具体类型"，断言时也优先断言为接口。
 
 ## 9. 练习要点
 

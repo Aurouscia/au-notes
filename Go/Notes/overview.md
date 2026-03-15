@@ -29,6 +29,7 @@
 
 - basics.md ✅
 - advanced.md ✅
+- type.md ✅ 函数类型详解（不变性）
 - 复习次数：0
 
 ## 6.interface - 接口

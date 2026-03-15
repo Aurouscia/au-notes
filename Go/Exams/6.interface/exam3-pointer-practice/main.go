@@ -128,7 +128,7 @@ func SumCounters(counters ...Counter) int {
 	for _, c := range counters {
 		sum += c.Get()
 	}
-	return 0
+	return 0 // 应该返回 sum
 }
 
 // FindByName 请实现此函数
@@ -144,7 +144,7 @@ func FindByName(counters []Counter, name string) (Counter, bool) {
 			}
 		}
 		// ❌ 问题：类型断言为 BaseCounter 值类型会失败
-		// 因为 counters 中存储的是 *BaseCounter，不是 BaseCounter
+		// 因为你赋值给接口时使用了指针（&bc），所以接口中存储的是 *BaseCounter
 		// 应该改为：bc, isCounter := c.(*BaseCounter)
 		// 更好的做法：定义 NamedCounter 接口，断言接口而不是具体类型
 	}
@@ -159,7 +159,7 @@ func main() {
 		fmt.Println("bc 的值：", bc.Get())
 	}
 	log()
-	bc.Add(10)
+	bc.Add(10) // 仅在调用方法时，可以自动取地址（值调用指针接收者方法）因为这是个临时动作
 	log()
 	bc.Reset()
 	log()

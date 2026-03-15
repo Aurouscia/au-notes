@@ -240,8 +240,10 @@ func main() {
 	// 7. Registry 测试
 	fmt.Println("\n6. Registry 测试:")
 	registry := NewRegistry()
-	registry.Register("base", NewBaseCounter)
-	registry.Register("safe", NewSafeCounter)
+	// 注意：NewBaseCounter 返回 *BaseCounter，需要包装成 CounterFactory 类型
+	// 因为 Go 函数类型不支持协变返回类型
+	registry.Register("base", func(name string) MutableCounter { return NewBaseCounter(name) })
+	registry.Register("safe", func(name string) MutableCounter { return NewSafeCounter(name) })
 
 	safe1, err := registry.Create("safe", "safe-counter-1")
 	if err != nil {

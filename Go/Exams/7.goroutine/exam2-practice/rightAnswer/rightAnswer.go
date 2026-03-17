@@ -173,7 +173,7 @@ func ProcessWithTimeout(task Task, timeout time.Duration) (Result, bool) {
 // ============================================
 
 func main() {
-	fmt.Println("=== 并发任务处理器测试（最佳实践版本）===\n")
+	fmt.Print("=== 并发任务处理器测试（最佳实践版本）===\n\n")
 
 	// 1. 测试 WorkerPool
 	fmt.Println("--- Test 1: WorkerPool ---")
@@ -191,7 +191,7 @@ func main() {
 
 	// 3. 测试带超时的任务处理
 	fmt.Println("--- Test 3: ProcessWithTimeout ---")
-	
+
 	// 3.1 正常情况（超时 1 秒，任务 500ms）
 	result, ok := ProcessWithTimeout(Task{ID: 1, Name: "quick-task"}, time.Second)
 	if ok {

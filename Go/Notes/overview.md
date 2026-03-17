@@ -40,4 +40,5 @@
 ## 7.goroutine - 协程与通道
 
 - basics.md ✅
+- advanced.md ✅
 - 复习次数：0

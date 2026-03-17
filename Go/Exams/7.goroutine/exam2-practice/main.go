@@ -46,6 +46,9 @@ func WorkerPool(tasks []Task, n int) []Result {
 		}
 	}()
 	results := []Result{}
+	// ❌ 错误：for t, ok := <-c; ok; 这是一个无限循环！
+	// 原因：ok 在初始化时被赋值为 true，循环条件永远为 true
+	// 正确做法：使用 for-range 或 for { t, ok := <-c; if !ok { break } }
 	for t, ok := <-c; ok; {
 		fmt.Println("task taken: ", t.Name)
 		result := ProcessTask(t)
@@ -74,6 +77,9 @@ func ProducerConsumer(producerCount, consumerCount, taskCount int) []Result {
 			}
 		}()
 	}
+	// ❌ 错误：生产者还没完成任务就关闭了 channel！
+	// 原因：goroutine 是异步执行的，close(c) 会在生产者启动后立即执行
+	// 正确做法：使用 sync.WaitGroup 等待所有生产者完成后再关闭
 	close(c)
 	results := []Result{}
 	wg := sync.WaitGroup{}
@@ -81,6 +87,7 @@ func ProducerConsumer(producerCount, consumerCount, taskCount int) []Result {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			// ❌ 错误：同样的无限循环问题
 			for t, ok := <-c; ok; {
 				res := ProcessTask(t)
 				results = append(results, res)

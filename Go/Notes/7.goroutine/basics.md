@@ -233,7 +233,7 @@ func main() {
     
     go producer(ch)
     
-    // 方式1：使用 range 遍历（推荐）
+    // 方式1：使用 range 遍历（推荐）channel 关闭时，循环会自动退出，无需检查 ok
     for v := range ch {
         fmt.Println(v)  // 0, 1, 2
     }

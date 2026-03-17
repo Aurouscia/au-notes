@@ -104,6 +104,14 @@
     - 通信更符合函数式风格
     - 共享内存无法高效实现“阻塞等待”的效果
 
+    ⚠️ 标准答案：CSP (通过通信共享内存) 的优点
+
+    - 无数据竞争	不共享内存，就没有 race condition
+    - 组合性	进程可以像乐高一样组合，Channel 可以串联、并联、选择
+    - 可推理性	形式化数学基础，可以证明死锁自由、活性等属性
+    - 天然同步	Channel 操作自带 happens-before 语义
+    - 容错性	一个进程崩溃不影响其他进程（Erlang 的"let it crash"）
+
 4. 以下代码的输出是什么？请解释原因。
    ```go
    func main() {
@@ -121,7 +129,9 @@
    }
    ```
     - 0, false
-    - 因为最后打印的是一个已经关闭且读完数据的 channel 
+    - 因为最后打印的是一个已经关闭且读完数据的 channel
+
+    有误：❌ 漏了前面两行输出 1 和 2 
 
 5. 以下代码的输出是什么？请解释 goroutine 的执行顺序。
    ```go
@@ -142,3 +152,5 @@
    ```
     - Main waiting, Goroutine start, Goroutine end, Main done
     - 主线程在 <-done 处被阻塞，直到 done 被发送一个 true 才继续
+
+    ⚠️ 注意："Main waiting" 和 "Goroutine start" 的先后顺序不确定，取决于调度器

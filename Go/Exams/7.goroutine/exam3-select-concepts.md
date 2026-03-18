@@ -21,10 +21,10 @@
     - 取消
 
 7. 调用 ______ 函数可以取消 context 并传播取消信号给所有子 context。
-    - Cancel()
+    - Cancel() **❌有误，正确答案：cancel（小写，它是一个函数变量，不是 Cancel 函数）**
 
 8. 如果不调用 `cancel()`，会导致 ______ 泄漏。
-    - gorountine
+    - gorountine **❌拼写错误，正确答案：goroutine（以及 context 资源）**
 
 ## 二、判断题（正确的打√，错误的打×）
 
@@ -32,19 +32,19 @@
     - 错，可以没有
 
 2. `select` 的 case 可以执行任意类型的语句。（  ）
-    - 错，只能是 channel 读取
+    - 错，只能是 channel 读取 **❌不够准确，正确答案：错，只能是 channel 的发送或接收操作（<-ch 或 ch <- v）**
 
 3. 向已关闭的 channel 发送数据会导致 panic。（  ）
     - 对
 
 4. `WaitGroup` 可以重复使用，不需要重新创建。（  ）
-    - 不知道
+    - 不知道 **❌有误，正确答案：√（WaitGroup 可以重复使用，但必须在 Wait 返回后才能再次使用）**
 
 5. `WaitGroup` 应该传递指针给 goroutine，而不是值。（  ）
     - 对，否则会形成两个互不相干的 waitGroup
 
 6. `context.WithValue` 返回的 context 也需要调用 cancel。（  ）
-    - 不知道
+    - 不知道 **❌有误，正确答案：×（WithValue 只返回 context，不返回 cancel 函数，因为它不涉及取消或超时）**
 
 7. 父 context 取消时，所有子孙 context 都会收到取消信号。（  ）
     - 对
@@ -64,15 +64,16 @@
     - 无 default 的是阻塞模式，select 会一直等待直到有一个 case 接收
         ```go
         select{
-            case: v1 := <-ch1
-            case: <-ch2
+            case: v1 := <-ch1  // **❌修正：case 后面没有冒号，应该是 case v1 := <-ch1:**
+                _ = v1
+            case: <-ch2       // **❌修正：case 后面没有冒号，应该是 case <-ch2:**
         }
         ```
     - 有 default 的是非阻塞模式，如果没有一个 case 可接收 select，会走 default 
         ```go
         select{
-            case: <-ch1
-            case: <-ch2
+            case <-ch1:  // **❌修正：case 后面没有冒号，应该是 case <-ch1:**
+            case <-ch2:  // **❌修正：case 后面没有冒号，应该是 case <-ch2:**
             default:
                 fmt.Println("no case matched")
         }

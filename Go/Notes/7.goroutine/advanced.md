@@ -245,6 +245,47 @@ defer cancel()
 ctx := context.WithValue(parent, key, value)
 ```
 
+### Context 的树状结构
+
+Context 在实际使用中一般**链式创建**，形成**树状结构**：
+
+```
+Background()
+    └── WithTimeout(5s)  // HTTP 请求 context
+            ├── WithCancel()  // 业务逻辑 A
+            │       └── WithValue()  // 传递用户 ID
+            └── WithTimeout(2s)  // 业务逻辑 B（更短的超时）
+```
+
+```go
+// 实际使用示例：HTTP 处理器中链式创建
+func handler(w http.ResponseWriter, r *http.Request) {
+    // r.Context() 是 HTTP 框架传入的 context（可能已有超时设置）
+    ctx := r.Context()
+    
+    // 基于传入的 context 创建子 context，添加更短的超时
+    ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+    defer cancel()
+    
+    // 继续传递 ctx 给下游函数...
+    result, err := processOrder(ctx, orderID)
+    // ...
+}
+
+func processOrder(ctx context.Context, orderID string) (*Order, error) {
+    // 基于传入的 ctx 再创建子 context，用于数据库操作
+    ctx, cancel := context.WithTimeout(ctx, 500*time.Millisecond)
+    defer cancel()
+    
+    return db.QueryOrder(ctx, orderID)
+}
+```
+
+**关键点**：
+- 子 context 继承父 context 的取消信号和截止时间
+- 父 context 取消时，**所有子孙 context** 都会收到取消信号
+- 子 context 的超时/取消**不会**影响父 context
+
 ### 取消信号传播
 
 ```go
@@ -472,6 +513,93 @@ func main() {
 | 主动取消 goroutine | `context.WithCancel` |
 | 传递请求元数据 | `context.WithValue` |
 
+### 不调用 cancel() 的后果
+
+#### 1. Goroutine 泄漏
+
+```go
+// ❌ 错误示例：忘记 cancel 导致泄漏
+func doSomething() {
+    ctx, cancel := context.WithCancel(context.Background())
+    // defer cancel()  // 忘记调用！
+    
+    go worker(ctx)  // worker 会一直阻塞等待 ctx.Done()
+    // 函数返回，但 worker goroutine 永远不会退出
+}
+```
+
+**泄漏原理**：
+
+```
+WithCancel 内部实现简图：
+
+parentCtx ──┬──► childCtx (返回的 ctx)
+            │
+            └──► goroutine: 监听 parent 的 Done()
+                     │
+                     ▼
+                当 parent 取消时，关闭 child 的 done channel
+                当 cancel() 被调用时，关闭 child 的 done channel
+```
+
+- `WithCancel`/`WithTimeout`/`WithDeadline` 内部会创建一个新的 goroutine
+- 这个 goroutine 负责监听父 context 的取消信号，并传播给子 context
+- **如果不调用 `cancel()`，这个内部 goroutine 会一直阻塞等待，无法被 GC 回收**
+
+#### 2. 定时器资源泄漏
+
+```go
+// ❌ 错误示例：即使超时自动触发，也需要 cancel
+func query() {
+    ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+    // 超时后返回，但内部的 time.Timer 资源未释放！
+    
+    db.Query(ctx, sql)
+}  // 函数返回，但定时器还在后台运行
+```
+
+**原理**：`WithTimeout` 内部使用 `time.AfterFunc` 创建定时器，需要调用 `cancel()` 来停止定时器，释放资源。
+
+#### 3. 正确的做法
+
+```go
+// ✅ 正确示例：使用 defer 确保 cancel 被调用
+func doSomething() {
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()  // 确保调用，防止泄漏
+    
+    go worker(ctx)
+    // ... 其他逻辑
+}  // 函数返回时自动调用 cancel()
+
+// ✅ 对于可能提前返回的函数，defer 尤其重要
+func process(ctx context.Context) error {
+    ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+    defer cancel()  // 无论哪个分支返回，都能执行到
+    
+    if err := step1(ctx); err != nil {
+        return err  // 这里也会调用 cancel()
+    }
+    if err := step2(ctx); err != nil {
+        return err  // 这里也会调用 cancel()
+    }
+    return nil
+}
+```
+
+#### 4. 特殊情况：可以不调用 cancel 吗？
+
+```go
+// 理论上可以不调用 cancel 的情况（但不推荐）：
+// 1. 程序即将退出（os.Exit 或 main 函数结束）
+// 2. 明确知道 parent context 会很快被取消
+
+// ❌ 即便如此，仍建议始终调用 cancel()：
+// - 代码可能被复用，无法保证 parent 一定会被取消
+// - 保持一致的编码习惯，避免遗漏
+// - 资源及时释放，减少不必要的开销
+```
+
 ### 常见错误
 
 ```go
@@ -515,10 +643,9 @@ case ch <- 1:        // case A: 发送成功
 
 **为什么会死锁？**
 
-1. `select` 选择 `case ch <- 1` 意味着**已经有接收方准备好**接收数据
-2. 但执行完 `ch <- 1` 后，数据已经被那个**隐式的接收方**取走了
-3. 接着执行 `<-ch` 时，channel 已空，且**没有发送方**，于是阻塞
-4. 由于这是单 goroutine，没有其他 goroutine 能向 ch 发送数据 → **死锁**
+1. `select` 选择 `case ch <- 1` 意味着**已经有接收方准备好**接收数据（但实际上并没有）
+2. case 内的 <-ch 永远不会执行
+3. 由于这是单 goroutine，没有其他 goroutine 能向 ch 发送数据 → **死锁**
 
 **正确的做法**：发送和接收应该在**不同的 goroutine** 中进行：
 

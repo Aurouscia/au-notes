@@ -50,7 +50,8 @@ func (m *MultiDownloader) downloadWithTimeout(url string, timeout time.Duration)
 	defer cancel()
 
 	resultCh := make(chan DownloadResult, 1)
-	m.download(url, resultCh)
+	// m.download(url, resultCh) // ❌有误：这里不应该是同步调用！否则会阻塞在这里等待，下面的 select 毫无意义
+	go m.download(url, resultCh) // 修复：在 goroutine 中执行下载，实现真正的并发超时控制
 
 	select {
 	case result := <-resultCh:
@@ -71,27 +72,40 @@ func (m *MultiDownloader) DownloadAll(timeout time.Duration) []DownloadResult {
 	// 2. 使用 WaitGroup 等待所有任务完成
 	// 3. 收集所有结果并返回
 
-	resultCh := make(chan DownloadResult, len(m.urls))
+	resultCh := make(chan DownloadResult, len(m.urls)) // ❌ 虽然无缓冲区不会死锁，但可能影响并发性能，最好设置缓冲区
 
 	wg := sync.WaitGroup{}
 	for _, u := range m.urls {
 		wg.Add(1)
 		go func() {
 			resultCh <- m.downloadWithTimeout(u, timeout)
-			// wg.Done() // 错误：不应该在这里done，而是应该在收集结果后 done，否则可能收集不全
+			// wg.Done() // ❌ 不应该在这里done，而是应该在收集结果后 done，否则可能收集不全（竞态条件）
 		}()
 	}
 
-	results := []DownloadResult{}
-	go func() {
-		for res := range resultCh {
-			// fmt.Printf("接收到结果：%s，是否有错误：%v\n", res.URL, res.Err != nil)
-			results = append(results, res)
-			wg.Done()
-		}
-	}()
+	// results := []DownloadResult{}
+	// go func() {
+	// 	  for res := range resultCh {
+	// 		  results = append(results, res)
+	// 		  wg.Done()
+	// 	  }
+	//    close(resultCh)
+	// }()
+	// wg.Wait() // ❌ for range resultCh 会一直阻塞，直到 resultCh 被关闭。但 close(resultCh) 在循环后面，循环不结束就执行不到
 
-	wg.Wait()
+	// 以下是正确的最佳实践：
+	// 1. 在专门的 goroutine 中 Wait，Wait 通过后说明任务完成，这时再关闭 channel
+	// 2. 在主 goroutine 中收集结果，杜绝线程不安全问题（确保切片和逻辑在同一个 goroutine 中）
+	go func() {
+		wg.Wait()
+		close(resultCh)
+	}()
+	results := []DownloadResult{}
+	for res := range resultCh {
+		results = append(results, res)
+		wg.Done()
+	}
+
 	return results
 }
 

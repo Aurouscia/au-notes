@@ -50,7 +50,7 @@
 - exam1-concepts.md：概念题（Channel 基础）✅ 已完成
 - exam2-practice/：实践题（并发素数筛）✅ 已完成
 - exam3-select-concepts.md：概念题（Select、WaitGroup、Context）✅ 需要加强（case 语法格式、WithValue 不返回 cancel、WaitGroup 可重复使用）
-- exam3-select-practice/：实践题（多路复用下载器）⏳ 待完成
+- exam4-select-practice/：实践题（多路复用下载器）✅ 需要加强（同步调用导致的超时失效、channel 关闭位置错误，Done 位置错误，goroutine 操作外部切片导致线程不安全问题）
 - exam4-context-practice/：实践题（可取消的任务队列）⏳ 待完成
 - exam5-fix-bug/：纠错题（找出并修复代码问题）⏳ 待完成
 - 状态：进行中

@@ -337,3 +337,13 @@ ch <- 1  // 阻塞，没有接收方
 - 一般并发任务：Channel
 
 Channel 是 Go 并发编程的精髓，优先使用 channel，只有在性能关键且能确保无竞态时才考虑共享内存。
+
+## 9.GC
+
+gc 会回收不再使用的 channel，所以一般情况下不 close 也不会泄漏。
+
+但 gc 不会回收卡住的 goroutine（由 runtime 持有）
+- 如果 goroutine 试图向一个没人接收的 channel 发送，它就会永远卡在那里，造成泄漏。
+- 解决方法
+    - 使用 context 设置取消信号
+    - 确保 channel 缓冲区足够大（一定能结束）

@@ -1,0 +1,190 @@
+# 考试 4：指针进阶概念
+
+## 一、填空题
+
+1. 以下代码的输出是 ______：
+   ```go
+   a := 10
+   b := 20
+   p1 := &a
+   p2 := &b
+   p1 = p2
+   *p1 = 100
+   fmt.Println(a, b)
+   ```
+
+2. 函数 `new(int)` 返回的是 ______ 类型，它分配的内存位于 ______（栈/堆）。
+
+3. 以下代码的输出是 ______：
+   ```go
+   var p *int
+   fmt.Println(p == nil)
+   ```
+
+4. 以下代码会 ______（正常运行/panic）：
+   ```go
+   var p *int
+   fmt.Println(*p)
+   ```
+
+5. 以下代码的输出是 ______：
+   ```go
+   x := 5
+   p := &x
+   fmt.Println(*p == x)
+   fmt.Println(p == &x)
+   ```
+
+---
+
+## 二、判断题（正确填✓，错误填✗）
+
+1. （ ）Go 语言中，指针的指针（`**int`）是合法的。
+
+2. （ ）以下代码会编译错误：
+   ```go
+   func getPtr() *int {
+       x := 10
+       return &x
+   }
+   ```
+
+3. （ ）`&` 运算符只能用于变量，不能用于常量或字面量。
+
+4. （ ）以下代码的输出是 `10 20`：
+   ```go
+   a, b := 10, 20
+   swap(&a, &b)
+   fmt.Println(a, b)
+   
+   func swap(x, y *int) {
+       x, y = y, x
+   }
+   ```
+
+5. （ ）`unsafe.Pointer` 可以进行任意的指针类型转换。
+
+---
+
+## 三、代码分析题
+
+### 第 1 题
+
+```go
+package main
+
+import "fmt"
+
+func modify(p *int) {
+    *p = 100
+    p = nil
+}
+
+func main() {
+    x := 10
+    p := &x
+    modify(p)
+    fmt.Println(x, p == nil)
+}
+```
+
+输出是：________
+
+### 第 2 题
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    arr := [3]int{1, 2, 3}
+    p := &arr[0]
+    fmt.Println(*p)
+    p++
+    fmt.Println(*p)
+}
+```
+
+这段代码会：________（编译错误/正常运行，输出是什么）
+
+### 第 3 题
+
+```go
+package main
+
+import "fmt"
+
+type Person struct {
+    Name string
+    Age  int
+}
+
+func (p Person) Birthday() {
+    p.Age++
+}
+
+func (p *Person) RealBirthday() {
+    p.Age++
+}
+
+func main() {
+    person := Person{Name: "Alice", Age: 20}
+    person.Birthday()
+    fmt.Println(person.Age)
+    person.RealBirthday()
+    fmt.Println(person.Age)
+}
+```
+
+输出是：________
+
+### 第 4 题
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    s := []int{1, 2, 3}
+    p := &s[1]
+    *p = 100
+    fmt.Println(s)
+    s = append(s, 4)
+    *p = 200
+    fmt.Println(s)
+}
+```
+
+输出是：________
+
+---
+
+## 四、简答题
+
+1. 解释以下代码中 `p` 的变化，并说明最终输出：
+   ```go
+   x, y := 1, 2
+   p := &x
+   q := &y
+   r := p
+   p = q
+   *r = 10
+   fmt.Println(x, y, *p)
+   ```
+
+2. 以下代码有什么问题？如何修复？
+   ```go
+   func appendValue(s []int, v int) {
+       s = append(s, v)
+   }
+   
+   func main() {
+       s := []int{1, 2, 3}
+       appendValue(s, 4)
+       fmt.Println(s)
+   }
+   ```
+
+3. 编写一个函数 `swap`，交换两个 `int` 变量的值，要求使用指针实现。

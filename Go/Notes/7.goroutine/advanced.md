@@ -380,6 +380,10 @@ func handler(ctx context.Context) {
 
 > **注意**：Context 值用于传递请求作用域的数据（如 traceID、userID），不要用于传递可选参数。
 
+### 惯例
+
+函数如果有 context 参数，应该是第一个参数
+
 ---
 
 ## 4. 综合示例：任务队列

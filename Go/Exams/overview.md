@@ -15,12 +15,14 @@
 - exam4-array-slice-practice/：数组与切片实践题 ✅ 已完成
 - exam5-struct-concepts.md：结构体概念题 ✅ 需要加强（值接收者方法无法修改原结构体）
 - exam6-struct-practice/：结构体实践题 ✅ 已完成
+- exam7-advanced-concepts/：进阶概念题 ✅ 已完成（多行 const 的格式错误）
 - 状态：已完成
 
 ## 3.control-flow - 流程控制
 
 - exam1-concepts.md：概念题 ✅ 需要加强（switch case 规则、fallthrough 行为、for-range 语法细节）
 - exam2-practice/：实践题（猜数字游戏）✅ 优秀
+- exam3-advanced-concepts.md：进阶概念题 ✅ 需要加强（for-range 字符串字节索引、for 内部的 defer 执行顺序）
 - 状态：已完成
 
 ## 4.pointer - 指针

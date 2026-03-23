@@ -85,30 +85,39 @@ func consumer4(ch <-chan int, wg *sync.WaitGroup) {
 func problem4() {
 	fmt.Println("\n=== 题目 4 ===")
 	ch := make(chan int)
-	var wg sync.WaitGroup
+	var wgSend sync.WaitGroup
+	var wgRecieve sync.WaitGroup
 
-	wg.Add(1)
-	go producer4(ch, &wg)
+	wgSend.Add(1)
+	go producer4(ch, &wgSend)
 
-	wg.Add(1)
-	go consumer4(ch, &wg)
+	wgRecieve.Add(1)
+	go consumer4(ch, &wgRecieve)
 
-	wg.Wait()
+	wgSend.Wait()
 	close(ch)
+	wgRecieve.Wait() // 修复方法：分两个 waitGroup，并把接收的 wait 放到 close 后，否则 consumer 会无限等待下去，永远不释放 waitGroup
 
 	fmt.Println("Done")
 }
 
 // ========== 题目 5：Context 值传递错误 ==========
+
+// 定义 key 类型
+type contextKey string
+
+const userIDKey contextKey = "userID"
+
 func handler5(ctx context.Context) {
 	// 设置用户 ID
-	ctx = context.WithValue(ctx, "userID", "12345")
+	ctx = context.WithValue(ctx, userIDKey, "12345") // 这里需要使用专用的 contextKey 类型（虽然底层是 string，但是它的值不能被字符串字面量代替）
 
 	process5(ctx)
 }
 
 func process5(ctx context.Context) {
-	if userID := ctx.Value("userID"); userID != nil {
+	// 注意：这里使用了 userIDKey 来获取值
+	if userID := ctx.Value(userIDKey); userID != nil {
 		fmt.Println("UserID:", userID)
 	} else {
 		fmt.Println("UserID not found")
@@ -128,8 +137,8 @@ func main() {
 	problem1()
 	problem2()
 	problem3()
-	// problem4()
-	// problem5()
+	problem4()
+	problem5()
 
-	fmt.Println("请取消注释运行各个题目")
+	// fmt.Println("请取消注释运行各个题目")
 }

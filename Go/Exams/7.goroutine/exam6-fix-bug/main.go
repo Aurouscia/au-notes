@@ -10,8 +10,9 @@ import (
 // ========== 题目 1：Select 死锁 ==========
 func problem1() {
 	fmt.Println("=== 题目 1 ===")
-	ch := make(chan int)
-	
+	// ch := make(chan int)
+	ch := make(chan int, 1) // 解决方法：添加缓冲区
+
 	select {
 	case ch <- 1:
 		fmt.Println("sent")
@@ -21,7 +22,7 @@ func problem1() {
 }
 
 // ========== 题目 2：WaitGroup 计数错误 ==========
-func worker2(id int, wg sync.WaitGroup) {
+func worker2(id int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Printf("Worker %d starting\n", id)
 	time.Sleep(time.Second)
@@ -31,20 +32,22 @@ func worker2(id int, wg sync.WaitGroup) {
 func problem2() {
 	fmt.Println("\n=== 题目 2 ===")
 	var wg sync.WaitGroup
-	
+
 	for i := 1; i <= 3; i++ {
-		go worker2(i, wg)
+		wg.Add(1)          // 解决方法：在 go 之前 wg.Add(1)
+		go worker2(i, &wg) // 解决方法：传入 wg 的指针而不是值
 	}
-	
+
 	wg.Wait()
 	fmt.Println("All workers finished")
 }
 
 // ========== 题目 3：Context 泄漏 ==========
-func process3(ctx context.Context) error {
-	// 创建子 context，但忘记 cancel
-	ctx, _ = context.WithTimeout(ctx, 2*time.Second)
-	
+func process3(ctx context.Context, wg *sync.WaitGroup) error {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel() // 解决方法：defer cancel
+	defer wg.Done()
+
 	select {
 	case <-time.After(3 * time.Second):
 		return fmt.Errorf("timeout")
@@ -55,10 +58,12 @@ func process3(ctx context.Context) error {
 
 func problem3() {
 	fmt.Println("\n=== 题目 3 ===")
+	wg := sync.WaitGroup{}
 	for i := 0; i < 1000; i++ {
 		ctx := context.Background()
-		process3(ctx)
+		go process3(ctx, &wg)
 	}
+	wg.Wait()
 	fmt.Println("Done")
 }
 
@@ -81,16 +86,16 @@ func problem4() {
 	fmt.Println("\n=== 题目 4 ===")
 	ch := make(chan int)
 	var wg sync.WaitGroup
-	
+
 	wg.Add(1)
 	go producer4(ch, &wg)
-	
+
 	wg.Add(1)
 	go consumer4(ch, &wg)
-	
+
 	wg.Wait()
 	close(ch)
-	
+
 	fmt.Println("Done")
 }
 
@@ -98,7 +103,7 @@ func problem4() {
 func handler5(ctx context.Context) {
 	// 设置用户 ID
 	ctx = context.WithValue(ctx, "userID", "12345")
-	
+
 	process5(ctx)
 }
 
@@ -119,12 +124,12 @@ func problem5() {
 func main() {
 	// 依次运行每个题目，观察问题
 	// 注意：部分题目可能导致死锁或 panic
-	
-	// problem1()
-	// problem2()
-	// problem3()
+
+	problem1()
+	problem2()
+	problem3()
 	// problem4()
 	// problem5()
-	
+
 	fmt.Println("请取消注释运行各个题目")
 }

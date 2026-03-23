@@ -23,7 +23,7 @@
    var p *int
    fmt.Println(p == nil)
    ```
-    - 不知道
+    - true（未初始化的指针是 nil）
 
 4. 以下代码会 ______（正常运行/panic）：
    ```go
@@ -120,7 +120,7 @@ func main() {
 ```
 
 这段代码会：________（编译错误/正常运行，输出是什么）
-- 编译错误（不能 `&arr[0]`）
+- 编译错误（不能进行指针运算）
 
 ### 第 3 题
 
@@ -174,6 +174,8 @@ func main() {
 ```
 
 输出是：________
+- 1 100 3
+- 1 100 3 4
 
 ---
 
@@ -189,6 +191,9 @@ func main() {
    *r = 10
    fmt.Println(x, y, *p)
    ```
+    - 一开始 p 指向 x
+    - 然后 p 改为指向 y
+    - 输出为 10 2 2
 
 2. 以下代码有什么问题？如何修复？
    ```go
@@ -202,5 +207,12 @@ func main() {
        fmt.Println(s)
    }
    ```
+    - appendValue 函数中 s 被替换，没有修改 main 中的 s
+    - 修复：改为 `appendValue(s *[]int, v int)`，调用时 `appendValue(&s, 4)`
 
 3. 编写一个函数 `swap`，交换两个 `int` 变量的值，要求使用指针实现。
+    ```go
+    func swap(x *int, y *int){
+        *x, *y = *y, *x
+    }
+    ```

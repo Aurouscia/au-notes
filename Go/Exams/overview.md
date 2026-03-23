@@ -30,6 +30,7 @@
 - exam1-concepts.md：概念题 ✅ 已完成
 - exam2-practice/：实践题 ✅ 已完成（修正了 for-range 用法）
 - exam3-fix-bug/：纠错题 ✅ 已完成
+- exam4-advanced-concepts.md：进阶概念题 ✅ 需要加强（`new()`内存分配机制、逃逸分析、`&`运算符适用范围、`unsafe.Pointer`概念）
 - 状态：已完成
 
 ## 5.function - 函数

@@ -60,6 +60,7 @@ func problem3() {
 	fmt.Println("\n=== 题目 3 ===")
 	wg := sync.WaitGroup{}
 	for i := 0; i < 1000; i++ {
+		wg.Add(1) // ❌忘记了 wg.Add(1)，导致 wg.Wait 直接离开
 		ctx := context.Background()
 		go process3(ctx, &wg)
 	}

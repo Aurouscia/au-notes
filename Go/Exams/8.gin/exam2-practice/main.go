@@ -1,6 +1,7 @@
 package main
 
 import (
+	"exam2-practice/middlewares"
 	"exam2-practice/utils"
 	"net/http"
 	"strconv"
@@ -29,7 +30,9 @@ var storage = make(map[int]*User, 10) // 线程不安全，无法并发
 var mu = sync.Mutex{}
 
 func main() {
-	g := gin.Default()
+	g := gin.New()
+	g.Use(gin.Recovery())
+	g.Use(middlewares.MyLogger())
 
 	g.GET("/users", getUsers)
 	g.GET("/users/:id", getOneUser)
@@ -43,10 +46,18 @@ func main() {
 func getUsers(ctx *gin.Context) {
 	mu.Lock()
 	defer mu.Unlock()
-	res := make([]User, len(storage)) // 注意第一个是 len 第二个是 cap
-	for idx, u := range storage {
-		res[idx] = *u
+
+	// ❌ 该写法有问题：for-range 一个 map，第一返回值是 key，不能作为切片的 index 使用！
+	// res := make([]User, len(storage)) // 注意第一个是 len 第二个是 cap
+	// for idx, u := range storage {
+	// 	res[idx] = *u
+	// }
+
+	res := make([]User, 0, len(storage))
+	for _, u := range storage {
+		res = append(res, *u)
 	}
+
 	utils.CreateResponseSuccess(ctx, res)
 }
 
@@ -93,7 +104,8 @@ func updateUser(ctx *gin.Context) {
 	}
 
 	newU := User{}
-	if err := ctx.ShouldBindJSON(newU); err != nil {
+	// ❌ 记得 Bind 要修改原 struct，必须传入指针而不是本体
+	if err := ctx.ShouldBindJSON(&newU); err != nil {
 		utils.CreateResponseFailed(ctx, http.StatusBadRequest, "user json invalid")
 		return
 	}

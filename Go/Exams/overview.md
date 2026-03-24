@@ -60,6 +60,6 @@
 
 ## 8.gin - Gin Web 框架
 
-- exam1-concepts.md：概念题（Gin 基础）⏳ 进行中
-- exam2-practice/：实践题（用户管理系统 API）⏳ 进行中
-- 状态：进行中
+- exam1-concepts.md：概念题（Gin 基础）✅ 需要加强（中间件返回值类型）
+- exam2-practice/：实践题（用户管理系统 API）✅ 已完成
+- 状态：已完成

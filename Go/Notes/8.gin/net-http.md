@@ -32,6 +32,9 @@ func main() {
 }
 ```
 
+> 注意：`http.ResponseWriter`不需要星号，这是由于它是接口，不是结构体（和 `context.Context` 不需要星号一个道理  
+> 接口变量本身就包含一个指针，指向实际的数据，所以传递接口时，已经在传递引用了
+
 ### http.HandleFunc 详解
 
 ```go

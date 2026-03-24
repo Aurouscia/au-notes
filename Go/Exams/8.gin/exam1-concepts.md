@@ -14,10 +14,11 @@
     - Query
 
 4. 在 Gin 中，中间件是一个返回 `________` 类型的函数。
-    - void
+    - void 
+    ❌ 中间件是一个返回 handler 的工厂函数，签名为 `func Middleware() gin.HandlerFunc`，返回值为 `gin.HandlerFunc`
 
 5. 使用 `c.________(&obj)` 可以将请求体自动绑定到结构体，并进行验证。
-    - ShouldBindJson
+    - ShouldBindJson ❌ JSON 是全大写：`ShouldBindJSON
 
 ## 二、判断题（正确填✅，错误填❌）
 
@@ -80,4 +81,40 @@
         r.Group("/api", Jwt()){
             ...
         }
+    ```
+
+    ❌ 完整版：
+    ```go
+    func main() {
+        r := gin.Default()  // 自带 Logger 和 Recovery
+        
+        // 1. 全局中间件（Logger 已通过 Default 添加）
+        
+        // 2. /api 路由组带 JWT 认证
+        api := r.Group("/api", JWTAuth())
+        {
+            api.GET("/users", getUsers)
+            api.POST("/users", createUser)
+            // ...
+        }
+        
+        // 3. /health 不需要认证，直接注册
+        r.GET("/health", healthCheck)
+        
+        r.Run()
+    }
+
+    // 中间件：返回一个 HandlerFunc 的函数
+    func JWTAuth() gin.HandlerFunc {
+        return func(c *gin.Context) {
+            // JWT 验证逻辑
+            token := c.GetHeader("Authorization")
+            if token == "" {
+                c.JSON(401, gin.H{"error": "unauthorized"})
+                c.Abort()
+                return
+            }
+            c.Next()
+        }
+    }
     ```

@@ -63,3 +63,9 @@
 - exam1-concepts.md：概念题（Gin 基础）✅ 需要加强（中间件返回值类型）
 - exam2-practice/：实践题（用户管理系统 API）✅ 已完成
 - 状态：已完成
+
+## 9.gorm - GORM 数据库操作
+
+- exam1-concepts.md：概念题（GORM 基础）⏳ 进行中
+- exam2-practice/：实践题（图书管理系统）⏳ 进行中
+- 状态：进行中

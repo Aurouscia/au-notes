@@ -484,3 +484,9 @@ db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
 | 排序 | `db.Order(field).Find()` |
 | 分页 | `db.Limit(n).Offset(m).Find()` |
 | 事务 | `db.Transaction(func(tx) error)` |
+
+### 注意事项
+
+- 使用`db`进行操作后，返回的也是其本身`db`，所以可以链式调用
+    - `db`有一个`Error`属性，如果出错了会把错误写到这，所以应该在操作结尾`.Error`，检查是否出错
+- 按约定，事务传入的函数应使用 `tx` 作为参数（其实也是 `*gorm.DB` 类型），且事务内只能操作 `tx`，不能操作外层的 `db`

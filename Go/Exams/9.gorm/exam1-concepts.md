@@ -19,10 +19,15 @@ type User struct {
 ```
 
 - `primaryKey`：
+    - 主键
 - `size:100`：
+    - 字符串长度 100
 - `not null`：
+    - 不能为 null
 - `uniqueIndex`：
+    - 唯一索引
 - `default:18`：
+    - 默认值为 18
 
 ---
 
@@ -31,14 +36,29 @@ type User struct {
 请写出完成以下操作的 GORM 代码：
 
 1. 创建一条 User 记录（Name="张三", Age=25）：
+    ```go
+    db.Create(&User{Name:"张三", Age:25})
+    ```
 
 2. 查询 ID=5 的用户：
+    ```go
+    db.Where(&User{ID:5}).First(&user)
+    ```
 
 3. 查询所有年龄大于 18 的用户：
+    ```go
+    db.Where("Age > ?", 18).Find(&users)
+    ```
 
 4. 将 ID=5 的用户年龄改为 30：
+    ```go
+    db.Where("ID = ?", 5).Update("Age", 30)
+    ```
 
 5. 删除 ID=5 的用户（软删除）：
+    ```go
+    db.Where("ID = ?", 5).Delete()
+    ```
 
 ---
 
@@ -47,8 +67,11 @@ type User struct {
 `First`、`Take`、`Last` 三个方法有什么区别？
 
 - First：
+    - 查询单个（写入结构体）
 - Take：
+    - 查询前几个（写入切片）
 - Last：
+    - 查询后几个（写入切片）
 
 ---
 
@@ -64,11 +87,15 @@ db.Where(&User{Name: "张三", Age: 0}).Find(&users)
 db.Where(map[string]interface{}{"name": "张三", "age": 0}).Find(&users)
 ```
 
+- 区别在于零值：结构体条件会忽略零值，Map 条件不会
+
 ---
 
 ## 第5题：Dialector
 
 `sqlite.Open("test.db")` 返回的是什么类型？它的作用是什么？
+- 返回的是`*sqlite.Dialector`，实现`gorm.Dialector`接口
+- 作用是把数据库操作翻译为特定的 SQL 方言，这里是 sqlite
 
 ---
 
@@ -77,14 +104,23 @@ db.Where(map[string]interface{}{"name": "张三", "age": 0}).Find(&users)
 请说明以下三种关联关系的区别，并各举一个生活中的例子：
 
 1. Has One（一对一）：
+    - 一个实体绑定另一个实体
+    - 例如：一个人只能拥有一张驾照，且一张驾照只能被一个人拥有
 2. Has Many（一对多）：
+    - 一个实体绑定多个实体
+    - 例如：一个人可以拥有多辆车，但一辆车只能被一个人拥有
 3. Many To Many（多对多）：
+    - 多个实体绑定多个实体（需要中间表）
+    - 例如：一个人可以投资多只股票，一只股票也可以被多人投资
 
 ---
 
 ## 第7题：Preload
 
 什么是 N+1 查询问题？Preload 如何解决它？
+
+- 例如：“先查询用户，再查询用户所有的订单”这种问题，会需要进行多次查询
+- Preload 使用 IN 表达式在一次查询中查出用户和订单
 
 ---
 
@@ -106,3 +142,5 @@ tx.Create(&user)
 tx.Create(&order)
 tx.Commit()
 ```
+- 第一种会捕获其中发生的异常自动回滚，但必须写在一个函数中完成开始和结束
+- 第二种需要手动处理异常，但比较灵活，开始和结束可以分在不同函数中

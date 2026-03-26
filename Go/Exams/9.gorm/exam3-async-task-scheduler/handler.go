@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

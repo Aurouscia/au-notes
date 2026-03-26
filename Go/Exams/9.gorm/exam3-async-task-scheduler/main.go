@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	// TODO: 初始化数据库连接
 	// 要求：
 	// 1. 使用 SQLite 内存模式或文件模式
 	// 2. 自动迁移 Task 模型
@@ -23,7 +22,9 @@ func main() {
 	db, err := initDB()
 	if err != nil {
 		log.Fatal("数据库初始化失败:", err)
+		return
 	}
+	log.Print("数据库初始化成功")
 
 	// TODO: 初始化任务调度器
 	// 要求：
@@ -35,7 +36,7 @@ func main() {
 	// 要求：
 	// 1. 创建 Gin 引擎
 	// 2. 创建 TaskHandler
-		// 3. 注册路由：
+	// 3. 注册路由：
 	//    - POST /api/tasks -> CreateTask
 	//    - GET /api/tasks/:id -> GetTask
 	//    - GET /api/tasks -> ListTasks
@@ -79,11 +80,12 @@ func main() {
 }
 
 // initDB 初始化数据库
-// TODO: 实现数据库初始化
 func initDB() (*gorm.DB, error) {
-	// 请在此处实现
-	// 提示：使用 sqlite.Open(":memory:") 或 sqlite.Open("tasks.db")
-	return nil, nil
+	db, err := gorm.Open(sqlite.Open(":memory:"))
+	if err != nil {
+		db.AutoMigrate()
+	}
+	return db, err
 }
 
 // setupRouter 设置路由

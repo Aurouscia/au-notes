@@ -15,14 +15,20 @@ const (
 )
 
 // Task 任务模型
-// TODO: 使用 GORM 标签定义模型
 // 要求：
 // 1. ID 为主键，自增
 // 2. Type 字段不为空
 // 3. Status 字段不为空，并添加索引
 // 4. Params 和 Result 使用合适的数据类型存储 JSON 字符串
 type Task struct {
-	// 请在此处实现
+	ID        uint   `gorm:"primary_key,auto_increment"`
+	Type      string `gorm:"not_null"`
+	Params    string
+	Status    string `gorm:"not_null,index"`
+	Result    string
+	Error     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // TaskRequest 任务请求结构体
@@ -33,14 +39,14 @@ type TaskRequest struct {
 
 // TaskResponse 任务响应结构体
 type TaskResponse struct {
-	ID        uint       `json:"id"`
-	Type      string     `json:"type"`
-	Params    string     `json:"params"`
-	Status    string     `json:"status"`
-	Result    string     `json:"result,omitempty"`
-	Error     string     `json:"error,omitempty"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	ID        uint      `json:"id"`
+	Type      string    `json:"type"`
+	Params    string    `json:"params"`
+	Status    string    `json:"status"`
+	Result    string    `json:"result,omitempty"`
+	Error     string    `json:"error,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // TaskStats 任务统计

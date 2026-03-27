@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"sync"
 	"time"
 
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ type TaskScheduler struct {
 	taskQueue   chan uint     // 任务 ID 队列
 	quit        chan struct{} // 退出信号
 	workerCount int           // Worker 数量
+	wg          *sync.WaitGroup
 }
 
 // NewTaskScheduler 创建任务调度器
@@ -28,6 +30,11 @@ func NewTaskScheduler(db *gorm.DB, workerCount int) *TaskScheduler {
 		taskQueue:   make(chan uint, 100),
 		quit:        make(chan struct{}),
 		workerCount: workerCount,
+		wg:          &sync.WaitGroup{},
+	}
+	for i := range workerCount {
+		ts.wg.Add(1)
+		go ts.worker(i)
 	}
 	return &ts
 }
@@ -49,37 +56,32 @@ func (s *TaskScheduler) SubmitTask(taskID uint) error {
 // 2. 收到 quit 信号时优雅退出
 // 3. 调用 processTask 处理任务
 func (s *TaskScheduler) worker(id int) {
-
-	//case <-time.After(time.Duration(30) * time.Second):
-	//panic(fmt.Sprintf("task %d stucked in worker %d", taskId))
+	defer s.wg.Done()
 
 	quit := false
-	stopQuitWatchCh := make(chan int, 1)
-	defer func() {
-		stopQuitWatchCh <- 1 //
-		stopQuitWatchCh.close()
-	}()
 
-	// 开一个 routine，监听 quit 信号
+	// 开一个 routine，监听 s.quit 的关闭信号
 	go func() {
-		select {
-		case q <- s.quit:
-			quit = true
-		case <-stopQuitWatchCh:
-			// 停止监听 quit，避免 routine 泄漏
+		for {
+			_, ok := <-s.quit
+			if !ok {
+				quit = true
+				break
+			}
 		}
 	}()
 
 Loop:
 	for {
-		resCh := make(chan error)
-		select {
-		case taskId := <-s.taskQueue:
-			select {
-			case resCh <- s.processTask(taskId):
-			}
-
-		case <-s.quit:
+		taskId, ok := <-s.taskQueue
+		if !ok {
+			break Loop
+		}
+		err := s.processTask(taskId)
+		if err != nil {
+			fmt.Printf("worker %d encountered error when processing task %d\n", id, taskId)
+		}
+		if quit {
 			break Loop
 		}
 	}
@@ -145,17 +147,13 @@ func (s *TaskScheduler) executeTaskLogic(taskType string, params string) (string
 }
 
 // Shutdown 优雅关闭调度器
-// TODO: 发送退出信号并等待 Worker 完成
 // 要求：
 // 1. 关闭 quit Channel 通知所有 Worker 退出
 // 2. 等待一小段时间让正在执行的任务完成
 // 3. 关闭 taskQueue
 func (s *TaskScheduler) Shutdown(ctx context.Context) error {
-	// 请在此处实现
+	close(s.quit)
+	s.wg.Wait()
+	close(s.taskQueue)
 	return nil
-}
-
-// randomSleep 随机睡眠（辅助函数）
-func randomSleep(min, max time.Duration) {
-	time.Sleep(min + time.Duration(rand.Float64()*float64(max-min)))
 }

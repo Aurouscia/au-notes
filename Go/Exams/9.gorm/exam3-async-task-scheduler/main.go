@@ -26,13 +26,11 @@ func main() {
 	}
 	log.Print("数据库初始化成功")
 
-	// TODO: 初始化任务调度器
 	// 要求：
 	// 1. 创建 TaskScheduler，Worker 数量设置为 3
 	// 2. 调度器会自动启动 Worker Goroutine
 	scheduler := NewTaskScheduler(db, 3)
 
-	// TODO: 初始化 HTTP 处理器和路由
 	// 要求：
 	// 1. 创建 Gin 引擎
 	// 2. 创建 TaskHandler
@@ -89,8 +87,29 @@ func initDB() (*gorm.DB, error) {
 }
 
 // setupRouter 设置路由
-// TODO: 实现路由设置
 func setupRouter(db *gorm.DB, scheduler *TaskScheduler) *gin.Engine {
-	// 请在此处实现
+	g := gin.Default()
+	g.POST("/api/tasks", func(ctx *gin.Context) {
+		task := Task{}
+		ctx.BindJSON(&task)
+		db.Create(&task)
+		scheduler.SubmitTask(task.ID)
+		ctx.JSON(http.StatusOK, task)
+	})
+	g.GET("/api/tasks/:id", func(ctx *gin.Context) {
+		task := Task{}
+		db.Find(&task, ctx.Param("id"))
+		ctx.JSON(http.StatusOK, task)
+	})
+	g.GET("/api/tasks", func(ctx *gin.Context) {
+		tasks := []Task{}
+		db.Find(&tasks)
+		ctx.JSON(http.StatusOK, tasks)
+	})
+	g.GET("/api/tasks/stats", func(ctx *gin.Context) {
+		var results any
+		db.Model(&Task{}).Select("ID, Status, count(*) as Total").Group("Status").Find(&results)
+		ctx.JSON(http.StatusOK, results)
+	})
 	return nil
 }

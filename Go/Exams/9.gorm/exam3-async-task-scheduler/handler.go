@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -31,20 +32,26 @@ func NewTaskHandler(db *gorm.DB, scheduler *TaskScheduler) *TaskHandler {
 // 3. 将任务 ID 提交到调度器队列
 // 4. 返回任务 ID 和初始状态
 func (h *TaskHandler) CreateTask(c *gin.Context) {
-	task := Task{}
-	err := c.BindJSON(&task)
+	taskReq := TaskRequest{}
+	err := c.BindJSON(&taskReq)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+	task := Task{
+		ID:     0,
+		Params: paramsToString(taskReq.Params),
+		Type:   taskReq.Type,
+		Status: "pending",
 	}
 	err = h.db.Create(&task).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = h.scheduler.SubmitTask(task.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, task)
@@ -59,13 +66,13 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 // 4. 返回任务详情
 func (h *TaskHandler) GetTask(c *gin.Context) {
 	task := Task{}
-	err := h.db.Find(&task, c.Param("id")).Error
+	err := h.db.First(&task, c.Param("id")).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	if task.ID == 0 {
-		c.Status(http.StatusNotFound)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, task)
@@ -93,6 +100,9 @@ func (h *TaskHandler) ListTasks(c *gin.Context) {
 	if convErr != nil {
 		pageSizeNum = 10
 	}
+
+	total :=
+		h.db.Model(&Task{}).Count()
 
 	q := h.db.Model(&Task{})
 	if status != "" {

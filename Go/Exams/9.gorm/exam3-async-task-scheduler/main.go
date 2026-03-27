@@ -80,8 +80,8 @@ func main() {
 // initDB 初始化数据库
 func initDB() (*gorm.DB, error) {
 	db, err := gorm.Open(sqlite.Open(":memory:"))
-	if err != nil {
-		db.AutoMigrate()
+	if err == nil {
+		db.AutoMigrate(&Task{})
 	}
 	return db, err
 }
@@ -89,27 +89,12 @@ func initDB() (*gorm.DB, error) {
 // setupRouter 设置路由
 func setupRouter(db *gorm.DB, scheduler *TaskScheduler) *gin.Engine {
 	g := gin.Default()
-	g.POST("/api/tasks", func(ctx *gin.Context) {
-		task := Task{}
-		ctx.BindJSON(&task)
-		db.Create(&task)
-		scheduler.SubmitTask(task.ID)
-		ctx.JSON(http.StatusOK, task)
-	})
-	g.GET("/api/tasks/:id", func(ctx *gin.Context) {
-		task := Task{}
-		db.Find(&task, ctx.Param("id"))
-		ctx.JSON(http.StatusOK, task)
-	})
-	g.GET("/api/tasks", func(ctx *gin.Context) {
-		tasks := []Task{}
-		db.Find(&tasks)
-		ctx.JSON(http.StatusOK, tasks)
-	})
-	g.GET("/api/tasks/stats", func(ctx *gin.Context) {
-		var results any
-		db.Model(&Task{}).Select("ID, Status, count(*) as Total").Group("Status").Find(&results)
-		ctx.JSON(http.StatusOK, results)
-	})
-	return nil
+
+	handler := NewTaskHandler(db, scheduler)
+
+	g.POST("/api/tasks", handler.CreateTask)
+	g.GET("/api/tasks/:id", handler.GetTask)
+	g.GET("/api/tasks", handler.ListTasks)
+	g.GET("/api/tasks/stats", handler.GetTaskStats)
+	return g
 }

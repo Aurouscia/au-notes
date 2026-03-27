@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -22,7 +24,6 @@ func NewTaskHandler(db *gorm.DB, scheduler *TaskScheduler) *TaskHandler {
 }
 
 // CreateTask 创建任务
-// TODO: 实现任务提交接口
 // POST /api/tasks
 // 要求：
 // 1. 绑定请求参数（type, params）
@@ -30,11 +31,26 @@ func NewTaskHandler(db *gorm.DB, scheduler *TaskScheduler) *TaskHandler {
 // 3. 将任务 ID 提交到调度器队列
 // 4. 返回任务 ID 和初始状态
 func (h *TaskHandler) CreateTask(c *gin.Context) {
-	// 请在此处实现
+	task := Task{}
+	err := c.BindJSON(&task)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err = h.db.Create(&task).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	err = h.scheduler.SubmitTask(task.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, task)
 }
 
 // GetTask 获取任务详情
-// TODO: 实现任务查询接口
 // GET /api/tasks/:id
 // 要求：
 // 1. 从 URL 参数获取任务 ID
@@ -42,11 +58,20 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 // 3. 如果任务不存在返回 404
 // 4. 返回任务详情
 func (h *TaskHandler) GetTask(c *gin.Context) {
-	// 请在此处实现
+	task := Task{}
+	err := h.db.Find(&task, c.Param("id")).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if task.ID == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+	c.JSON(http.StatusOK, task)
 }
 
 // ListTasks 获取任务列表
-// TODO: 实现任务列表接口
 // GET /api/tasks?status=&page=&page_size=
 // 要求：
 // 1. 获取查询参数：status（可选）、page（默认1）、page_size（默认10，最大100）
@@ -54,17 +79,46 @@ func (h *TaskHandler) GetTask(c *gin.Context) {
 // 3. 实现分页查询
 // 4. 返回任务列表和总数
 func (h *TaskHandler) ListTasks(c *gin.Context) {
-	// 请在此处实现
+	tasks := []Task{}
+	status := c.Query("status")
+	page := c.Query("page")
+	pageSize := c.Query("page_size")
+
+	pageNum, convErr := strconv.Atoi(page)
+	if convErr != nil {
+		pageNum = 1
+	}
+	pageIndex := pageNum - 1
+	pageSizeNum, convErr := strconv.Atoi(pageSize)
+	if convErr != nil {
+		pageSizeNum = 10
+	}
+
+	q := h.db.Model(&Task{})
+	if status != "" {
+		q = q.Where("status = ?", status)
+	}
+	q = q.Offset(pageIndex * pageSizeNum).Limit(pageSizeNum)
+	err := q.Find(&tasks).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, tasks)
 }
 
 // GetTaskStats 获取任务统计
-// TODO: 实现任务统计接口
 // GET /api/tasks/stats
 // 要求：
 // 1. 使用 GORM 的 Count 方法统计各状态任务数量
 // 2. 返回统计结果
 func (h *TaskHandler) GetTaskStats(c *gin.Context) {
-	// 请在此处实现
+	var results any
+	err := h.db.Model(&Task{}).Select("Status, count(*) as Total").Group("Status").Find(&results).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+	}
+	c.JSON(http.StatusOK, results)
 }
 
 // paramsToString 将 map 转换为 JSON 字符串（辅助函数）

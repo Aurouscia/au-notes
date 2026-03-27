@@ -21,10 +21,10 @@ const (
 // 3. Status 字段不为空，并添加索引
 // 4. Params 和 Result 使用合适的数据类型存储 JSON 字符串
 type Task struct {
-	ID        uint   `gorm:"primary_key,auto_increment"`
-	Type      string `gorm:"not_null"`
+	ID        uint   `gorm:"primary_key;auto_increment"` // ❌ 注意标签的分隔是分号
+	Type      string `gorm:"not null"`                   // ❌ not null 中间没有空格
 	Params    string
-	Status    string `gorm:"not_null,index"`
+	Status    string `gorm:"not null;index"`
 	Result    string
 	Error     string
 	CreatedAt time.Time

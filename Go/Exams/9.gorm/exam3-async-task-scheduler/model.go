@@ -21,8 +21,12 @@ const (
 // 3. Status 字段不为空，并添加索引
 // 4. Params 和 Result 使用合适的数据类型存储 JSON 字符串
 type Task struct {
-	ID        uint   `gorm:"primary_key;auto_increment"` // ❌ 注意标签的分隔是分号
-	Type      string `gorm:"not null"`                   // ❌ not null 中间没有空格
+	// ⚠️ GORM v2 中 auto_increment 是默认行为，不需要显式设置
+	// ⚠️ 使用 primaryKey 即可（注意大小写：primaryKey 不是 primary_key）
+	// 注：如果要写多个，应该使用分号隔开
+	ID uint `gorm:"primaryKey"`
+	// 修复：GORM 中非空约束使用 not null（带空格）
+	Type      string `gorm:"not null"`
 	Params    string
 	Status    string `gorm:"not null;index"`
 	Result    string

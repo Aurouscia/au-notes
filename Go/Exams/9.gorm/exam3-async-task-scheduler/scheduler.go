@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"gorm.io/gorm"
@@ -17,6 +18,7 @@ type TaskScheduler struct {
 	quit        chan struct{} // 退出信号
 	workerCount int           // Worker 数量
 	wg          *sync.WaitGroup
+	closed      int32 // 标记是否已关闭，使用 atomic 操作
 }
 
 // NewTaskScheduler 创建任务调度器
@@ -42,6 +44,10 @@ func NewTaskScheduler(db *gorm.DB, workerCount int) *TaskScheduler {
 // SubmitTask 提交任务到队列
 // 注意：使用 select 防止 Channel 满时阻塞，如果 Channel 已满返回错误
 func (s *TaskScheduler) SubmitTask(taskID uint) error {
+	// 检查调度器是否已关闭，避免向已关闭的 channel 写入导致 panic
+	if atomic.LoadInt32(&s.closed) == 1 {
+		return fmt.Errorf("调度器已关闭，无法提交任务 taskID: %d", taskID)
+	}
 	select {
 	case s.taskQueue <- taskID:
 	default:
@@ -58,31 +64,26 @@ func (s *TaskScheduler) SubmitTask(taskID uint) error {
 func (s *TaskScheduler) worker(id int) {
 	defer s.wg.Done()
 
-	quit := false
-
-	// 开一个 routine，监听 s.quit 的关闭信号
-	go func() {
-		for {
-			_, ok := <-s.quit
-			if !ok {
-				quit = true
-				break
-			}
-		}
-	}()
-
-Loop:
+	// ❌ 使用 select 同时监听 taskQueue 和 quit，避免使用额外的 goroutine 和共享变量
+	// 这样可以避免竞态条件（quit 变量没有同步保护）和 goroutine 泄漏
 	for {
-		taskId, ok := <-s.taskQueue
-		if !ok {
-			break Loop
-		}
-		err := s.processTask(taskId)
-		if err != nil {
-			fmt.Printf("worker %d encountered error when processing task %d\n", id, taskId)
-		}
-		if quit {
-			break Loop
+		// 虽然这个 select 可能继续执行，可能直接退出，但问题不大（这并非竞态条件，不会出bug）
+		// 可按需求将 <-s.quit 改为“drain掉所有剩余任务”
+		select {
+		case taskID, ok := <-s.taskQueue:
+			if !ok {
+				// Channel 已关闭，优雅退出
+				return
+			}
+			if err := s.processTask(taskID); err != nil {
+				// 最佳实践：使用结构化日志而不是 fmt.Printf
+				fmt.Printf("worker %d: failed to process task %d: %v\n", id, taskID, err)
+			}
+		case <-s.quit:
+			// 收到退出信号，处理完当前任务后退出
+			// 最佳实践：退出前清空队列中的任务（可选，取决于业务需求）
+			// 这里选择直接退出，让剩余任务在下次启动时处理或由其他机制处理
+			return
 		}
 	}
 }
@@ -97,22 +98,23 @@ Loop:
 func (s *TaskScheduler) processTask(taskID uint) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		var task Task
-		if err := tx.Find(&task, taskID).Error; err != nil {
+		// ⚠️ 使用 First 而不是 Find，First 在记录不存在时会返回 ErrRecordNotFound
+		if err := tx.First(&task, taskID).Error; err != nil {
 			return err
 		}
-		err := tx.Model(&task).Update("Status", "running").Error
-		if err != nil {
+		// ❌ 字段名应该使用小写的 "status" 而不是 "Status"（GORM 会自动处理，但保持一致性更好）
+		// 同时更新 UpdatedAt 字段
+		if err := tx.Model(&task).Update("status", "running").Error; err != nil {
 			return err
 		}
 		result, err := s.executeTaskLogic(task.Type, task.Params)
 		if err != nil {
-			_ = tx.Model(&task).Update("Status", "failed")
-			return err
+			// ❌ 失败时应该记录错误信息到 Error 字段
+			// 最佳实践：使用 Updates + 结构体 一次性更新多个字段，减少数据库操作
+			return tx.Model(&task).Updates(Task{Status: "failed", Error: err.Error()}).Error
 		}
-		// ❌ Update 会重置当前链式状态，多个 Update 不会合并为一个操作，要更新多个字段必须使用 Updates
-		// tx.Model(&task).Update("Status", "completed").Update("Result", result)
-		err = tx.Model(&task).Updates(Task{Status: "completed", Result: result}).Error
-		return err
+		// ❌ 使用 Updates 一次性更新状态和结果
+		return tx.Model(&task).Updates(Task{Status: "completed", Result: result}).Error
 	})
 }
 
@@ -152,8 +154,34 @@ func (s *TaskScheduler) executeTaskLogic(taskType string, params string) (string
 // 2. 等待一小段时间让正在执行的任务完成
 // 3. 关闭 taskQueue
 func (s *TaskScheduler) Shutdown(ctx context.Context) error {
-	close(s.quit)
-	s.wg.Wait()
+	// ⚠️ 最佳实践：
+
+	// 第1步：标记调度器已关闭，阻止新任务提交
+	// 这样可以确保 SubmitTask 在关闭过程中返回错误，而不是 panic
+	atomic.StoreInt32(&s.closed, 1)
+
+	// 第2步：关闭 taskQueue，阻止新任务进入队列
+	// 必须先关闭队列，再通知 Worker 退出，否则等待期间仍可能有新任务提交
 	close(s.taskQueue)
-	return nil
+
+	// 第3步：关闭 quit channel，通知所有 Worker 退出
+	close(s.quit)
+
+	// 第4步：使用 context 控制等待时间，等待所有 Worker 完成
+	// 开一个 goroutine 等待 waitGroup 归零，归零后设置 done
+	done := make(chan struct{})
+	go func() {
+		s.wg.Wait()
+		close(done)
+	}()
+
+	// 等待 done（所有 worker 退出）或超时
+	select {
+	case <-done:
+		// 所有 Worker 已退出
+		return nil
+	case <-ctx.Done():
+		// 超时，强制退出
+		return ctx.Err()
+	}
 }

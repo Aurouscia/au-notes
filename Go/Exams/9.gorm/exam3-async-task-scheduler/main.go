@@ -21,8 +21,9 @@ func main() {
 	// 3. 打印数据库初始化成功日志
 	db, err := initDB()
 	if err != nil {
+		// ⚠️最佳实践：log.Fatal 会调用 os.Exit(1) 终止程序，后面的 return 永远不会执行
+		// 应该去掉多余的 return 语句
 		log.Fatal("数据库初始化失败:", err)
-		return
 	}
 	log.Print("数据库初始化成功")
 
@@ -51,11 +52,17 @@ func main() {
 	go func() {
 		// 等待中断信号
 		quit := make(chan os.Signal, 1)
+		// ⚠️ 最佳实践：使用 signal.NotifyContext 可以更方便地处理信号和取消
+		// 使用 signal.Notify 将操作系统信号注册到指定的 channel，当程序接收到指定的信号时，信号会被发送到该 channel。
+		// SIGINT 中断信号
+		// SIGTERM 终止信号
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		<-quit
 		log.Println("正在关闭服务器...")
 
 		// 创建带超时的上下文
+		// 注意：这里使用同一个 ctx 先关闭调度器再关闭服务器，如果调度器关闭耗时较长，
+		// 可能会导致服务器关闭时 ctx 已经超时。建议分开处理或使用更长的超时时间。
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
@@ -65,6 +72,7 @@ func main() {
 		}
 
 		// 关闭 HTTP 服务器
+		// Shutdown 会优雅地关闭服务器，等待现有连接处理完成
 		if err := srv.Shutdown(ctx); err != nil {
 			log.Println("服务器关闭失败:", err)
 		}
@@ -79,11 +87,15 @@ func main() {
 
 // initDB 初始化数据库
 func initDB() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open(":memory:"))
-	if err == nil {
-		db.AutoMigrate(&Task{})
+	db, err := gorm.Open(sqlite.Open("tasks.db"))
+	if err != nil {
+		return nil, err
 	}
-	return db, err
+	// ❌ 检查 AutoMigrate 的错误返回值
+	if err := db.AutoMigrate(&Task{}); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 // setupRouter 设置路由

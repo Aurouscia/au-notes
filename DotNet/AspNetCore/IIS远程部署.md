@@ -13,6 +13,7 @@
     - 注意要先配置好iis，再安装整个webdeploy（否则先卸载再安装），不然iis配置文件不齐全
 5. 创建用户组MSDepSvcUsers，创建一个新用户放到这个组里
     - 或者使用iis自己的账户：[https://www.cnblogs.com/longbky/p/11884449.html]
+    - （可能需要）双击网站，中间会出现“xx主页”，管理-IIS管理器权限-右上角允许用户
 6. 给C:\Windows\System32\inetsrv\config添加EveryOne的读取权限
 7. 确保8172端口在windows防火墙和服务商防火墙都开着
 

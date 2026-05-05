@@ -13,12 +13,20 @@
 - slice.md ✅
 - fmt.md ✅
 - struct.md ✅
-- 复习次数：0
+- 复习次数：1
+
+### 复习试题
+- review1-concepts.md：针对薄弱环节的概念题（无类型常量、短变量声明复用、值接收者方法、结构体嵌入）
+- review1-practice/：购物车系统实践题（指针接收者、结构体嵌入、常量定义综合运用）
 
 ## 3.control-flow - 流程控制
 
 - basics.md ✅
-- 复习次数：0
+- 复习次数：1
+
+### 复习试题
+- review1-concepts.md：针对薄弱环节的概念题（for-range 字符串字节索引、switch/fallthrough、defer 执行顺序、标签与 break/continue）
+- review1-practice/：文本分析器实践题（for-range、switch、defer、标签综合运用）
 
 ## 4.pointer - 指针
 

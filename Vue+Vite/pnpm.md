@@ -4,9 +4,15 @@
 
 ## 配置
 
-可通过环境变量 `PNPM_HOME` `PNPM_STORE_DIR` 分别设置 pnpm 的全局包目录和存储目录
+可通过环境变量 `PNPM_HOME` 设置 pnpm 的全局包目录
 
 注意：全局包目录必须在 PATH 环境变量中，否则 pnpm 会拒绝安装全局包
+
+通过以下命令设置存储位置
+
+```sh
+pnpm config set store-dir /path/to/.pnpm-store
+```
 
 ## windows 特殊行为
 
